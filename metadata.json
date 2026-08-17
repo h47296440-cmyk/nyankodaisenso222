@@ -1,0 +1,6 @@
+{
+  "name": "にゃんこ大戦争 v1.0 (Battle Cats Web Edition)",
+  "description": "スマホ対応の横スクロールタワーディフェンスゲーム。単体攻撃・範囲攻撃の個性豊かなにゃんこ軍団を率いて日本編・未来編・宇宙編のステージを攻略！ガチャ・お宝・パワーアップ機能搭載。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

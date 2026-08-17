@@ -1,0 +1,202 @@
+export type AttackType = 'single' | 'area';
+
+export type Rarity = 'normal' | 'rare' | 'super_rare' | 'uber_rare';
+
+export type EnemyTrait = 'white' | 'red' | 'floating' | 'black' | 'alien' | 'angel' | 'boss';
+
+export interface UnitForm {
+  name: string;
+  jpName: string;
+  description: string;
+  hp: number;
+  attackPower: number;
+  attackRange: number; // in px
+  attackSpeed: number; // attacks per second
+  attackWindup: number; // seconds before damage registers
+  speed: number; // movement speed px/s
+  knockbacks: number; // total KB count
+  attackType: AttackType;
+  cost: number;
+  cooldown: number; // in seconds
+  scale?: number;
+  colorTheme?: string;
+  spriteType: string;
+  traitBonus?: {
+    trait: EnemyTrait;
+    multiplier: number;
+    effect?: 'strong' | 'massive_damage' | 'resist' | 'knockback';
+  };
+}
+
+export interface CatDefinition {
+  id: string;
+  rarity: Rarity;
+  forms: [UnitForm, UnitForm]; // Form 1 and Form 2 (Evolved)
+  unlockedAtStart?: boolean;
+  unlockCostXp?: number;
+  unlockCostCatFood?: number;
+}
+
+export interface EnemyDefinition {
+  id: string;
+  name: string;
+  description: string;
+  hp: number;
+  attackPower: number;
+  attackRange: number;
+  attackSpeed: number;
+  attackWindup: number;
+  speed: number;
+  knockbacks: number;
+  attackType: AttackType;
+  rewardMoney: number;
+  rewardXp: number;
+  traits: EnemyTrait[];
+  spriteType: string;
+  scale?: number;
+  isBoss?: boolean;
+}
+
+export interface ActiveEntity {
+  instanceId: string;
+  defId: string;
+  name: string;
+  isCat: boolean;
+  x: number; // 0 to battleFieldWidth (e.g. 1800)
+  y: number; // baseline
+  hp: number;
+  maxHp: number;
+  attackPower: number;
+  attackRange: number;
+  attackInterval: number; // seconds between attacks
+  attackTimer: number; // cooldown until next attack
+  attackWindupTimer: number; // timer during swing/charge
+  isWindupActive: boolean;
+  speed: number;
+  knockbackCount: number;
+  maxKnockbacks: number;
+  attackType: AttackType;
+  cost?: number;
+  traits?: EnemyTrait[];
+  spriteType: string;
+  scale: number;
+  formIndex: number; // 0 or 1 for cats
+  isBoss?: boolean;
+  
+  // Animation states
+  state: 'walk' | 'attack' | 'knockback' | 'die';
+  animTimer: number;
+  knockbackVelocityX: number;
+  knockbackTimer: number;
+  hitFlashTimer: number;
+}
+
+export interface DamageNumber {
+  id: string;
+  x: number;
+  y: number;
+  value: number;
+  isCritical?: boolean;
+  isCatDamage: boolean;
+  lifetime: number;
+  maxLifetime: number;
+}
+
+export interface VisualEffect {
+  id: string;
+  x: number;
+  y: number;
+  type: 'hit' | 'aoe_burst' | 'cannon_beam' | 'cannon_charge' | 'smoke' | 'sparkle' | 'crit_flash' | 'boss_roar';
+  lifetime: number;
+  maxLifetime: number;
+  scale?: number;
+  color?: string;
+  text?: string;
+}
+
+export type TreasureQuality = 'none' | 'bronze' | 'silver' | 'gold';
+
+export interface Treasure {
+  id: string;
+  stageId: string;
+  name: string;
+  effectDescription: string;
+  quality: TreasureQuality;
+  buffType: 'money_rate' | 'money_cap' | 'cat_hp' | 'cat_atk' | 'cannon_power' | 'cannon_charge' | 'xp_bonus' | 'speed_bonus';
+  buffValue: number; // percentage boost (e.g. 0.1 for 10%)
+}
+
+export interface StageWave {
+  timeSeconds: number; // seconds after match starts
+  enemyId: string;
+  count: number;
+  interval: number;
+  castleHpThreshold?: number; // spawns when enemy castle HP drops below this %
+  boss?: boolean;
+}
+
+export interface StageDefinition {
+  id: string;
+  chapterId: 'japan' | 'future' | 'cosmos';
+  stageNumber: number;
+  name: string;
+  jpName: string;
+  energyCost: number;
+  castleHp: number;
+  enemyCastleSprite: string;
+  bgType: 'japan_grass' | 'japan_city' | 'future_neon' | 'future_space' | 'cosmos_galaxy';
+  battlefieldWidth: number;
+  baseRewardXp: number;
+  baseRewardCatFood: number;
+  waves: StageWave[];
+  bossAlert?: string;
+}
+
+export interface ChapterDefinition {
+  id: 'japan' | 'future' | 'cosmos';
+  name: string;
+  jpName: string;
+  subtitle: string;
+  bannerBg: string;
+  unlockRequirement?: string;
+  stages: StageDefinition[];
+}
+
+export interface PlayerUpgrades {
+  workerCatRate: number; // 働きネコ仕事効率 (Lv 1-10)
+  workerCatWallet: number; // 働きネコお財布 (Lv 1-10)
+  cannonPower: number; // にゃんこ砲攻撃力 (Lv 1-10)
+  cannonCharge: number; // にゃんこ砲チャージ (Lv 1-10)
+  cannonRange: number; // にゃんこ砲射程 (Lv 1-10)
+  castleHealth: number; // お城体力 (Lv 1-10)
+  researchSpeed: number; // 研究力 (Lv 1-10)
+  accounting: number; // 会計力 (Lv 1-10)
+  leadershipCap: number; // 統率力上限 (Lv 1-10)
+}
+
+export interface PlayerCatProgress {
+  catId: string;
+  level: number; // 1 to 20
+  unlocked: boolean;
+  activeForm: number; // 0 or 1
+}
+
+export interface PlayerProfile {
+  xp: number;
+  catFood: number;
+  energy: number;
+  maxEnergy: number;
+  lastEnergyRefillTime: number;
+  deck: string[]; // 10 cat IDs
+  cats: Record<string, PlayerCatProgress>;
+  upgrades: PlayerUpgrades;
+  clearedStages: Record<string, { stars: number; highscore: number }>;
+  treasures: Record<string, TreasureQuality>;
+  items: {
+    speedUp: number;
+    catCpu: number;
+    treasureRadar: number;
+    richCat: number;
+  };
+  gachaPityCounter: number;
+}
