@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlayerProfile, StageDefinition, TreasureQuality } from './types';
+import { PlayerProfile, StageDefinition, TreasureQuality, BattleActiveItems } from './types';
 import { loadProfile, saveProfile, resetProfile } from './utils/storage';
 import { CHAPTERS } from './data/stages';
 import { TitleScreen } from './components/title/TitleScreen';
@@ -9,6 +9,11 @@ import { PowerUpScreen } from './components/upgrade/PowerUpScreen';
 import { GachaScreen } from './components/gacha/GachaScreen';
 import { TreasuresScreen } from './components/treasures/TreasuresScreen';
 import { CatEncyclopediaScreen } from './components/encyclopedia/CatEncyclopediaScreen';
+import { UpdateHistoryModal } from './components/updates/UpdateHistoryModal';
+import { DeveloperModeModal } from './components/dev/DeveloperModeModal';
+import { ChapterStoryModal } from './components/story/ChapterStoryModal';
+import { StorySelectModal } from './components/story/StorySelectModal';
+import { audio } from './utils/audio';
 
 type AppView = 'title' | 'map' | 'battle' | 'upgrade' | 'gacha' | 'treasures' | 'encyclopedia';
 
@@ -16,6 +21,22 @@ export default function App() {
   const [profile, setProfile] = useState<PlayerProfile>(loadProfile);
   const [currentView, setCurrentView] = useState<AppView>('title');
   const [activeStage, setActiveStage] = useState<StageDefinition | null>(null);
+  const [battleActiveItems, setBattleActiveItems] = useState<BattleActiveItems>({});
+  const [showUpdateHistory, setShowUpdateHistory] = useState(false);
+  const [showDevModal, setShowDevModal] = useState(false);
+  const [showStorySelectModal, setShowStorySelectModal] = useState(false);
+  const [activeStoryKey, setActiveStoryKey] = useState<string | null>(null);
+
+  // Sync BGM with current view
+  useEffect(() => {
+    if (currentView === 'title') {
+      audio.switchBgm('title');
+    } else if (currentView === 'battle') {
+      audio.switchBgm('battle');
+    } else {
+      audio.switchBgm('map');
+    }
+  }, [currentView]);
 
   // Sync profile to localStorage whenever it changes
   useEffect(() => {
@@ -26,6 +47,12 @@ export default function App() {
   useEffect(() => {
     const timer = setInterval(() => {
       setProfile((prev) => {
+        if (prev.devMode?.infiniteEnergy) {
+          return {
+            ...prev,
+            energy: 9999,
+          };
+        }
         const leadershipBonus = (prev.upgrades?.leadershipCap || 1) * 20;
         const maxE = 100 + leadershipBonus;
         if (prev.energy < maxE) {
@@ -47,17 +74,31 @@ export default function App() {
     setProfile((prev) => updater(prev));
   };
 
-  // Launch battle with selected stage
-  const handleSelectStage = (stage: StageDefinition) => {
-    if (profile.energy < stage.energyCost) return;
+  // Launch battle with selected stage & items
+  const handleSelectStage = (stage: StageDefinition, activeItems?: BattleActiveItems) => {
+    const isInfiniteEnergy = !!profile.devMode?.infiniteEnergy;
+    if (!isInfiniteEnergy && profile.energy < stage.energyCost) return;
 
-    // Deduct energy
+    const itemsToUse = activeItems || {};
+
+    // Deduct items if used
+    const updatedItems = { ...profile.items };
+    if (itemsToUse.speedUp) updatedItems.speedUp = Math.max(0, (updatedItems.speedUp || 0) - 1);
+    if (itemsToUse.treasureRadar) updatedItems.treasureRadar = Math.max(0, (updatedItems.treasureRadar || 0) - 1);
+    if (itemsToUse.richCat) updatedItems.richCat = Math.max(0, (updatedItems.richCat || 0) - 1);
+    if (itemsToUse.catCpu) updatedItems.catCpu = Math.max(0, (updatedItems.catCpu || 0) - 1);
+    if (itemsToUse.catJobs) updatedItems.catJobs = Math.max(0, (updatedItems.catJobs || 0) - 1);
+    if (itemsToUse.sniper) updatedItems.sniper = Math.max(0, (updatedItems.sniper || 0) - 1);
+
+    // Deduct energy & update items
     setProfile((prev) => ({
       ...prev,
-      energy: Math.max(0, prev.energy - stage.energyCost),
+      energy: isInfiniteEnergy ? 9999 : Math.max(0, prev.energy - stage.energyCost),
+      items: updatedItems,
     }));
 
     setActiveStage(stage);
+    setBattleActiveItems(itemsToUse);
     setCurrentView('battle');
   };
 
@@ -83,6 +124,15 @@ export default function App() {
       const nextClearedStages = { ...prev.clearedStages };
       if (result.victory) {
         nextClearedStages[activeStage.id] = true;
+
+        // Check if clearing final stage of a chapter to trigger Ending cutscene
+        if (activeStage.id === 'japan_12' || activeStage.id === 'japan_6') {
+          setTimeout(() => setActiveStoryKey('japan_ending'), 600);
+        } else if (activeStage.id === 'future_3') {
+          setTimeout(() => setActiveStoryKey('future_ending'), 600);
+        } else if (activeStage.id === 'cosmos_3') {
+          setTimeout(() => setActiveStoryKey('cosmos_ending'), 600);
+        }
       }
 
       return {
@@ -131,6 +181,8 @@ export default function App() {
           <TitleScreen
             onStartGame={() => setCurrentView('map')}
             onResetData={handleResetData}
+            onOpenUpdateHistory={() => setShowUpdateHistory(true)}
+            onOpenDevMode={() => setShowDevModal(true)}
           />
         )}
 
@@ -142,6 +194,9 @@ export default function App() {
             onOpenGacha={() => setCurrentView('gacha')}
             onOpenTreasures={() => setCurrentView('treasures')}
             onOpenEncyclopedia={() => setCurrentView('encyclopedia')}
+            onOpenUpdateHistory={() => setShowUpdateHistory(true)}
+            onOpenDevMode={() => setShowDevModal(true)}
+            onOpenStorySelect={() => setShowStorySelectModal(true)}
             onBackToTitle={() => setCurrentView('title')}
           />
         )}
@@ -150,6 +205,7 @@ export default function App() {
           <BattleScreen
             stage={activeStage}
             profile={profile}
+            activeItems={battleActiveItems}
             onBattleEnd={handleBattleEnd}
             onExit={() => setCurrentView('map')}
             onNextStage={nextStage ? handleNextStage : undefined}
@@ -185,6 +241,36 @@ export default function App() {
             onBack={() => setCurrentView('map')}
           />
         )}
+
+        {/* Global Update History Modal */}
+        {showUpdateHistory && (
+          <UpdateHistoryModal onClose={() => setShowUpdateHistory(false)} />
+        )}
+
+        {/* Story Selection Gallery Modal */}
+        <StorySelectModal
+          isOpen={showStorySelectModal}
+          profile={profile}
+          onClose={() => setShowStorySelectModal(false)}
+          onSelectStory={(storyKey) => {
+            setShowStorySelectModal(false);
+            setActiveStoryKey(storyKey);
+          }}
+        />
+
+        {/* Chapter Story Scroll Player Modal */}
+        <ChapterStoryModal
+          storyKey={activeStoryKey}
+          onClose={() => setActiveStoryKey(null)}
+        />
+
+        {/* Developer Mode Modal */}
+        <DeveloperModeModal
+          isOpen={showDevModal}
+          profile={profile}
+          onClose={() => setShowDevModal(false)}
+          onUpdateProfile={handleUpdateProfile}
+        />
       </div>
     </div>
   );

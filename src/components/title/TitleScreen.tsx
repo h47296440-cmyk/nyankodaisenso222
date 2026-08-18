@@ -1,14 +1,21 @@
 import React, { useEffect } from 'react';
 import { UnitSpriteRenderer } from '../battle/UnitSpriteRenderer';
-import { Play, Sparkles, Volume2, VolumeX, RotateCcw } from 'lucide-react';
+import { Play, Sparkles, Volume2, VolumeX, RotateCcw, Wrench } from 'lucide-react';
 import { audio } from '../../utils/audio';
 
 interface TitleScreenProps {
   onStartGame: () => void;
   onResetData: () => void;
+  onOpenUpdateHistory: () => void;
+  onOpenDevMode: () => void;
 }
 
-export const TitleScreen: React.FC<TitleScreenProps> = ({ onStartGame, onResetData }) => {
+export const TitleScreen: React.FC<TitleScreenProps> = ({
+  onStartGame,
+  onResetData,
+  onOpenUpdateHistory,
+  onOpenDevMode,
+}) => {
   const [soundEnabled, setSoundEnabled] = React.useState(true);
 
   const toggleSound = () => {
@@ -23,7 +30,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onStartGame, onResetDa
   };
 
   return (
-    <div className="relative w-full h-full bg-gradient-to-b from-sky-400 via-sky-200 to-amber-100 flex flex-col items-center justify-between p-6 select-none overflow-hidden font-['M_PLUS_Rounded_1c']">
+    <div className="relative w-full h-full bg-gradient-to-b from-sky-400 via-sky-200 to-amber-100 flex flex-col items-center justify-between p-4 sm:p-6 select-none overflow-hidden font-['M_PLUS_Rounded_1c']">
       {/* Sun & Clouds */}
       <div className="absolute top-8 left-12 w-28 h-28 bg-yellow-300 rounded-full blur-xl opacity-80 pointer-events-none" />
       <div className="absolute top-16 right-16 w-56 h-20 bg-white/80 rounded-full blur-sm pointer-events-none" />
@@ -31,14 +38,37 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onStartGame, onResetDa
 
       {/* Top Bar */}
       <div className="w-full flex justify-between items-center z-10">
-        <span className="text-xs font-black text-amber-900 bg-amber-200/80 px-3 py-1 rounded-full border border-amber-400 shadow">
-          Ver 1.0 正式リリース版
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            id="btn-title-update-history"
+            onClick={() => {
+              audio.playClick();
+              onOpenUpdateHistory();
+            }}
+            className="text-xs sm:text-sm font-black text-amber-950 bg-amber-200 hover:bg-amber-300 px-3 py-1.5 rounded-full border-2 border-amber-400 shadow-md flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+          >
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+            <span>Ver 1.1</span>
+            <span className="text-[10px] text-amber-800 font-bold ml-0.5">アップデート履歴</span>
+          </button>
+
+          <button
+            id="btn-title-dev-mode"
+            onClick={() => {
+              audio.playClick();
+              onOpenDevMode();
+            }}
+            className="text-xs sm:text-sm font-black text-stone-900 bg-amber-400 hover:bg-amber-300 px-3 py-1.5 rounded-full border-2 border-amber-600 shadow-md flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+          >
+            <Wrench size={14} className="text-stone-900" />
+            <span>開発者モード</span>
+          </button>
+        </div>
 
         <button
           id="btn-title-toggle-sound"
           onClick={toggleSound}
-          className="p-2 rounded-xl bg-stone-900/80 text-white border border-stone-700 shadow"
+          className="p-2 rounded-xl bg-stone-900/80 hover:bg-stone-800 text-white border border-stone-700 shadow"
         >
           {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} className="text-stone-500" />}
         </button>

@@ -42,8 +42,8 @@ export const CastleSpriteRenderer: React.FC<CastleProps> = ({
 
       {isPlayer ? (
         /* Player Cat Base (にゃんこ城) */
-        <div className="relative w-36 h-60">
-          <svg width="144" height="240" viewBox="0 0 144 240" className="drop-shadow-2xl">
+        <div className="relative w-28 h-44 sm:w-36 sm:h-56 flex items-end">
+          <svg viewBox="0 0 144 240" className="w-full h-full drop-shadow-2xl overflow-visible">
             {/* Castle Roof & Cat Cannon Turret */}
             <rect x="24" y="90" width="96" height="130" fill="#e2e8f0" stroke="#0f172a" strokeWidth="4" rx="6" />
             {/* Bricks */}
@@ -79,9 +79,9 @@ export const CastleSpriteRenderer: React.FC<CastleProps> = ({
         </div>
       ) : (
         /* Enemy Castle */
-        <div className="relative w-40 h-60">
+        <div className="relative w-32 h-44 sm:w-40 sm:h-56 flex items-end">
           {spriteType === 'castle_future' ? (
-            <svg width="160" height="240" viewBox="0 0 160 240" className="drop-shadow-2xl">
+            <svg viewBox="0 0 160 240" className="w-full h-full drop-shadow-2xl overflow-visible">
               {/* Future Cyber Fortress */}
               <polygon points="20,220 40,80 120,80 140,220" fill="#0f172a" stroke="#06b6d4" strokeWidth="4" />
               <polygon points="45,80 80,20 115,80" fill="#083344" stroke="#22d3ee" strokeWidth="3" />
@@ -93,7 +93,7 @@ export const CastleSpriteRenderer: React.FC<CastleProps> = ({
               <rect x="62" y="180" width="36" height="40" rx="4" fill="#083344" stroke="#06b6d4" strokeWidth="3" />
             </svg>
           ) : spriteType === 'castle_cosmos' ? (
-            <svg width="160" height="240" viewBox="0 0 160 240" className="drop-shadow-2xl">
+            <svg viewBox="0 0 160 240" className="w-full h-full drop-shadow-2xl overflow-visible">
               {/* Cosmic Portal Fortress */}
               <ellipse cx="80" cy="120" rx="60" ry="70" fill="#1e1b4b" stroke="#a855f7" strokeWidth="4" />
               <circle cx="80" cy="120" r="38" fill="#312e81" stroke="#ec4899" strokeWidth="3" strokeDasharray="6,4" className="animate-spin" />
@@ -102,7 +102,7 @@ export const CastleSpriteRenderer: React.FC<CastleProps> = ({
             </svg>
           ) : (
             /* Japan Enemy Shrine / Doge Castle */
-            <svg width="160" height="240" viewBox="0 0 160 240" className="drop-shadow-2xl">
+            <svg viewBox="0 0 160 240" className="w-full h-full drop-shadow-2xl overflow-visible">
               {/* Dark Pagoda Roofs */}
               <polygon points="10,90 80,40 150,90 130,100 80,60 30,100" fill="#dc2626" stroke="#0f172a" strokeWidth="3" />
               <polygon points="25,50 80,15 135,50 120,58 80,30 40,58" fill="#dc2626" stroke="#0f172a" strokeWidth="3" />

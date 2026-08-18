@@ -54,8 +54,16 @@ export function getDefaultPlayerProfile(): PlayerProfile {
       catCpu: 3,
       treasureRadar: 2,
       richCat: 2,
+      catJobs: 3,
+      sniper: 2,
     },
     gachaPityCounter: 0,
+    devMode: {
+      unlocked: false,
+      infiniteEnergy: false,
+      infiniteXp: false,
+      infiniteCatFood: false,
+    },
   };
 }
 

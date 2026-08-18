@@ -7,6 +7,7 @@ import {
   VisualEffect,
   TreasureQuality,
   AttackType,
+  BattleActiveItems,
 } from '../../types';
 import { CAT_DEFINITIONS, ENEMY_DEFINITIONS } from '../../data/units';
 import { TREASURES } from '../../data/stages';
@@ -18,6 +19,7 @@ import { audio } from '../../utils/audio';
 interface BattleScreenProps {
   stage: StageDefinition;
   profile: PlayerProfile;
+  activeItems?: BattleActiveItems;
   onBattleEnd: (result: {
     victory: boolean;
     xpEarned: number;
@@ -32,6 +34,7 @@ interface BattleScreenProps {
 export const BattleScreen: React.FC<BattleScreenProps> = ({
   stage,
   profile,
+  activeItems = {} as BattleActiveItems,
   onBattleEnd,
   onExit,
   onNextStage,
@@ -69,21 +72,47 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
   const basePlayerCastleHp = Math.round((2000 + castleHpLevel * 500) * treasureCatHpMult);
   const battlefieldWidth = stage.battlefieldWidth || 1800;
+  const playerCastleX = 100;
+  const enemyCastleX = battlefieldWidth - 140;
 
-  // Battle State
+  // Initial Rich Cat item setup
+  const initWorkerLvl = activeItems.richCat ? 8 : 1;
+  const initBaseCap = 500 + initWorkerLvl * 250 + (workerWalletLevel - 1) * 150;
+  const initMoney = activeItems.richCat ? Math.round(initBaseCap * treasureMoneyCapMult) : 100;
+
+  // Timers & Waves tracking
+  const battleTimeRef = useRef(0);
+  const sniperTimerRef = useRef(0);
+  const spawnedWaveIndicesRef = useRef<Set<number>>(new Set());
+  const spawnedThresholdWavesRef = useRef<Set<number>>(new Set());
+  const isTerminatedRef = useRef(false);
+
+  // Authoritative Simulation Refs (prevents React closure stale state)
+  const catsRef = useRef<ActiveEntity[]>([]);
+  const enemiesRef = useRef<ActiveEntity[]>([]);
+  const playerCastleHpRef = useRef(basePlayerCastleHp);
+  const enemyCastleHpRef = useRef(stage.castleHp);
+  const moneyRef = useRef(initMoney);
+  const cannonProgressRef = useRef(0);
+  const damageNumbersRef = useRef<DamageNumber[]>([]);
+  const visualEffectsRef = useRef<VisualEffect[]>([]);
+  const deckCooldownsRef = useRef<Record<string, number>>({});
+  const workerLevelRef = useRef(initWorkerLvl);
+
+  // React State for UI Rendering
   const [playerCastleHp, setPlayerCastleHp] = useState(basePlayerCastleHp);
   const [enemyCastleHp, setEnemyCastleHp] = useState(stage.castleHp);
-  const [workerLevel, setWorkerLevel] = useState(1);
-  const [money, setMoney] = useState(100);
+  const [workerLevel, setWorkerLevel] = useState(initWorkerLvl);
+  const [money, setMoney] = useState(initMoney);
   const [cannonProgress, setCannonProgress] = useState(0);
   const [isCannonFiring, setIsCannonFiring] = useState(false);
-  const [gameSpeed, setGameSpeed] = useState(1);
+  const [gameSpeed, setGameSpeed] = useState(activeItems.speedUp ? 2 : 1);
   const [isPaused, setIsPaused] = useState(false);
-  const [isAutoBattle, setIsAutoBattle] = useState(false);
+  const [isAutoBattle, setIsAutoBattle] = useState(!!activeItems.catCpu);
   const [cameraX, setCameraX] = useState(0);
   const [bossAlert, setBossAlert] = useState<string | null>(null);
 
-  // Entities & visual fx
+  // Entities & visual fx for UI
   const [cats, setCats] = useState<ActiveEntity[]>([]);
   const [enemies, setEnemies] = useState<ActiveEntity[]>([]);
   const [damageNumbers, setDamageNumbers] = useState<DamageNumber[]>([]);
@@ -106,12 +135,6 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     catFoodEarned: 0,
     treasureDropped: null,
   });
-
-  // Timers & Waves tracking
-  const battleTimeRef = useRef(0);
-  const spawnedWaveIndicesRef = useRef<Set<number>>(new Set());
-  const spawnedThresholdWavesRef = useRef<Set<number>>(new Set());
-  const isTerminatedRef = useRef(false);
 
   // Maximum Money based on worker level
   const baseCap = 500 + workerLevel * 250 + (workerWalletLevel - 1) * 150;
@@ -160,27 +183,22 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         battleTimeRef.current += dt;
 
         // 1. Money Generation
-        const ratePerSec = (15 + workerLevel * 12 + (workerRateLevel - 1) * 8) * treasureMoneyRateMult;
-        setMoney((prev) => Math.min(maxMoney, prev + ratePerSec * dt));
+        const ratePerSec = (15 + workerLevelRef.current * 12 + (workerRateLevel - 1) * 8) * treasureMoneyRateMult;
+        moneyRef.current = Math.min(maxMoney, moneyRef.current + ratePerSec * dt);
 
         // 2. Cannon Charging
         const cannonChargeRate = (1.5 + cannonChargeLevel * 0.4) * treasureCannonChargeMult;
-        setCannonProgress((prev) => Math.min(100, prev + cannonChargeRate * dt));
+        cannonProgressRef.current = Math.min(100, cannonProgressRef.current + cannonChargeRate * dt);
 
         // 3. Deck Cooldown countdowns
-        setDeckCooldowns((prev) => {
-          const next: Record<string, number> = {};
-          let changed = false;
-          Object.entries(prev).forEach(([id, rem]) => {
-            const remNum = Number(rem);
-            if (remNum > 0) {
-              const updated = Math.max(0, remNum - dt);
-              next[id] = updated;
-              changed = true;
-            }
-          });
-          return changed ? next : prev;
+        const nextCds: Record<string, number> = {};
+        Object.entries(deckCooldownsRef.current).forEach(([id, rem]) => {
+          const remNum = Number(rem);
+          if (remNum > 0) {
+            nextCds[id] = Math.max(0, remNum - dt);
+          }
         });
+        deckCooldownsRef.current = nextCds;
 
         // 4. Wave Spawner
         stage.waves.forEach((wave, idx) => {
@@ -192,14 +210,16 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
           // Castle HP threshold wave
           if (wave.castleHpThreshold && !spawnedThresholdWavesRef.current.has(idx)) {
-            const hpPercent = (enemyCastleHp / stage.castleHp) * 100;
+            const hpPercent = (enemyCastleHpRef.current / stage.castleHp) * 100;
             if (hpPercent <= wave.castleHpThreshold) {
               spawnedThresholdWavesRef.current.add(idx);
               spawnEnemy(wave.enemyId, wave.boss);
-              if (wave.boss && stage.bossAlert) {
-                setBossAlert(stage.bossAlert);
-                audio.playHit(true, true);
-                setTimeout(() => setBossAlert(null), 4000);
+              if (wave.boss) {
+                audio.playBossAlert();
+                if (stage.bossAlert) {
+                  setBossAlert(stage.bossAlert);
+                  setTimeout(() => setBossAlert(null), 4000);
+                }
               }
             }
           }
@@ -209,22 +229,57 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         updateEntities(dt);
 
         // 6. Update Visual Effects & Damage Numbers
-        setDamageNumbers((prev) =>
-          prev
-            .map((d) => ({ ...d, lifetime: d.lifetime + dt }))
-            .filter((d) => d.lifetime < d.maxLifetime)
-        );
+        damageNumbersRef.current = damageNumbersRef.current
+          .map((d) => ({ ...d, lifetime: d.lifetime + dt }))
+          .filter((d) => d.lifetime < d.maxLifetime);
 
-        setVisualEffects((prev) =>
-          prev
-            .map((fx) => ({ ...fx, lifetime: fx.lifetime + dt }))
-            .filter((fx) => fx.lifetime < fx.maxLifetime)
-        );
+        visualEffectsRef.current = visualEffectsRef.current
+          .map((fx) => ({ ...fx, lifetime: fx.lifetime + dt }))
+          .filter((fx) => fx.lifetime < fx.maxLifetime);
 
-        // 7. Auto-Battle Logic (ニャンピューター)
+        // 7. Sniper Item Automatic Support
+        if (activeItems.sniper && enemiesRef.current.length > 0) {
+          sniperTimerRef.current += dt;
+          if (sniperTimerRef.current >= 8.0) {
+            sniperTimerRef.current = 0;
+            // Find foremost enemy (closest to player castle, i.e. lowest X)
+            let foremostEnemy: ActiveEntity | null = null;
+            enemiesRef.current.forEach((en) => {
+              if (!foremostEnemy || en.x < foremostEnemy.x) {
+                foremostEnemy = en;
+              }
+            });
+
+            if (foremostEnemy) {
+              const target = foremostEnemy as ActiveEntity;
+              audio.playHit(true, true);
+              const sniperDmg = 450;
+              target.hp -= sniperDmg;
+              target.state = 'knockback';
+              target.knockbackTimer = 0.45;
+              target.knockbackVelocityX = 75; // Knock back towards right
+              target.hitFlashTimer = 0.3;
+              spawnFx(target.x, target.y + 20, 'hit');
+              spawnDamageNum(target.x, target.y + 35, sniperDmg, true, true);
+            }
+          }
+        }
+
+        // 8. Auto-Battle Logic (ニャンピューター)
         if (isAutoBattle) {
           handleAutoBattleTick();
         }
+
+        // 9. Synchronize ref state to React state for fluid rendering
+        setCats([...catsRef.current]);
+        setEnemies([...enemiesRef.current]);
+        setPlayerCastleHp(playerCastleHpRef.current);
+        setEnemyCastleHp(enemyCastleHpRef.current);
+        setMoney(moneyRef.current);
+        setCannonProgress(cannonProgressRef.current);
+        setDeckCooldowns({ ...deckCooldownsRef.current });
+        setDamageNumbers([...damageNumbersRef.current]);
+        setVisualEffects([...visualEffectsRef.current]);
       }
 
       animationFrameId = requestAnimationFrame(gameTick);
@@ -232,34 +287,25 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
     animationFrameId = requestAnimationFrame(gameTick);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [
-    isPaused,
-    gameSpeed,
-    workerLevel,
-    isAutoBattle,
-    battleResult.ended,
-    enemyCastleHp,
-    playerCastleHp,
-    maxMoney,
-  ]);
+  }, [isPaused, gameSpeed, isAutoBattle, battleResult.ended, maxMoney]);
 
   // Auto Battle AI
   const handleAutoBattleTick = () => {
     // 1. If money >= worker upgrade cost, upgrade worker first if below cap
-    if (workerLevel < maxWorkerLevel && money >= workerUpgradeCost) {
+    if (workerLevelRef.current < maxWorkerLevel && moneyRef.current >= workerUpgradeCost) {
       handleUpgradeWorker();
       return;
     }
 
     // 2. Fire cannon if ready
-    if (cannonProgress >= 100 && enemies.length > 2) {
+    if (cannonProgressRef.current >= 100 && enemiesRef.current.length > 2) {
       handleFireCannon();
       return;
     }
 
     // 3. Spawn available units from cheapest meatshield to big hitters
     for (const slot of deckSlotDefs) {
-      if (money >= slot.cost && slot.cooldownRemaining <= 0) {
+      if (moneyRef.current >= slot.cost && (deckCooldownsRef.current[slot.def.id] || 0) <= 0) {
         handleSpawnCat(slot.def.id);
         break;
       }
@@ -269,7 +315,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   // Spawn Cat Handler
   const handleSpawnCat = (catId: string) => {
     const slot = deckSlotDefs.find((s) => s.def.id === catId);
-    if (!slot || money < slot.cost || slot.cooldownRemaining > 0) return;
+    if (!slot || moneyRef.current < slot.cost || (deckCooldownsRef.current[catId] || 0) > 0) return;
 
     const form = slot.def.forms[slot.activeFormIndex];
     const catLevel = profile.cats[catId]?.level || 1;
@@ -281,7 +327,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       defId: catId,
       name: form.name,
       isCat: true,
-      x: 100, // spawn near player castle
+      x: playerCastleX, // spawn near player castle
       y: 0,
       hp: Math.round(form.hp * levelMult * treasureCatHpMult),
       maxHp: Math.round(form.hp * levelMult * treasureCatHpMult),
@@ -306,10 +352,11 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       hitFlashTimer: 0,
     };
 
-    setMoney((prev) => prev - form.cost);
-    setDeckCooldowns((prev) => ({ ...prev, [catId]: slot.maxCooldown }));
-    setCats((prev) => [...prev, newCat]);
-    audio.playCatSpawn();
+    moneyRef.current -= form.cost;
+    deckCooldownsRef.current[catId] = slot.maxCooldown;
+    catsRef.current.push(newCat);
+
+    audio.playCatSpawn(1.0, slot.def.rarity);
   };
 
   // Spawn Enemy Helper
@@ -320,7 +367,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       defId: enemyId,
       name: def.name,
       isCat: false,
-      x: battlefieldWidth - 140, // spawn near enemy castle
+      x: enemyCastleX, // spawn near enemy castle
       y: 0,
       hp: def.hp,
       maxHp: def.hp,
@@ -346,21 +393,23 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       hitFlashTimer: 0,
     };
 
-    setEnemies((prev) => [...prev, newEnemy]);
+    enemiesRef.current.push(newEnemy);
   };
 
   // Upgrade Worker Cat
   const handleUpgradeWorker = () => {
-    if (workerLevel >= maxWorkerLevel || money < workerUpgradeCost) return;
-    setMoney((prev) => prev - workerUpgradeCost);
-    setWorkerLevel((prev) => prev + 1);
+    if (workerLevelRef.current >= maxWorkerLevel || moneyRef.current < workerUpgradeCost) return;
+    moneyRef.current -= workerUpgradeCost;
+    workerLevelRef.current += 1;
+    setWorkerLevel(workerLevelRef.current);
     audio.playWorkerLevelUp();
   };
 
   // Fire Cat Cannon (にゃんこ砲)
   const handleFireCannon = () => {
-    if (cannonProgress < 100 || isCannonFiring) return;
+    if (cannonProgressRef.current < 100 || isCannonFiring) return;
     setIsCannonFiring(true);
+    cannonProgressRef.current = 0;
     setCannonProgress(0);
     audio.playCannonBlast();
 
@@ -368,21 +417,16 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
     // Blast effect and knockback to ALL active enemies
     setTimeout(() => {
-      setEnemies((prev) =>
-        prev.map((enemy) => {
-          const nextHp = enemy.hp - cannonDmg;
-          // Spawn damage number
-          spawnDamageNum(enemy.x, 30, cannonDmg, true, true);
-          return {
-            ...enemy,
-            hp: Math.max(0, nextHp),
-            state: 'knockback',
-            knockbackVelocityX: 200,
-            knockbackTimer: 0.5,
-            x: Math.min(battlefieldWidth - 100, enemy.x + 80),
-          };
-        })
-      );
+      enemiesRef.current.forEach((enemy) => {
+        const nextHp = Math.max(0, enemy.hp - cannonDmg);
+        enemy.hp = nextHp;
+        spawnDamageNum(enemy.x, 30, cannonDmg, true, true);
+        enemy.state = 'knockback';
+        enemy.knockbackVelocityX = 220;
+        enemy.knockbackTimer = 0.5;
+        enemy.x = Math.min(enemyCastleX, enemy.x + 80);
+        enemy.isWindupActive = false;
+      });
       setIsCannonFiring(false);
     }, 450);
   };
@@ -398,7 +442,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       lifetime: 0,
       maxLifetime: 0.8,
     };
-    setDamageNumbers((prev) => [...prev.slice(-20), newDmg]);
+    damageNumbersRef.current.push(newDmg);
   };
 
   const spawnFx = (x: number, y: number, type: VisualEffect['type'], color?: string) => {
@@ -411,135 +455,136 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       lifetime: 0,
       maxLifetime: 0.35,
     };
-    setVisualEffects((prev) => [...prev.slice(-15), newFx]);
+    visualEffectsRef.current.push(newFx);
   };
 
-  // Entity Simulation Update
+  // Entity Simulation Update (Frame-accurate ref-based physics)
   const updateEntities = (dt: number) => {
     // Check Victory / Defeat Conditions
-    if (enemyCastleHp <= 0 && !battleResult.ended) {
+    if (enemyCastleHpRef.current <= 0 && !battleResult.ended && !isTerminatedRef.current) {
       handleMatchEnd(true);
       return;
     }
-    if (playerCastleHp <= 0 && !battleResult.ended) {
+    if (playerCastleHpRef.current <= 0 && !battleResult.ended && !isTerminatedRef.current) {
       handleMatchEnd(false);
       return;
     }
 
     // 1. UPDATE CATS
-    setCats((currentCats) => {
-      return currentCats
-        .map((cat) => {
-          let c = { ...cat, animTimer: cat.animTimer + dt };
+    for (let i = 0; i < catsRef.current.length; i++) {
+      const cat = catsRef.current[i];
+      cat.animTimer += dt;
 
-          // Knockback handling
-          if (c.state === 'knockback') {
-            c.knockbackTimer -= dt;
-            c.x = Math.max(100, c.x - c.knockbackVelocityX * dt);
-            if (c.knockbackTimer <= 0) {
-              c.state = 'walk';
-            }
-            return c;
+      // Knockback handling
+      if (cat.state === 'knockback') {
+        cat.knockbackTimer -= dt;
+        cat.x = Math.max(playerCastleX, cat.x - cat.knockbackVelocityX * dt);
+        if (cat.knockbackTimer <= 0) {
+          cat.state = 'walk';
+        }
+        continue;
+      }
+
+      // Attack Cooldown
+      if (cat.attackTimer > 0) {
+        cat.attackTimer -= dt;
+      }
+
+      // Find living enemies ahead of this cat
+      const enemiesInFront = enemiesRef.current.filter((e) => e.hp > 0 && e.x >= cat.x - 15);
+      const closestEnemyX = enemiesInFront.length > 0 ? Math.min(...enemiesInFront.map((e) => e.x)) : enemyCastleX;
+      const targetDistance = Math.max(0, closestEnemyX - cat.x);
+
+      // Clamp position so cat NEVER passes enemy frontline
+      if (cat.x > closestEnemyX - 5) {
+        cat.x = Math.max(playerCastleX, closestEnemyX - 5);
+      }
+
+      if (targetDistance <= cat.attackRange) {
+        // Within range: Stop and attack
+        if (!cat.isWindupActive && cat.attackTimer <= 0) {
+          cat.isWindupActive = true;
+          cat.attackWindupTimer = 0.25;
+          cat.state = 'attack';
+        }
+
+        if (cat.isWindupActive) {
+          cat.attackWindupTimer -= dt;
+          if (cat.attackWindupTimer <= 0) {
+            executeCatAttack(cat);
+            cat.isWindupActive = false;
+            cat.attackTimer = cat.attackInterval;
+            cat.state = 'walk';
           }
-
-          // Cooldowns
-          if (c.attackTimer > 0) {
-            c.attackTimer -= dt;
-          }
-
-          // Target Detection: Enemy unit or Enemy Castle
-          // Find frontmost enemy in front of this cat
-          const enemiesInFront = enemies.filter((e) => e.x > c.x && e.hp > 0);
-          const enemyDistance = enemiesInFront.length > 0 ? Math.min(...enemiesInFront.map((e) => e.x - c.x)) : Infinity;
-          const castleDistance = (battlefieldWidth - 140) - c.x;
-          const targetDistance = Math.min(enemyDistance, castleDistance);
-
-          // If within attack range, attack!
-          if (targetDistance <= c.attackRange) {
-            if (!c.isWindupActive && c.attackTimer <= 0) {
-              // Start Attack Windup
-              c.isWindupActive = true;
-              c.attackWindupTimer = 0.25; // windup before damage connects
-              c.state = 'attack';
-            }
-
-            if (c.isWindupActive) {
-              c.attackWindupTimer -= dt;
-              if (c.attackWindupTimer <= 0) {
-                // Execute attack damage!
-                executeCatAttack(c);
-                c.isWindupActive = false;
-                c.attackTimer = c.attackInterval;
-                c.state = 'walk';
-              }
-            }
-          } else {
-            // Move forward
-            c.state = 'walk';
-            c.isWindupActive = false;
-            c.x = Math.min(battlefieldWidth - 140, c.x + c.speed * dt);
-          }
-
-          return c;
-        })
-        .filter((cat) => cat.hp > 0);
-    });
+        }
+      } else {
+        // Move forward towards enemy/castle, capped strictly before target
+        cat.state = 'walk';
+        cat.isWindupActive = false;
+        const nextX = cat.x + cat.speed * dt;
+        cat.x = Math.min(closestEnemyX - 5, Math.min(enemyCastleX, nextX));
+      }
+    }
 
     // 2. UPDATE ENEMIES
-    setEnemies((currentEnemies) => {
-      return currentEnemies
-        .map((enemy) => {
-          let e = { ...enemy, animTimer: enemy.animTimer + dt };
+    for (let i = 0; i < enemiesRef.current.length; i++) {
+      const enemy = enemiesRef.current[i];
+      enemy.animTimer += dt;
 
-          // Knockback handling
-          if (e.state === 'knockback') {
-            e.knockbackTimer -= dt;
-            e.x = Math.min(battlefieldWidth - 140, e.x + e.knockbackVelocityX * dt);
-            if (e.knockbackTimer <= 0) {
-              e.state = 'walk';
-            }
-            return e;
+      // Knockback handling
+      if (enemy.state === 'knockback') {
+        enemy.knockbackTimer -= dt;
+        enemy.x = Math.min(enemyCastleX, enemy.x + enemy.knockbackVelocityX * dt);
+        if (enemy.knockbackTimer <= 0) {
+          enemy.state = 'walk';
+        }
+        continue;
+      }
+
+      // Attack Cooldown
+      if (enemy.attackTimer > 0) {
+        enemy.attackTimer -= dt;
+      }
+
+      // Find living cats ahead of this enemy
+      const catsInFront = catsRef.current.filter((c) => c.hp > 0 && c.x <= enemy.x + 15);
+      const closestCatX = catsInFront.length > 0 ? Math.max(...catsInFront.map((c) => c.x)) : playerCastleX;
+      const targetDistance = Math.max(0, enemy.x - closestCatX);
+
+      // Clamp position so enemy NEVER passes cat frontline
+      if (enemy.x < closestCatX + 5) {
+        enemy.x = Math.min(enemyCastleX, closestCatX + 5);
+      }
+
+      if (targetDistance <= enemy.attackRange) {
+        // Within range: Stop and attack
+        if (!enemy.isWindupActive && enemy.attackTimer <= 0) {
+          enemy.isWindupActive = true;
+          enemy.attackWindupTimer = 0.25;
+          enemy.state = 'attack';
+        }
+
+        if (enemy.isWindupActive) {
+          enemy.attackWindupTimer -= dt;
+          if (enemy.attackWindupTimer <= 0) {
+            executeEnemyAttack(enemy);
+            enemy.isWindupActive = false;
+            enemy.attackTimer = enemy.attackInterval;
+            enemy.state = 'walk';
           }
+        }
+      } else {
+        // Move leftwards towards player base, capped strictly before cat
+        enemy.state = 'walk';
+        enemy.isWindupActive = false;
+        const nextX = enemy.x - enemy.speed * dt;
+        enemy.x = Math.max(closestCatX + 5, Math.max(playerCastleX, nextX));
+      }
+    }
 
-          // Cooldowns
-          if (e.attackTimer > 0) {
-            e.attackTimer -= dt;
-          }
-
-          // Target Detection: Cat unit or Player Castle
-          const catsInFront = cats.filter((cat) => cat.x < e.x && cat.hp > 0);
-          const catDistance = catsInFront.length > 0 ? Math.min(...catsInFront.map((cat) => e.x - cat.x)) : Infinity;
-          const playerCastleDist = e.x - 100;
-          const targetDistance = Math.min(catDistance, playerCastleDist);
-
-          // If in range, attack!
-          if (targetDistance <= e.attackRange) {
-            if (!e.isWindupActive && e.attackTimer <= 0) {
-              e.isWindupActive = true;
-              e.attackWindupTimer = 0.25;
-              e.state = 'attack';
-            }
-
-            if (e.isWindupActive) {
-              e.attackWindupTimer -= dt;
-              if (e.attackWindupTimer <= 0) {
-                executeEnemyAttack(e);
-                e.isWindupActive = false;
-                e.attackTimer = e.attackInterval;
-                e.state = 'walk';
-              }
-            }
-          } else {
-            // Move leftwards towards player base
-            e.state = 'walk';
-            e.isWindupActive = false;
-            e.x = Math.max(100, e.x - e.speed * dt);
-          }
-
-          return e;
-        })
-        .filter((e) => e.hp > 0);
-    });
+    // Filter dead entities
+    catsRef.current = catsRef.current.filter((c) => c.hp > 0);
+    enemiesRef.current = enemiesRef.current.filter((e) => e.hp > 0);
   };
 
   // Cat Attacks: Single-target vs Area Attack!
@@ -548,8 +593,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     const isCrit = Math.random() < 0.15; // 15% crit chance
     const dmg = Math.round(cat.attackPower * (isCrit ? 2.0 : 1.0));
 
-    // Find enemies in reach
-    const enemiesInReach = enemies.filter((e) => e.x >= cat.x && e.x <= cat.x + cat.attackRange && e.hp > 0);
+    // Find enemies in reach (in front of cat within range + buffer)
+    const enemiesInReach = enemiesRef.current.filter(
+      (e) => e.hp > 0 && e.x >= cat.x - 25 && e.x <= cat.x + cat.attackRange + 30
+    );
 
     if (enemiesInReach.length > 0) {
       if (isArea) {
@@ -557,87 +604,74 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         audio.playHit(isCrit, true);
         spawnFx(cat.x + cat.attackRange * 0.5, 20, 'aoe_burst');
 
-        setEnemies((prev) =>
-          prev.map((e) => {
-            if (e.x >= cat.x && e.x <= cat.x + cat.attackRange && e.hp > 0) {
-              const nextHp = Math.max(0, e.hp - dmg);
-              spawnDamageNum(e.x, 25, dmg, isCrit, true);
+        enemiesInReach.forEach((e) => {
+          const nextHp = Math.max(0, e.hp - dmg);
+          e.hp = nextHp;
+          spawnDamageNum(e.x, 25, dmg, isCrit, true);
 
-              // Knockback if crossed KB threshold
-              const kbThreshold = e.maxHp / e.maxKnockbacks;
-              const currentKBs = Math.floor((e.maxHp - nextHp) / kbThreshold);
-              const shouldKb = currentKBs > e.knockbackCount;
+          // Knockback if crossed KB threshold
+          const kbThreshold = e.maxHp / e.maxKnockbacks;
+          const currentKBs = Math.floor((e.maxHp - nextHp) / kbThreshold);
+          const shouldKb = currentKBs > e.knockbackCount;
 
-              if (nextHp <= 0) {
-                // Reward money on kill
-                const def = ENEMY_DEFINITIONS[e.defId];
-                if (def) setMoney((m) => Math.min(maxMoney, m + def.rewardMoney));
-              }
-
-              if (shouldKb) {
-                audio.playKnockback();
-                return {
-                  ...e,
-                  hp: nextHp,
-                  knockbackCount: currentKBs,
-                  state: 'knockback',
-                  knockbackVelocityX: 180,
-                  knockbackTimer: 0.4,
-                  x: Math.min(battlefieldWidth - 100, e.x + 50),
-                };
-              }
-              return { ...e, hp: nextHp };
+          if (nextHp <= 0) {
+            const def = ENEMY_DEFINITIONS[e.defId];
+            if (def) {
+              moneyRef.current = Math.min(maxMoney, moneyRef.current + def.rewardMoney);
             }
-            return e;
-          })
-        );
+          }
+
+          if (shouldKb) {
+            audio.playKnockback();
+            e.knockbackCount = currentKBs;
+            e.state = 'knockback';
+            e.knockbackVelocityX = 180;
+            e.knockbackTimer = 0.4;
+            e.x = Math.min(enemyCastleX, e.x + 60);
+            e.isWindupActive = false;
+          }
+        });
       } else {
         // ★ SINGLE TARGET ATTACK (単体攻撃): Hits ONLY the front-most enemy!
         audio.playHit(isCrit, false);
-        // Sort to find closest enemy to cat
         const target = [...enemiesInReach].sort((a, b) => a.x - b.x)[0];
         spawnFx(target.x, 20, 'hit');
         spawnDamageNum(target.x, 25, dmg, isCrit, true);
 
-        setEnemies((prev) =>
-          prev.map((e) => {
-            if (e.instanceId === target.instanceId) {
-              const nextHp = Math.max(0, e.hp - dmg);
-              const kbThreshold = e.maxHp / e.maxKnockbacks;
-              const currentKBs = Math.floor((e.maxHp - nextHp) / kbThreshold);
-              const shouldKb = currentKBs > e.knockbackCount;
+        const nextHp = Math.max(0, target.hp - dmg);
+        target.hp = nextHp;
 
-              if (nextHp <= 0) {
-                const def = ENEMY_DEFINITIONS[e.defId];
-                if (def) setMoney((m) => Math.min(maxMoney, m + def.rewardMoney));
-              }
+        const kbThreshold = target.maxHp / target.maxKnockbacks;
+        const currentKBs = Math.floor((target.maxHp - nextHp) / kbThreshold);
+        const shouldKb = currentKBs > target.knockbackCount;
 
-              if (shouldKb) {
-                audio.playKnockback();
-                return {
-                  ...e,
-                  hp: nextHp,
-                  knockbackCount: currentKBs,
-                  state: 'knockback',
-                  knockbackVelocityX: 180,
-                  knockbackTimer: 0.4,
-                  x: Math.min(battlefieldWidth - 100, e.x + 50),
-                };
-              }
-              return { ...e, hp: nextHp };
-            }
-            return e;
-          })
-        );
+        if (nextHp <= 0) {
+          const def = ENEMY_DEFINITIONS[target.defId];
+          if (def) {
+            moneyRef.current = Math.min(maxMoney, moneyRef.current + def.rewardMoney);
+          }
+        }
+
+        if (shouldKb) {
+          audio.playKnockback();
+          target.knockbackCount = currentKBs;
+          target.state = 'knockback';
+          target.knockbackVelocityX = 180;
+          target.knockbackTimer = 0.4;
+          target.x = Math.min(enemyCastleX, target.x + 60);
+          target.isWindupActive = false;
+        }
       }
     } else {
-      // Hit Enemy Castle
-      const castleX = battlefieldWidth - 140;
-      if (castleX - cat.x <= cat.attackRange) {
+      // Hit Enemy Castle if in reach
+      if (enemyCastleX - cat.x <= cat.attackRange + 30) {
         audio.playHit(false, false);
-        spawnFx(castleX, 40, isArea ? 'aoe_burst' : 'hit');
-        spawnDamageNum(castleX, 40, dmg, isCrit, true);
-        setEnemyCastleHp((prev) => Math.max(0, prev - dmg));
+        spawnFx(enemyCastleX, 40, isArea ? 'aoe_burst' : 'hit');
+        spawnDamageNum(enemyCastleX, 40, dmg, isCrit, true);
+        enemyCastleHpRef.current = Math.max(0, enemyCastleHpRef.current - dmg);
+        if (enemyCastleHpRef.current <= 0 && !battleResult.ended) {
+          handleMatchEnd(true);
+        }
       }
     }
   };
@@ -647,79 +681,70 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     const isArea = enemy.attackType === 'area';
     const dmg = enemy.attackPower;
 
-    // Find cats in reach
-    const catsInReach = cats.filter((c) => c.x <= enemy.x && c.x >= enemy.x - enemy.attackRange && c.hp > 0);
+    // Find cats in reach (in front of enemy towards player castle)
+    const catsInReach = catsRef.current.filter(
+      (c) => c.hp > 0 && c.x <= enemy.x + 25 && c.x >= enemy.x - enemy.attackRange - 30
+    );
 
     if (catsInReach.length > 0) {
       if (isArea) {
         audio.playHit(false, true);
         spawnFx(enemy.x - enemy.attackRange * 0.5, 20, 'aoe_burst');
 
-        setCats((prev) =>
-          prev.map((c) => {
-            if (c.x <= enemy.x && c.x >= enemy.x - enemy.attackRange && c.hp > 0) {
-              const nextHp = Math.max(0, c.hp - dmg);
-              spawnDamageNum(c.x, 25, dmg, false, false);
+        catsInReach.forEach((c) => {
+          const nextHp = Math.max(0, c.hp - dmg);
+          c.hp = nextHp;
+          spawnDamageNum(c.x, 25, dmg, false, false);
 
-              const kbThreshold = c.maxHp / c.maxKnockbacks;
-              const currentKBs = Math.floor((c.maxHp - nextHp) / kbThreshold);
-              const shouldKb = currentKBs > c.knockbackCount;
+          const kbThreshold = c.maxHp / c.maxKnockbacks;
+          const currentKBs = Math.floor((c.maxHp - nextHp) / kbThreshold);
+          const shouldKb = currentKBs > c.knockbackCount;
 
-              if (shouldKb) {
-                return {
-                  ...c,
-                  hp: nextHp,
-                  knockbackCount: currentKBs,
-                  state: 'knockback',
-                  knockbackVelocityX: 180,
-                  knockbackTimer: 0.4,
-                  x: Math.max(100, c.x - 50),
-                };
-              }
-              return { ...c, hp: nextHp };
-            }
-            return c;
-          })
-        );
+          if (shouldKb) {
+            audio.playKnockback();
+            c.knockbackCount = currentKBs;
+            c.state = 'knockback';
+            c.knockbackVelocityX = 180;
+            c.knockbackTimer = 0.4;
+            c.x = Math.max(playerCastleX, c.x - 60);
+            c.isWindupActive = false;
+          }
+        });
       } else {
         audio.playHit(false, false);
-        // Closest cat to enemy (highest x)
+        // Frontmost cat is closest to enemy base (largest x)
         const target = [...catsInReach].sort((a, b) => b.x - a.x)[0];
         spawnFx(target.x, 20, 'hit');
         spawnDamageNum(target.x, 25, dmg, false, false);
 
-        setCats((prev) =>
-          prev.map((c) => {
-            if (c.instanceId === target.instanceId) {
-              const nextHp = Math.max(0, c.hp - dmg);
-              const kbThreshold = c.maxHp / c.maxKnockbacks;
-              const currentKBs = Math.floor((c.maxHp - nextHp) / kbThreshold);
-              const shouldKb = currentKBs > c.knockbackCount;
+        const nextHp = Math.max(0, target.hp - dmg);
+        target.hp = nextHp;
 
-              if (shouldKb) {
-                return {
-                  ...c,
-                  hp: nextHp,
-                  knockbackCount: currentKBs,
-                  state: 'knockback',
-                  knockbackVelocityX: 180,
-                  knockbackTimer: 0.4,
-                  x: Math.max(100, c.x - 50),
-                };
-              }
-              return { ...c, hp: nextHp };
-            }
-            return c;
-          })
-        );
+        const kbThreshold = target.maxHp / target.maxKnockbacks;
+        const currentKBs = Math.floor((target.maxHp - nextHp) / kbThreshold);
+        const shouldKb = currentKBs > target.knockbackCount;
+
+        if (shouldKb) {
+          audio.playKnockback();
+          target.knockbackCount = currentKBs;
+          target.state = 'knockback';
+          target.knockbackVelocityX = 180;
+          target.knockbackTimer = 0.4;
+          target.x = Math.max(playerCastleX, target.x - 60);
+          target.isWindupActive = false;
+        }
       }
     } else {
       // Hit Player Castle
-      if (enemy.x - 100 <= enemy.attackRange) {
+      if (enemy.x - playerCastleX <= enemy.attackRange + 30) {
         audio.playHit(false, false);
-        spawnFx(100, 40, 'hit');
-        spawnDamageNum(100, 40, dmg, false, false);
-        setPlayerCastleHp((prev) => Math.max(0, prev - dmg));
+        audio.playCastleDamage();
+        spawnFx(playerCastleX, 40, 'hit');
+        spawnDamageNum(playerCastleX, 40, dmg, false, false);
+        playerCastleHpRef.current = Math.max(0, playerCastleHpRef.current - dmg);
+        if (playerCastleHpRef.current <= 0 && !battleResult.ended) {
+          handleMatchEnd(false);
+        }
       }
     }
   };
@@ -728,6 +753,12 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const handleMatchEnd = (victory: boolean) => {
     isTerminatedRef.current = true;
 
+    if (victory) {
+      audio.playVictory();
+    } else {
+      audio.playDefeat();
+    }
+
     // Treasure drop roll if victory
     let treasureDrop: { name: string; quality: TreasureQuality; description: string } | null = null;
     let treasureQuality: TreasureQuality = 'none';
@@ -735,13 +766,29 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     if (victory) {
       const trDef = TREASURES[stage.id];
       if (trDef) {
-        const roll = Math.random();
-        if (roll < 0.35) {
+        if (activeItems.treasureRadar) {
+          // Guaranteed Gold Treasure with Radar!
           treasureQuality = 'gold';
-        } else if (roll < 0.65) {
-          treasureQuality = 'silver';
-        } else if (roll < 0.88) {
-          treasureQuality = 'bronze';
+        } else {
+          const isFestival = !!stage.treasureFestival;
+          const roll = Math.random();
+          if (isFestival) {
+            if (roll < 0.65) {
+              treasureQuality = 'gold';
+            } else if (roll < 0.90) {
+              treasureQuality = 'silver';
+            } else {
+              treasureQuality = 'bronze';
+            }
+          } else {
+            if (roll < 0.35) {
+              treasureQuality = 'gold';
+            } else if (roll < 0.65) {
+              treasureQuality = 'silver';
+            } else if (roll < 0.88) {
+              treasureQuality = 'bronze';
+            }
+          }
         }
 
         if (treasureQuality !== 'none') {
@@ -754,7 +801,11 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       }
     }
 
-    const xpEarned = victory ? stage.baseRewardXp : Math.floor(stage.baseRewardXp * 0.2);
+    let baseXp = victory ? stage.baseRewardXp : Math.floor(stage.baseRewardXp * 0.2);
+    if (activeItems.catJobs && victory) {
+      baseXp = Math.round(baseXp * 1.5);
+    }
+    const xpEarned = baseXp;
     const catFoodEarned = victory ? stage.baseRewardCatFood : 0;
 
     setBattleResult({
@@ -784,8 +835,28 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
   return (
     <div className="relative w-full h-full bg-stone-950 flex flex-col select-none overflow-hidden font-['M_PLUS_Rounded_1c']">
-      {/* 2D Horizontal Scrolling Battlefield Canvas */}
-      <div className="relative flex-1 w-full overflow-hidden">
+      <BattleHud
+        money={money}
+        maxMoney={maxMoney}
+        workerLevel={workerLevel}
+        maxWorkerLevel={maxWorkerLevel}
+        workerUpgradeCost={workerUpgradeCost}
+        onUpgradeWorker={handleUpgradeWorker}
+        cannonProgress={cannonProgress}
+        onFireCannon={handleFireCannon}
+        isCannonFiring={isCannonFiring}
+        deckCats={deckSlotDefs}
+        onSpawnCat={handleSpawnCat}
+        gameSpeed={gameSpeed}
+        onToggleSpeed={toggleSpeed}
+        isPaused={isPaused}
+        onTogglePause={() => setIsPaused((p) => !p)}
+        isAutoBattle={isAutoBattle}
+        onToggleAutoBattle={() => setIsAutoBattle((a) => !a)}
+        onRetreat={onExit}
+        soundEnabled={audio.soundEnabled}
+        onToggleSound={toggleSound}
+      >
         <BattleCanvas
           stage={stage}
           playerCastleHp={playerCastleHp}
@@ -802,33 +873,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           setCameraX={setCameraX}
           bossAlert={bossAlert}
         />
-
-        {/* Floating HUD controls on top and bottom */}
-        <div className="absolute inset-0 pointer-events-none">
-          <BattleHud
-            money={money}
-            maxMoney={maxMoney}
-            workerLevel={workerLevel}
-            maxWorkerLevel={maxWorkerLevel}
-            workerUpgradeCost={workerUpgradeCost}
-            onUpgradeWorker={handleUpgradeWorker}
-            cannonProgress={cannonProgress}
-            onFireCannon={handleFireCannon}
-            isCannonFiring={isCannonFiring}
-            deckCats={deckSlotDefs}
-            onSpawnCat={handleSpawnCat}
-            gameSpeed={gameSpeed}
-            onToggleSpeed={toggleSpeed}
-            isPaused={isPaused}
-            onTogglePause={() => setIsPaused((p) => !p)}
-            isAutoBattle={isAutoBattle}
-            onToggleAutoBattle={() => setIsAutoBattle((a) => !a)}
-            onRetreat={onExit}
-            soundEnabled={audio.soundEnabled}
-            onToggleSound={toggleSound}
-          />
-        </div>
-      </div>
+      </BattleHud>
 
       {/* Result Modal when victory / defeat occurs */}
       {battleResult.ended && (

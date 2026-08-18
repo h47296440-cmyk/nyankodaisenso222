@@ -26,6 +26,8 @@ export const GachaScreen: React.FC<GachaScreenProps> = ({
   const [isRolling, setIsRolling] = useState(false);
   const [gachaResults, setGachaResults] = useState<GachaResultItem[] | null>(null);
 
+  const isInfiniteCatFood = !!profile.devMode?.infiniteCatFood;
+
   // Gacha probability weights:
   // Rare: 65%, Super Rare: 25%, Uber Rare: 10%
   const performSingleRoll = (guaranteeUber: boolean = false): GachaResultItem => {
@@ -63,7 +65,7 @@ export const GachaScreen: React.FC<GachaScreenProps> = ({
 
   const handleRoll = (count: number) => {
     const cost = count === 1 ? 150 : 1500;
-    if (profile.catFood < cost || isRolling) return;
+    if ((!isInfiniteCatFood && profile.catFood < cost) || isRolling) return;
 
     audio.playClick();
     setIsRolling(true);
@@ -108,7 +110,7 @@ export const GachaScreen: React.FC<GachaScreenProps> = ({
 
         return {
           ...prev,
-          catFood: prev.catFood - cost,
+          catFood: isInfiniteCatFood ? Math.max(prev.catFood, 99999) : prev.catFood - cost,
           xp: prev.xp + totalXpBonus,
           cats: nextCats,
         };
@@ -152,9 +154,15 @@ export const GachaScreen: React.FC<GachaScreenProps> = ({
             <Gift size={13} />
             <span>ネコ缶無料受取</span>
           </button>
-          <div className="bg-stone-800 border border-amber-500/50 px-3 py-1 rounded-full text-amber-300 font-black text-xs">
+          <div className={`px-3 py-1 rounded-full font-black text-xs border ${
+            isInfiniteCatFood
+              ? 'bg-amber-950 border-amber-400 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.5)] animate-pulse'
+              : 'bg-stone-800 border-amber-500/50 text-amber-300'
+          }`}>
             <span className="text-[10px] text-amber-400 mr-1">所持ネコ缶</span>
-            <span className="text-sm">{profile.catFood}</span>
+            <span className="text-sm">
+              {isInfiniteCatFood ? '∞ (MAX)' : profile.catFood}
+            </span>
           </div>
         </div>
       </div>
@@ -276,31 +284,35 @@ export const GachaScreen: React.FC<GachaScreenProps> = ({
           {/* 1x Roll */}
           <button
             id="btn-gacha-roll-1"
-            disabled={profile.catFood < 150}
+            disabled={!isInfiniteCatFood && profile.catFood < 150}
             onClick={() => handleRoll(1)}
             className={`flex-1 py-4 rounded-2xl border-2 flex flex-col items-center justify-center font-black transition-all ${
-              profile.catFood >= 150
+              isInfiniteCatFood || profile.catFood >= 150
                 ? 'bg-stone-900 hover:bg-stone-800 border-amber-400 text-white shadow-lg active:scale-95'
                 : 'bg-stone-900 border-stone-800 text-stone-600 opacity-60 cursor-not-allowed'
             }`}
           >
             <div className="text-sm font-black text-amber-300">1回ガチャを引く</div>
-            <div className="text-xs text-stone-300 mt-1">ネコ缶 150缶</div>
+            <div className="text-xs text-stone-300 mt-1">
+              {isInfiniteCatFood ? 'ネコ缶 無制限 (無料)' : 'ネコ缶 150缶'}
+            </div>
           </button>
 
           {/* 11x Roll with Guaranteed Uber */}
           <button
             id="btn-gacha-roll-11"
-            disabled={profile.catFood < 1500}
+            disabled={!isInfiniteCatFood && profile.catFood < 1500}
             onClick={() => handleRoll(11)}
             className={`flex-1 py-4 rounded-2xl border-2 flex flex-col items-center justify-center font-black transition-all ${
-              profile.catFood >= 1500
+              isInfiniteCatFood || profile.catFood >= 1500
                 ? 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 border-yellow-100 text-stone-950 shadow-xl active:scale-95'
                 : 'bg-stone-900 border-stone-800 text-stone-600 opacity-60 cursor-not-allowed'
             }`}
           >
             <div className="text-sm sm:text-base font-black">11連続ガチャ（超激レア確定！）</div>
-            <div className="text-xs text-stone-900 font-bold mt-1">ネコ缶 1500缶</div>
+            <div className="text-xs text-stone-900 font-bold mt-1">
+              {isInfiniteCatFood ? 'ネコ缶 無制限 (無料)' : 'ネコ缶 1500缶'}
+            </div>
           </button>
         </div>
       </div>

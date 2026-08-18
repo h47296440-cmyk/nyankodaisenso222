@@ -236,7 +236,7 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
         }}
       >
         {/* Ground Bar */}
-        <div className={`absolute bottom-0 left-0 right-0 h-16 border-t-4 ${getGroundColor()} z-10 flex items-center justify-between px-8 text-stone-400 text-xs font-mono opacity-50`}>
+        <div className={`absolute bottom-0 left-0 right-0 h-10 sm:h-12 border-t-4 ${getGroundColor()} z-10 flex items-center justify-between px-6 text-stone-400 text-[10px] sm:text-xs font-mono opacity-50`}>
           <span>【にゃんこ本陣】0m</span>
           <span>500m</span>
           <span>1000m</span>
@@ -245,7 +245,7 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
         </div>
 
         {/* Player Base (Left side at x: 80px) */}
-        <div className="absolute bottom-16 left-8 z-10">
+        <div className="absolute bottom-10 sm:bottom-12 left-6 sm:left-10 z-10">
           <CastleSpriteRenderer
             isPlayer={true}
             hp={playerCastleHp}
@@ -255,7 +255,7 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
         </div>
 
         {/* Enemy Castle (Right side at battlefieldWidth - 120px) */}
-        <div className="absolute bottom-16 right-8 z-10">
+        <div className="absolute bottom-10 sm:bottom-12 right-6 sm:right-10 z-10">
           <CastleSpriteRenderer
             isPlayer={false}
             hp={enemyCastleHp}
@@ -268,7 +268,7 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
         {cats.map((cat) => (
           <div
             key={cat.instanceId}
-            className="absolute bottom-16 z-20 transition-transform"
+            className="absolute bottom-10 sm:bottom-12 z-20 transition-transform"
             style={{
               left: `${cat.x}px`,
               transform: 'translateX(-50%)',
@@ -298,7 +298,7 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
         {enemies.map((enemy) => (
           <div
             key={enemy.instanceId}
-            className="absolute bottom-16 z-20 transition-transform"
+            className="absolute bottom-10 sm:bottom-12 z-20 transition-transform"
             style={{
               left: `${enemy.x}px`,
               transform: 'translateX(-50%)',
@@ -326,9 +326,9 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
 
         {/* Cat Cannon Laser Blast Visual */}
         {isCannonFiring && (
-          <div className="absolute bottom-24 left-32 right-0 h-28 pointer-events-none z-30 flex items-center">
+          <div className="absolute bottom-16 sm:bottom-20 left-28 sm:left-36 right-0 h-24 sm:h-28 pointer-events-none z-30 flex items-center">
             {/* Giant laser beam */}
-            <div className="w-full h-16 bg-gradient-to-r from-sky-400 via-white to-sky-300 opacity-90 blur-sm animate-pulse" />
+            <div className="w-full h-14 sm:h-16 bg-gradient-to-r from-sky-400 via-white to-sky-300 opacity-90 blur-sm animate-pulse" />
             <div className="absolute inset-0 bg-white opacity-80 animate-ping" />
             <div className="absolute inset-0 bg-gradient-to-t from-sky-500/0 via-sky-300/40 to-sky-500/0" />
           </div>
@@ -343,7 +343,7 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
               className="absolute pointer-events-none z-30"
               style={{
                 left: `${fx.x}px`,
-                bottom: `${fx.y + 60}px`,
+                bottom: `${fx.y + 40}px`,
                 transform: 'translate(-50%, -50%)',
                 opacity: 1 - progress,
               }}
@@ -379,14 +379,14 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
               key={dmg.id}
               className={`absolute font-black pointer-events-none z-30 transition-all ${
                 dmg.isCritical
-                  ? 'text-yellow-300 text-lg font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] scale-125'
+                  ? 'text-yellow-300 text-base sm:text-lg font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] scale-125'
                   : dmg.isCatDamage
-                  ? 'text-white text-xs drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'
-                  : 'text-rose-400 text-xs drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'
+                  ? 'text-white text-xs sm:text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'
+                  : 'text-rose-400 text-xs sm:text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'
               }`}
               style={{
                 left: `${dmg.x}px`,
-                bottom: `${dmg.y + 70 + progress * 40}px`,
+                bottom: `${dmg.y + 50 + progress * 35}px`,
                 opacity: 1 - progress,
                 transform: 'translateX(-50%)',
               }}
@@ -405,7 +405,7 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
           e.stopPropagation();
           setCameraX(0);
         }}
-        className="absolute bottom-20 left-3 bg-stone-900/80 hover:bg-stone-800 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg border border-white/20 backdrop-blur shadow z-30"
+        className="absolute bottom-12 sm:bottom-14 left-2 sm:left-4 bg-stone-900/85 hover:bg-stone-800 text-white text-[10px] sm:text-[11px] font-black px-2.5 py-1 rounded-lg border border-white/20 backdrop-blur shadow-lg z-30 active:scale-95"
       >
         ◀ 自城へ
       </button>
@@ -418,7 +418,7 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
             setCameraX(battlefieldWidth - containerRef.current.clientWidth);
           }
         }}
-        className="absolute bottom-20 right-3 bg-stone-900/80 hover:bg-stone-800 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg border border-white/20 backdrop-blur shadow z-30"
+        className="absolute bottom-12 sm:bottom-14 right-2 sm:right-4 bg-stone-900/85 hover:bg-stone-800 text-white text-[10px] sm:text-[11px] font-black px-2.5 py-1 rounded-lg border border-white/20 backdrop-blur shadow-lg z-30 active:scale-95"
       >
         敵城へ ▶
       </button>

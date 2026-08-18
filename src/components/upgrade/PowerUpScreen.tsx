@@ -27,7 +27,8 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
   const currentForm = selectedCatDef.forms[currentFormIndex];
   const isEvolved = catProgress.level >= 10;
   const levelUpCost = getCatLevelUpCost(selectedCatDef.rarity, catProgress.level);
-  const canLevelUp = catProgress.unlocked && profile.xp >= levelUpCost && catProgress.level < 20;
+  const isInfiniteXp = !!profile.devMode?.infiniteXp;
+  const canLevelUp = catProgress.unlocked && (isInfiniteXp || profile.xp >= levelUpCost) && catProgress.level < 20;
 
   // Level Up Cat
   const handleLevelUpCat = () => {
@@ -36,10 +37,11 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
     onUpdateProfile((prev) => {
       const current = prev.cats[selectedCatId] || { catId: selectedCatId, level: 1, unlocked: true, activeForm: 0 };
       const nextLevel = current.level + 1;
-      const nextForm = nextLevel >= 10 ? 1 : current.activeForm;
+      // Only switch to form 1 when crossing the level 10 evolution milestone the very first time
+      const nextForm = current.level === 9 && nextLevel === 10 ? 1 : current.activeForm;
       return {
         ...prev,
-        xp: prev.xp - levelUpCost,
+        xp: isInfiniteXp ? Math.max(prev.xp, 99999999) : prev.xp - levelUpCost,
         cats: {
           ...prev.cats,
           [selectedCatId]: {
@@ -55,11 +57,11 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
   // Unlock Cat with XP
   const handleUnlockWithXp = () => {
     const cost = selectedCatDef.unlockCostXp || 1000;
-    if (profile.xp < cost) return;
+    if (!isInfiniteXp && profile.xp < cost) return;
     audio.playVictory();
     onUpdateProfile((prev) => ({
       ...prev,
-      xp: prev.xp - cost,
+      xp: isInfiniteXp ? Math.max(prev.xp, 99999999) : prev.xp - cost,
       cats: {
         ...prev.cats,
         [selectedCatId]: {
@@ -72,17 +74,40 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
     }));
   };
 
-  // Toggle Form between 1 and 2
-  const handleToggleForm = () => {
-    if (!isEvolved) return;
+  // Select Specific Form (0 = Form 1, 1 = Form 2)
+  const handleSelectForm = (formIdx: number) => {
+    if (formIdx === 1 && !isEvolved) {
+      alert('第2形態は Lv.10 以上に強化すると解放されます！');
+      return;
+    }
     audio.playClick();
     onUpdateProfile((prev) => {
-      const current = prev.cats[selectedCatId];
+      const current = prev.cats[selectedCatId] || { catId: selectedCatId, level: 1, unlocked: true, activeForm: 0 };
       return {
         ...prev,
         cats: {
           ...prev.cats,
           [selectedCatId]: {
+            ...current,
+            activeForm: formIdx,
+          },
+        },
+      };
+    });
+  };
+
+  // Toggle Form for a specific catId
+  const handleToggleCatFormById = (targetCatId: string) => {
+    const prog = profile.cats[targetCatId];
+    if (!prog || prog.level < 10) return;
+    audio.playClick();
+    onUpdateProfile((prev) => {
+      const current = prev.cats[targetCatId];
+      return {
+        ...prev,
+        cats: {
+          ...prev.cats,
+          [targetCatId]: {
             ...current,
             activeForm: current.activeForm === 0 ? 1 : 0,
           },
@@ -95,12 +120,12 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
   const handleUpgradeBaseSkill = (skillKey: keyof PlayerUpgrades) => {
     const currentLv = profile.upgrades[skillKey] || 1;
     const cost = getBaseUpgradeCost(currentLv);
-    if (currentLv >= 10 || profile.xp < cost) return;
+    if (currentLv >= 10 || (!isInfiniteXp && profile.xp < cost)) return;
 
     audio.playWorkerLevelUp();
     onUpdateProfile((prev) => ({
       ...prev,
-      xp: prev.xp - cost,
+      xp: isInfiniteXp ? Math.max(prev.xp, 99999999) : prev.xp - cost,
       upgrades: {
         ...prev.upgrades,
         [skillKey]: currentLv + 1,
@@ -158,9 +183,15 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
           <h2 className="text-base sm:text-lg font-black text-amber-300">パワーアップ＆編成</h2>
         </div>
         <div className="flex items-center gap-3 text-xs font-black">
-          <div className="bg-stone-800 border border-emerald-500/50 px-3 py-1 rounded-full text-emerald-300">
+          <div className={`px-3 py-1 rounded-full flex items-center gap-1 border ${
+            isInfiniteXp
+              ? 'bg-emerald-950 border-emerald-400 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse'
+              : 'bg-stone-800 border-emerald-500/50 text-emerald-300'
+          }`}>
             <span className="text-[10px] text-emerald-400 mr-1">所持XP</span>
-            <span className="text-sm font-black">{profile.xp.toLocaleString()}</span>
+            <span className="text-sm font-black">
+              {isInfiniteXp ? '∞ (MAX)' : profile.xp.toLocaleString()}
+            </span>
           </div>
         </div>
       </div>
@@ -270,7 +301,7 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
           <div className="flex-1 p-4 md:p-6 overflow-y-auto flex flex-col justify-between">
             <div>
               {/* Top Banner */}
-              <div className="flex items-center justify-between border-b border-stone-800 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-800 pb-3">
                 <div>
                   <div className="flex items-center gap-2">
                     <span
@@ -287,22 +318,62 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
                   <h3 className="text-xl sm:text-2xl font-black text-white mt-1">
                     {currentForm.name}
                   </h3>
-                  <div className="text-xs text-amber-300 font-bold">
-                    {catProgress.unlocked ? `現在のレベル: Lv.${catProgress.level} / 20` : '未解放キャラクター'}
+                  <div className="text-xs text-amber-300 font-bold flex items-center gap-2 mt-0.5">
+                    <span>{catProgress.unlocked ? `レベル: Lv.${catProgress.level} / 20` : '未解放キャラクター'}</span>
+                    {isEvolved && (
+                      <span className="text-[10px] bg-indigo-900/80 text-indigo-200 border border-indigo-500/50 px-1.5 py-0.2 rounded-full font-bold">
+                        進化済み
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                {/* Evolved Form Switch Button */}
-                {isEvolved && (
+                {/* Direct Form 1 / Form 2 Selection Tabs */}
+                <div className="flex items-center gap-1.5 bg-stone-950 p-1.5 rounded-xl border border-stone-700">
                   <button
-                    id="btn-toggle-form"
-                    onClick={handleToggleForm}
-                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-black border border-purple-300 shadow flex items-center gap-1.5 active:scale-95"
+                    id="btn-select-form-1"
+                    onClick={() => handleSelectForm(0)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all ${
+                      currentFormIndex === 0
+                        ? 'bg-amber-500 text-stone-950 shadow-[0_0_10px_rgba(245,158,11,0.5)] scale-105'
+                        : 'text-stone-400 hover:text-white hover:bg-stone-800'
+                    }`}
                   >
-                    <RefreshCw size={14} />
-                    <span>形態切替 (第{currentFormIndex + 1}形態)</span>
+                    <span>第1形態</span>
+                    {currentFormIndex === 0 && <Check size={14} className="stroke-[3]" />}
                   </button>
-                )}
+
+                  <button
+                    id="btn-select-form-2"
+                    onClick={() => handleSelectForm(1)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all ${
+                      currentFormIndex === 1
+                        ? 'bg-purple-600 text-white shadow-[0_0_10px_rgba(168,85,247,0.5)] scale-105'
+                        : isEvolved
+                        ? 'text-stone-400 hover:text-white hover:bg-stone-800'
+                        : 'text-stone-600 cursor-not-allowed bg-stone-900/50'
+                    }`}
+                    title={isEvolved ? '第2形態を選択' : 'Lv.10で進化解放'}
+                  >
+                    <span>第2形態</span>
+                    {currentFormIndex === 1 ? (
+                      <Check size={14} className="stroke-[3]" />
+                    ) : !isEvolved ? (
+                      <span className="text-[9px] text-stone-500 font-normal">🔒Lv.10</span>
+                    ) : null}
+                  </button>
+                </div>
+              </div>
+
+              {/* Active Form Notice */}
+              <div className="mt-2.5 px-3 py-1 rounded-lg bg-stone-900 border border-stone-800 text-[11px] text-amber-300 font-black flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <Swords size={13} className="text-amber-400" />
+                  <span>出撃中の形態: 【第{currentFormIndex + 1}形態 - {currentForm.name}】</span>
+                </span>
+                <span className="text-[10px] text-stone-400 font-normal">
+                  ※バトルではこの形態で出撃します
+                </span>
               </div>
 
               {/* Character Animation Showcase */}
@@ -433,33 +504,54 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
               const prog = profile.cats[catId] || { level: 1, activeForm: 0 };
               const form = def.forms[prog.activeForm];
               const isSelectedSlot = selectedDeckSlotIndex === idx;
+              const isCatEvolved = prog.level >= 10;
 
               return (
-                <button
+                <div
                   key={idx}
-                  id={`deck-slot-${idx}`}
-                  onClick={() => handleSelectDeckSlot(idx)}
                   className={`relative p-2 rounded-xl border-2 flex flex-col items-center justify-between text-center transition-all ${
                     isSelectedSlot
                       ? 'bg-amber-950 border-yellow-300 shadow-[0_0_15px_rgba(253,224,71,0.6)] animate-pulse scale-105'
                       : 'bg-stone-800 hover:bg-stone-700 border-stone-600'
                   }`}
                 >
-                  <div className="w-full flex justify-between text-[8px] font-black">
-                    <span className="text-stone-400">枠{idx + 1}</span>
-                    <span className="text-yellow-300">¥{form.cost}</span>
-                  </div>
-                  <div className="my-1 scale-90">
-                    <UnitSpriteRenderer
-                      spriteType={form.spriteType}
-                      isCat={true}
-                      state="walk"
-                      animTimer={0.5}
-                      scale={0.8}
-                    />
-                  </div>
-                  <div className="text-[10px] font-black truncate w-full">{form.name}</div>
-                </button>
+                  <button
+                    id={`deck-slot-${idx}`}
+                    onClick={() => handleSelectDeckSlot(idx)}
+                    className="w-full flex flex-col items-center justify-between cursor-pointer"
+                  >
+                    <div className="w-full flex justify-between text-[8px] font-black">
+                      <span className="text-stone-400">枠{idx + 1}</span>
+                      <span className="text-yellow-300">¥{form.cost}</span>
+                    </div>
+                    <div className="my-1 scale-90">
+                      <UnitSpriteRenderer
+                        spriteType={form.spriteType}
+                        isCat={true}
+                        state="walk"
+                        animTimer={0.5}
+                        scale={0.8}
+                      />
+                    </div>
+                    <div className="text-[10px] font-black truncate w-full">{form.name}</div>
+                  </button>
+
+                  {/* Form toggle pill for evolved cats in deck */}
+                  {isCatEvolved && (
+                    <button
+                      id={`btn-deck-form-toggle-${catId}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleCatFormById(catId);
+                      }}
+                      className="mt-1 px-1.5 py-0.5 rounded bg-purple-900/80 hover:bg-purple-800 text-[8px] font-bold text-purple-200 border border-purple-400/50 flex items-center gap-0.5 active:scale-95 transition-all"
+                      title="形態を切り替え"
+                    >
+                      <RefreshCw size={8} />
+                      <span>第{prog.activeForm + 1}形態</span>
+                    </button>
+                  )}
+                </div>
               );
             })}
           </div>
@@ -467,40 +559,60 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
           {/* Unlocked Cats to swap in */}
           <div>
             <h4 className="text-xs font-black text-stone-300 mb-2">
-              所持キャラクター一覧（タップして編成にセット）
+              所持キャラクター一覧（タップして編成にセット / 形態切替可）
             </h4>
             <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-2">
               {CAT_DEFINITIONS.filter((c) => profile.cats[c.id]?.unlocked).map((cat) => {
                 const prog = profile.cats[cat.id];
                 const form = cat.forms[prog.activeForm];
                 const isInDeck = profile.deck.includes(cat.id);
+                const isCatEvolved = prog.level >= 10;
 
                 return (
-                  <button
+                  <div
                     key={cat.id}
-                    id={`btn-swap-cat-${cat.id}`}
-                    onClick={() => handleSwapIntoDeck(cat.id)}
-                    className={`p-2 rounded-xl border-2 flex flex-col items-center text-center transition-all ${
+                    className={`p-2 rounded-xl border-2 flex flex-col items-center justify-between text-center transition-all ${
                       isInDeck
-                        ? 'bg-stone-900 border-emerald-600 opacity-90'
+                        ? 'bg-stone-900 border-emerald-600 opacity-95'
                         : 'bg-stone-900 hover:bg-stone-800 border-stone-700 hover:border-amber-400'
                     }`}
                   >
-                    <div className="w-full flex justify-between text-[8px] font-black">
-                      <span className="text-amber-400">Lv.{prog.level}</span>
-                      {isInDeck && <span className="text-emerald-400 font-bold">編成中</span>}
-                    </div>
-                    <div className="my-1">
-                      <UnitSpriteRenderer
-                        spriteType={form.spriteType}
-                        isCat={true}
-                        state="walk"
-                        animTimer={0.5}
-                        scale={0.75}
-                      />
-                    </div>
-                    <div className="text-[10px] font-black truncate w-full">{form.name}</div>
-                  </button>
+                    <button
+                      id={`btn-swap-cat-${cat.id}`}
+                      onClick={() => handleSwapIntoDeck(cat.id)}
+                      className="w-full flex flex-col items-center cursor-pointer"
+                    >
+                      <div className="w-full flex justify-between text-[8px] font-black">
+                        <span className="text-amber-400">Lv.{prog.level}</span>
+                        {isInDeck && <span className="text-emerald-400 font-bold">編成中</span>}
+                      </div>
+                      <div className="my-1">
+                        <UnitSpriteRenderer
+                          spriteType={form.spriteType}
+                          isCat={true}
+                          state="walk"
+                          animTimer={0.5}
+                          scale={0.75}
+                        />
+                      </div>
+                      <div className="text-[10px] font-black truncate w-full">{form.name}</div>
+                    </button>
+
+                    {isCatEvolved && (
+                      <button
+                        id={`btn-roster-form-toggle-${cat.id}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleCatFormById(cat.id);
+                        }}
+                        className="mt-1 px-1.5 py-0.5 rounded bg-purple-950 hover:bg-purple-900 text-[8px] font-bold text-purple-300 border border-purple-500/40 flex items-center gap-0.5 active:scale-95"
+                        title="形態を切り替え"
+                      >
+                        <RefreshCw size={8} />
+                        <span>第{prog.activeForm + 1}形態</span>
+                      </button>
+                    )}
+                  </div>
                 );
               })}
             </div>

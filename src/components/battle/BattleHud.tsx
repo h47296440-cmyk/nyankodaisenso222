@@ -1,7 +1,6 @@
 import React from 'react';
-import { CatDefinition, PlayerProfile } from '../../types';
-import { CAT_DEFINITIONS } from '../../data/units';
-import { Zap, Volume2, VolumeX, FastForward, Play, Pause, ShieldAlert, Sparkles, Bot } from 'lucide-react';
+import { CatDefinition } from '../../types';
+import { Zap, Volume2, VolumeX, FastForward, Play, Pause, Bot } from 'lucide-react';
 
 interface BattleHudProps {
   money: number;
@@ -30,6 +29,7 @@ interface BattleHudProps {
   onRetreat: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  children?: React.ReactNode;
 }
 
 export const BattleHud: React.FC<BattleHudProps> = ({
@@ -53,52 +53,53 @@ export const BattleHud: React.FC<BattleHudProps> = ({
   onRetreat,
   soundEnabled,
   onToggleSound,
+  children,
 }) => {
   const canUpgradeWorker = workerLevel < maxWorkerLevel && money >= workerUpgradeCost;
   const isCannonReady = cannonProgress >= 100 && !isCannonFiring;
 
   return (
-    <div className="flex flex-col justify-between h-full pointer-events-none z-30">
+    <div className="flex flex-col h-full w-full bg-stone-950 overflow-hidden select-none font-['M_PLUS_Rounded_1c']">
       {/* Top Status Header */}
-      <div className="w-full bg-stone-900/90 backdrop-blur-md border-b border-stone-700/80 px-2 sm:px-4 py-1.5 flex items-center justify-between pointer-events-auto text-white shadow-md">
+      <div className="w-full flex-shrink-0 bg-stone-900/95 backdrop-blur-md border-b border-stone-700/80 px-2 sm:px-4 py-1.5 flex items-center justify-between text-white shadow-md z-20">
         {/* Money Display (働きネコ所持金) */}
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 border-2 border-yellow-100 flex items-center justify-center font-black text-stone-900 text-sm shadow-md">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 border-2 border-yellow-100 flex items-center justify-center font-black text-stone-900 text-xs sm:text-sm shadow-md">
             ¥
           </div>
           <div className="flex flex-col">
-            <div className="text-xs text-stone-400 font-bold leading-none">所持金</div>
-            <div className="text-base sm:text-lg font-black tracking-tight text-yellow-300 drop-shadow">
+            <div className="text-[10px] text-stone-400 font-bold leading-none">所持金</div>
+            <div className="text-sm sm:text-lg font-black tracking-tight text-yellow-300 drop-shadow leading-none mt-0.5">
               {Math.floor(money).toLocaleString()}{' '}
-              <span className="text-xs font-normal text-stone-400">/ {maxMoney.toLocaleString()}</span>
+              <span className="text-[10px] sm:text-xs font-normal text-stone-400">/ {maxMoney.toLocaleString()}</span>
             </div>
           </div>
         </div>
 
-        {/* Action Toggles: Speed, Auto (ニャンピューター), Sound, Pause */}
+        {/* Action Toggles: Speed, Auto (ニャンピューター), Sound, Pause, Retreat */}
         <div className="flex items-center gap-1 sm:gap-2">
           {/* Auto Battle */}
           <button
             id="btn-auto-battle"
             onClick={onToggleAutoBattle}
-            className={`px-2 sm:px-3 py-1 rounded-lg text-xs font-black flex items-center gap-1 border transition-all ${
+            className={`px-2 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-black flex items-center gap-1 border transition-all ${
               isAutoBattle
                 ? 'bg-amber-500 text-stone-950 border-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.5)] animate-pulse'
                 : 'bg-stone-800 text-stone-300 border-stone-600 hover:bg-stone-700'
             }`}
             title="ニャンピューター (自動生産)"
           >
-            <Bot size={14} />
-            <span className="hidden sm:inline">オート</span>
+            <Bot size={13} />
+            <span className="hidden xs:inline sm:inline">オート</span>
           </button>
 
           {/* Speed Toggle */}
           <button
             id="btn-toggle-speed"
             onClick={onToggleSpeed}
-            className="px-2.5 py-1 rounded-lg text-xs font-black bg-stone-800 hover:bg-stone-700 text-cyan-400 border border-cyan-500/40 flex items-center gap-1 shadow"
+            className="px-2 sm:px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-black bg-stone-800 hover:bg-stone-700 text-cyan-400 border border-cyan-500/40 flex items-center gap-1 shadow"
           >
-            <FastForward size={14} />
+            <FastForward size={13} />
             <span>x{gameSpeed}</span>
           </button>
 
@@ -106,39 +107,44 @@ export const BattleHud: React.FC<BattleHudProps> = ({
           <button
             id="btn-toggle-sound"
             onClick={onToggleSound}
-            className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-600 shadow"
+            className="p-1 sm:p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-600 shadow"
           >
-            {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} className="text-stone-500" />}
+            {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} className="text-stone-500" />}
           </button>
 
           {/* Pause */}
           <button
             id="btn-toggle-pause"
             onClick={onTogglePause}
-            className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-600 shadow"
+            className="p-1 sm:p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-600 shadow"
           >
-            {isPaused ? <Play size={16} className="text-emerald-400" /> : <Pause size={16} />}
+            {isPaused ? <Play size={15} className="text-emerald-400" /> : <Pause size={15} />}
           </button>
 
           {/* Retreat */}
           <button
             id="btn-retreat"
             onClick={onRetreat}
-            className="px-2 py-1 rounded-lg text-xs font-bold bg-rose-900/70 hover:bg-rose-800 text-rose-200 border border-rose-700"
+            className="px-2 py-1 rounded-lg text-[11px] sm:text-xs font-bold bg-rose-900/70 hover:bg-rose-800 text-rose-200 border border-rose-700"
           >
             撤退
           </button>
         </div>
       </div>
 
+      {/* Center Battlefield Canvas Area */}
+      <div className="relative flex-1 w-full min-h-0 overflow-hidden bg-stone-950">
+        {children}
+      </div>
+
       {/* Bottom Deck & Deployment Controls Bar */}
-      <div className="w-full bg-stone-900/95 backdrop-blur-lg border-t-2 border-stone-700 px-1 sm:px-3 py-2 pointer-events-auto flex items-stretch gap-1.5 sm:gap-2 shadow-2xl">
+      <div className="w-full flex-shrink-0 bg-stone-900/95 backdrop-blur-lg border-t-2 border-stone-700 px-1 sm:px-3 py-1.5 sm:py-2 flex items-stretch gap-1 sm:gap-2 shadow-2xl z-20">
         {/* Left Side: Worker Cat Level Up Button (働きネコレベルアップ) */}
         <button
           id="btn-upgrade-worker"
           disabled={workerLevel >= maxWorkerLevel || money < workerUpgradeCost}
           onClick={onUpgradeWorker}
-          className={`flex-shrink-0 w-20 sm:w-24 rounded-xl border-2 flex flex-col items-center justify-center p-1 sm:p-2 text-center transition-all ${
+          className={`flex-shrink-0 w-16 sm:w-24 rounded-xl border-2 flex flex-col items-center justify-center p-1 text-center transition-all ${
             workerLevel >= maxWorkerLevel
               ? 'bg-stone-800 border-stone-700 text-stone-500 opacity-60'
               : canUpgradeWorker
@@ -146,12 +152,12 @@ export const BattleHud: React.FC<BattleHudProps> = ({
               : 'bg-stone-800 border-stone-700 text-stone-400 opacity-75'
           }`}
         >
-          <div className="text-[10px] font-black text-amber-200 uppercase tracking-tighter">働きネコ</div>
-          <div className="text-xs sm:text-sm font-black leading-tight">
+          <div className="text-[9px] sm:text-[10px] font-black text-amber-200 uppercase tracking-tighter">働きネコ</div>
+          <div className="text-[11px] sm:text-sm font-black leading-tight">
             Lv.{workerLevel} {workerLevel >= maxWorkerLevel ? 'MAX' : `▶ ${workerLevel + 1}`}
           </div>
           {workerLevel < maxWorkerLevel && (
-            <div className="text-[10px] sm:text-xs font-black text-yellow-300 mt-0.5">
+            <div className="text-[9px] sm:text-xs font-black text-yellow-300 mt-0.5">
               ¥{workerUpgradeCost}
             </div>
           )}
@@ -172,7 +178,7 @@ export const BattleHud: React.FC<BattleHudProps> = ({
                 id={`btn-spawn-${slot.def.id}`}
                 disabled={!canSpawn}
                 onClick={() => onSpawnCat(slot.def.id)}
-                className={`relative rounded-lg border-2 overflow-hidden flex flex-col justify-between p-1 select-none transition-all active:scale-95 ${
+                className={`relative rounded-lg border-2 overflow-hidden flex flex-col justify-between p-1 select-none transition-all active:scale-95 min-h-[38px] sm:min-h-[44px] ${
                   canSpawn
                     ? 'bg-stone-800 hover:bg-stone-700 border-amber-400/80 shadow-md cursor-pointer'
                     : 'bg-stone-900 border-stone-700/60 opacity-60 cursor-not-allowed'
@@ -189,20 +195,20 @@ export const BattleHud: React.FC<BattleHudProps> = ({
                   >
                     {form.attackType === 'area' ? '範囲' : '単体'}
                   </span>
-                  <span className="text-[9px] sm:text-[10px] font-black text-yellow-300 drop-shadow">
+                  <span className="text-[8px] sm:text-[10px] font-black text-yellow-300 drop-shadow">
                     ¥{slot.cost}
                   </span>
                 </div>
 
                 {/* Cat Name */}
-                <div className="text-[10px] sm:text-xs font-black truncate text-stone-100 my-0.5">
+                <div className="text-[9px] sm:text-xs font-black truncate text-stone-100 my-0.5 text-left">
                   {form.name}
                 </div>
 
                 {/* Cooldown Dark Overlay */}
                 {isOnCooldown && (
                   <div
-                    className="absolute inset-0 bg-black/75 flex items-center justify-center font-mono font-black text-amber-300 text-xs sm:text-sm z-10"
+                    className="absolute inset-0 bg-black/75 flex items-center justify-center font-mono font-black text-amber-300 text-[10px] sm:text-xs z-10"
                     style={{
                       clipPath: `inset(0 0 ${100 - cooldownPercent}% 0)`,
                     }}
@@ -220,15 +226,15 @@ export const BattleHud: React.FC<BattleHudProps> = ({
           id="btn-fire-cannon"
           disabled={!isCannonReady}
           onClick={onFireCannon}
-          className={`flex-shrink-0 w-20 sm:w-24 rounded-xl border-2 flex flex-col items-center justify-center p-1 sm:p-2 text-center transition-all ${
+          className={`flex-shrink-0 w-16 sm:w-24 rounded-xl border-2 flex flex-col items-center justify-center p-1 text-center transition-all ${
             isCannonReady
               ? 'bg-gradient-to-b from-sky-400 to-blue-700 border-sky-200 text-white shadow-[0_0_15px_rgba(56,189,248,0.7)] animate-bounce active:scale-95'
               : 'bg-stone-800 border-stone-700 text-stone-400 opacity-75'
           }`}
         >
-          <Zap size={18} className={isCannonReady ? 'text-yellow-300 animate-pulse' : 'text-stone-500'} />
-          <div className="text-[10px] font-black uppercase tracking-tighter mt-0.5">にゃんこ砲</div>
-          <div className="text-[10px] sm:text-xs font-black text-sky-300">
+          <Zap size={16} className={isCannonReady ? 'text-yellow-300 animate-pulse' : 'text-stone-500'} />
+          <div className="text-[9px] sm:text-[10px] font-black uppercase tracking-tighter mt-0.5">にゃんこ砲</div>
+          <div className="text-[9px] sm:text-xs font-black text-sky-300 leading-tight">
             {isCannonReady ? '発射可能！' : `${Math.floor(cannonProgress)}%`}
           </div>
         </button>

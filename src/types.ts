@@ -150,6 +150,18 @@ export interface StageDefinition {
   baseRewardCatFood: number;
   waves: StageWave[];
   bossAlert?: string;
+  mapX?: number; // 0-100 percentage on chapter map
+  mapY?: number; // 0-100 percentage on chapter map
+  treasureFestival?: boolean; // お宝出現率 超UP!!
+}
+
+export interface BattleActiveItems {
+  speedUp?: boolean;
+  treasureRadar?: boolean;
+  richCat?: boolean;
+  catCpu?: boolean;
+  catJobs?: boolean;
+  sniper?: boolean;
 }
 
 export interface ChapterDefinition {
@@ -181,6 +193,13 @@ export interface PlayerCatProgress {
   activeForm: number; // 0 or 1
 }
 
+export interface DevModeSettings {
+  unlocked: boolean;
+  infiniteEnergy: boolean;
+  infiniteXp: boolean;
+  infiniteCatFood: boolean;
+}
+
 export interface PlayerProfile {
   xp: number;
   catFood: number;
@@ -197,6 +216,10 @@ export interface PlayerProfile {
     catCpu: number;
     treasureRadar: number;
     richCat: number;
+    catJobs?: number; // おかめはちもく (XP 1.5倍)
+    sniper?: number; // スニャイパー (定期狙撃)
   };
   gachaPityCounter: number;
+  devMode?: DevModeSettings;
 }
+
