@@ -216,13 +216,13 @@ export const GachaScreen: React.FC<GachaScreenProps> = ({
 
         {/* Gacha Results Modal */}
         {gachaResults && (
-          <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-            <div className="w-full max-w-xl bg-stone-900 border-4 border-amber-400 rounded-3xl p-6 flex flex-col items-center shadow-2xl">
-              <h3 className="text-2xl font-black text-yellow-300 mb-4 flex items-center gap-2">
-                <Sparkles size={24} /> ガチャ結果発表！
+          <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 animate-in fade-in">
+            <div className="w-full max-w-xl max-h-[92dvh] bg-stone-900 border-3 sm:border-4 border-amber-400 rounded-2xl sm:rounded-3xl p-3 sm:p-6 flex flex-col items-center shadow-2xl overflow-hidden">
+              <h3 className="text-xl sm:text-2xl font-black text-yellow-300 mb-2 sm:mb-4 flex items-center gap-2 shrink-0">
+                <Sparkles size={20} className="sm:w-6 sm:h-6" /> ガチャ結果発表！
               </h3>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 w-full max-h-[60vh] overflow-y-auto p-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3 w-full flex-1 overflow-y-auto p-1 min-h-0">
                 {gachaResults.map((res, i) => {
                   const form = res.cat.forms[0];
                   const isUber = res.cat.rarity === 'uber_rare';
@@ -231,36 +231,36 @@ export const GachaScreen: React.FC<GachaScreenProps> = ({
                   return (
                     <div
                       key={i}
-                      className={`p-3 rounded-2xl border-2 flex flex-col items-center text-center relative ${
+                      className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl border-2 flex flex-col items-center text-center relative ${
                         isUber
-                          ? 'bg-gradient-to-b from-purple-950 to-stone-900 border-purple-400 shadow-lg scale-105'
+                          ? 'bg-gradient-to-b from-purple-950 to-stone-900 border-purple-400 shadow-lg'
                           : isSuper
                           ? 'bg-gradient-to-b from-amber-950 to-stone-900 border-yellow-400'
                           : 'bg-stone-800 border-stone-700'
                       }`}
                     >
                       {res.isNew ? (
-                        <span className="absolute -top-2 bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full border border-yellow-200">
+                        <span className="absolute -top-2 bg-red-600 text-white text-[8px] sm:text-[9px] font-black px-1.5 sm:px-2 py-0.5 rounded-full border border-yellow-200 shadow">
                           NEW!
                         </span>
                       ) : (
-                        <span className="absolute -top-2 bg-emerald-700 text-white text-[9px] font-black px-2 py-0.5 rounded-full">
+                        <span className="absolute -top-2 bg-emerald-700 text-white text-[8px] sm:text-[9px] font-black px-1.5 sm:px-2 py-0.5 rounded-full shadow">
                           XP +{res.xpBonus}
                         </span>
                       )}
 
-                      <div className="my-2">
+                      <div className="my-1 sm:my-2">
                         <UnitSpriteRenderer
                           spriteType={form.spriteType}
                           isCat={true}
                           state="walk"
                           animTimer={0.5}
-                          scale={0.85}
+                          scale={0.75}
                         />
                       </div>
 
-                      <div className="text-xs font-black text-white truncate w-full">{form.name}</div>
-                      <div className="text-[9px] font-black text-amber-300 uppercase mt-0.5">
+                      <div className="text-[11px] sm:text-xs font-black text-white truncate w-full">{form.name}</div>
+                      <div className="text-[8px] sm:text-[9px] font-black text-amber-300 uppercase mt-0.5">
                         {res.cat.rarity.replace('_', ' ')}
                       </div>
                     </div>
@@ -271,7 +271,7 @@ export const GachaScreen: React.FC<GachaScreenProps> = ({
               <button
                 id="btn-close-gacha-result"
                 onClick={() => setGachaResults(null)}
-                className="mt-6 py-2.5 px-8 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 text-stone-950 font-black text-sm border-2 border-yellow-200 shadow-lg active:scale-95"
+                className="mt-3 sm:mt-5 py-2 sm:py-2.5 px-8 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 text-stone-950 font-black text-xs sm:text-sm border-2 border-yellow-200 shadow-lg active:scale-95 shrink-0"
               >
                 OK
               </button>

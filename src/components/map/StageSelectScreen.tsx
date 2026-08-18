@@ -348,51 +348,51 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
             </button>
 
             {/* CURRENT SELECTED STAGE BANNER (Prominent Large White Board) */}
-            <div className="pointer-events-auto relative bg-white border-[3px] sm:border-[5px] border-black text-black px-4 sm:px-10 py-1.5 sm:py-3 rounded-xl shadow-2xl flex flex-col items-center min-w-[220px] sm:min-w-[340px]">
+            <div className="pointer-events-auto relative bg-white border-[3px] sm:border-[5px] border-black text-black px-3 sm:px-8 py-1 sm:py-2.5 rounded-xl shadow-2xl flex flex-col items-center min-w-[190px] sm:min-w-[320px] max-w-[70vw] sm:max-w-md">
               {/* CLEAR! Stamp on Top Left */}
               {isCurrentCleared && (
-                <div className="absolute -top-3 -left-2 sm:-top-3.5 sm:-left-3 bg-red-600 text-white font-black text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded border-2 border-black shadow rotate-[-8deg] tracking-wider animate-pulse">
+                <div className="absolute -top-2.5 -left-2 sm:-top-3.5 sm:-left-3 bg-red-600 text-white font-black text-[9px] sm:text-xs px-1.5 sm:px-2.5 py-0.5 rounded border-2 border-black shadow rotate-[-8deg] tracking-wider animate-pulse">
                   CLEAR!
                 </div>
               )}
 
               {/* Treasure Stamp on Top Right */}
-              <div className="absolute -top-3 -right-2 sm:-top-3.5 sm:-right-3">
+              <div className="absolute -top-2.5 -right-2 sm:-top-3.5 sm:-right-3">
                 {currentTreasureStatus === 'gold' ? (
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-600 border-2 border-black shadow-md flex items-center justify-center font-black text-stone-950 text-xs ring-2 ring-yellow-300 animate-bounce">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-600 border-2 border-black shadow-md flex items-center justify-center font-black text-stone-950 text-[10px] sm:text-xs ring-2 ring-yellow-300 animate-bounce">
                     宝
                   </div>
                 ) : currentTreasureStatus === 'silver' ? (
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-slate-200 via-stone-300 to-slate-400 border-2 border-black shadow-md flex items-center justify-center font-black text-stone-900 text-xs">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-slate-200 via-stone-300 to-slate-400 border-2 border-black shadow-md flex items-center justify-center font-black text-stone-900 text-[10px] sm:text-xs">
                     宝
                   </div>
                 ) : currentTreasureStatus === 'bronze' ? (
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-600 via-amber-700 to-amber-900 border-2 border-black shadow-md flex items-center justify-center font-black text-amber-100 text-xs">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-600 via-amber-700 to-amber-900 border-2 border-black shadow-md flex items-center justify-center font-black text-amber-100 text-[10px] sm:text-xs">
                     宝
                   </div>
                 ) : (
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-stone-300 border-2 border-stone-600 shadow flex items-center justify-center font-bold text-stone-500 text-xs">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-stone-300 border-2 border-stone-600 shadow flex items-center justify-center font-bold text-stone-500 text-[10px] sm:text-xs">
                     宝
                   </div>
                 )}
               </div>
 
               {/* Main Stage Name (Extremely Bold) */}
-              <h2 className="text-lg sm:text-3xl font-black text-black tracking-wide drop-shadow-sm">
+              <h2 className="text-base sm:text-2xl font-black text-black tracking-wide drop-shadow-sm truncate max-w-full">
                 {currentStage.name}
               </h2>
 
               {/* Bottom Info: Energy Cost & Clear Count */}
-              <div className="flex items-center justify-between w-full mt-0.5 sm:mt-1 pt-0.5 sm:pt-1 border-t-2 border-stone-300 text-[11px] sm:text-sm font-black">
+              <div className="flex items-center justify-between w-full mt-0.5 pt-0.5 border-t-2 border-stone-300 text-[10px] sm:text-xs font-black">
                 <div className="flex items-center gap-1 text-stone-800">
                   <span>統率力</span>
-                  <span className="text-red-600 font-extrabold text-xs sm:text-base">
+                  <span className="text-red-600 font-extrabold text-xs sm:text-sm">
                     -{currentStage.energyCost}
                   </span>
                 </div>
                 <div className="flex items-center gap-1 text-stone-800">
                   <span>クリア</span>
-                  <span className="font-extrabold text-xs sm:text-base">
+                  <span className="font-extrabold text-xs sm:text-sm">
                     {clearCount}回
                   </span>
                 </div>
@@ -400,7 +400,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
 
               {/* Treasure Festival Bubble Speech Tag */}
               {currentStage.treasureFestival && (
-                <div className="absolute -bottom-3.5 sm:-bottom-4 right-1 sm:right-2 bg-emerald-600 text-yellow-200 text-[9px] sm:text-xs font-black px-2 sm:px-2.5 py-0.5 rounded-full border-2 border-black shadow flex items-center gap-1">
+                <div className="absolute -bottom-3 sm:-bottom-4 right-1 sm:right-2 bg-emerald-600 text-yellow-200 text-[8px] sm:text-xs font-black px-1.5 sm:px-2.5 py-0.5 rounded-full border-2 border-black shadow flex items-center gap-1">
                   <span>お宝出現率</span>
                   <span className="text-white font-extrabold underline">超UP!!</span>
                 </div>
@@ -444,17 +444,17 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
         </div>
 
         {/* 4. RIGHT-BOTTOM DEPLOY & ENERGY PANEL */}
-        <div className="absolute right-2 sm:right-6 bottom-2 sm:bottom-3 z-30 flex flex-col items-end gap-1 sm:gap-1.5 pointer-events-auto">
+        <div className="absolute right-2 sm:right-6 bottom-2 sm:bottom-3 z-30 flex flex-col items-end gap-1 sm:gap-1.5 pointer-events-auto shrink-0">
           {/* Energy Display Box (Official Battle Cats Style) */}
-          <div className="relative bg-gradient-to-b from-amber-400 to-amber-500 border-2 sm:border-4 border-black px-2.5 sm:px-4 py-0.5 sm:py-1 rounded-xl shadow-xl flex items-center gap-1.5 sm:gap-3">
-            <span className="text-xs sm:text-base font-black text-black tracking-wider">
+          <div className="relative bg-gradient-to-b from-amber-400 to-amber-500 border-2 sm:border-4 border-black px-2 sm:px-4 py-0.5 sm:py-1 rounded-xl shadow-xl flex items-center gap-1.5 sm:gap-3">
+            <span className="text-[11px] sm:text-base font-black text-black tracking-wider">
               統率力
             </span>
-            <div className="bg-black text-lime-400 font-mono font-black text-xs sm:text-xl px-2 sm:px-3 py-0.5 rounded border sm:border-2 border-stone-800 min-w-[60px] sm:min-w-[80px] text-right">
+            <div className="bg-black text-lime-400 font-mono font-black text-xs sm:text-xl px-1.5 sm:px-3 py-0.5 rounded border sm:border-2 border-stone-800 min-w-[50px] sm:min-w-[80px] text-right">
               {isInfiniteEnergy ? '9999' : profile.energy}
             </div>
             {/* Small timer tag */}
-            <div className="absolute -top-2 -right-1.5 bg-orange-600 text-white font-mono text-[9px] sm:text-[10px] font-black px-1 sm:px-1.5 rounded border border-black shadow">
+            <div className="absolute -top-2 -right-1.5 bg-orange-600 text-white font-mono text-[8px] sm:text-[10px] font-black px-1 sm:px-1.5 rounded border border-black shadow">
               {isInfiniteEnergy ? 'MAX' : '03'}
             </div>
           </div>
@@ -467,7 +467,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                 audio.playClick();
                 onOpenUpgrade();
               }}
-              className="hidden sm:flex bg-stone-900 hover:bg-stone-800 text-white border-3 border-black px-2.5 py-1.5 rounded-xl shadow-xl flex-col items-center justify-center font-black active:scale-95 transition-transform"
+              className="hidden md:flex bg-stone-900 hover:bg-stone-800 text-white border-3 border-black px-2.5 py-1.5 rounded-xl shadow-xl flex-col items-center justify-center font-black active:scale-95 transition-transform"
             >
               <span className="text-[9px] text-amber-400">スロット 1</span>
               <span className="text-xs">編成</span>
@@ -477,7 +477,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
             <button
               id="btn-deploy-main"
               onClick={handleDeploy}
-              className="relative px-5 sm:px-12 py-2 sm:py-3 rounded-xl sm:rounded-2xl bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-500 hover:from-yellow-200 hover:to-amber-400 text-black font-black text-base sm:text-3xl border-3 sm:border-4 border-black shadow-[0_4px_0_#92400e,0_8px_16px_rgba(0,0,0,0.6)] sm:shadow-[0_8px_0_#92400e,0_12px_20px_rgba(0,0,0,0.6)] active:translate-y-1 active:shadow-[0_1px_0_#92400e] transition-all flex items-center justify-center gap-1.5 group"
+              className="relative px-4 sm:px-10 py-1.5 sm:py-3 rounded-xl sm:rounded-2xl bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-500 hover:from-yellow-200 hover:to-amber-400 text-black font-black text-sm sm:text-3xl border-3 sm:border-4 border-black shadow-[0_3px_0_#92400e,0_6px_12px_rgba(0,0,0,0.6)] sm:shadow-[0_8px_0_#92400e,0_12px_20px_rgba(0,0,0,0.6)] active:translate-y-0.5 active:shadow-[0_1px_0_#92400e] transition-all flex items-center justify-center gap-1.5 group min-h-[40px] sm:min-h-[56px]"
             >
               <span className="tracking-wider drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
                 いざ出陣!!
@@ -487,7 +487,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
         </div>
 
         {/* 5. BOTTOM BATTLE ITEMS TOGGLE BAR (6 Major Battle Items) */}
-        <div className="absolute left-2 sm:left-6 bottom-2 sm:bottom-3 z-30 flex items-center gap-1 sm:gap-2 bg-stone-900/90 backdrop-blur-md p-1 sm:p-2 rounded-xl sm:rounded-2xl border-2 border-stone-700 shadow-2xl pointer-events-auto overflow-x-auto max-w-[48vw] sm:max-w-none no-scrollbar">
+        <div className="absolute left-2 sm:left-6 bottom-2 sm:bottom-3 z-30 flex items-center gap-1 sm:gap-2 bg-stone-900/90 backdrop-blur-md p-1 sm:p-2 rounded-xl sm:rounded-2xl border-2 border-stone-700 shadow-2xl pointer-events-auto overflow-x-auto max-w-[calc(100vw-175px)] sm:max-w-[420px] md:max-w-none no-scrollbar">
           {/* 1. SPEED UP */}
           <button
             id="item-toggle-speedup"
