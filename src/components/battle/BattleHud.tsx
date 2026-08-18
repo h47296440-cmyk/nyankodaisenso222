@@ -61,7 +61,7 @@ export const BattleHud: React.FC<BattleHudProps> = ({
   return (
     <div className="flex flex-col h-full w-full bg-stone-950 overflow-hidden select-none font-['M_PLUS_Rounded_1c']">
       {/* Top Status Header */}
-      <div className="w-full flex-shrink-0 bg-stone-900/95 backdrop-blur-md border-b border-stone-700/80 px-2 sm:px-4 py-1.5 flex items-center justify-between text-white shadow-md z-20">
+      <div className="w-full flex-shrink-0 bg-stone-900/95 backdrop-blur-md border-b border-stone-700/80 px-2 sm:px-4 pt-[max(0.35rem,env(safe-area-inset-top,0px))] pb-1.5 flex items-center justify-between text-white shadow-md z-20">
         {/* Money Display (働きネコ所持金) */}
         <div className="flex items-center gap-1.5 sm:gap-2">
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 border-2 border-yellow-100 flex items-center justify-center font-black text-stone-900 text-xs sm:text-sm shadow-md">
@@ -138,7 +138,7 @@ export const BattleHud: React.FC<BattleHudProps> = ({
       </div>
 
       {/* Bottom Deck & Deployment Controls Bar */}
-      <div className="w-full flex-shrink-0 bg-stone-900/95 backdrop-blur-lg border-t-2 border-stone-700 px-1 sm:px-3 py-1.5 sm:py-2 flex items-stretch gap-1 sm:gap-2 shadow-2xl z-20">
+      <div className="w-full flex-shrink-0 bg-stone-900/95 backdrop-blur-lg border-t-2 border-stone-700 px-1 sm:px-3 pt-1.5 sm:pt-2 pb-[calc(max(0.35rem,env(safe-area-inset-bottom,0px))+4px)] flex items-stretch gap-1 sm:gap-2 shadow-2xl z-20">
         {/* Left Side: Worker Cat Level Up Button (働きネコレベルアップ) */}
         <button
           id="btn-upgrade-worker"

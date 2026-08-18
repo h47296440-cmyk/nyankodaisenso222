@@ -174,9 +174,9 @@ export default function App() {
   };
 
   return (
-    <div className="w-screen h-screen overflow-hidden bg-black select-none flex flex-col items-center justify-center">
-      {/* 16:9 or responsive viewport wrapper */}
-      <div className="relative w-full h-full max-w-[1920px] max-h-[1080px] bg-stone-950 overflow-hidden shadow-2xl flex flex-col">
+    <div className="w-full h-[100dvh] fixed inset-0 overflow-hidden bg-black select-none flex flex-col items-center justify-center">
+      {/* Responsive 100dvh viewport wrapper */}
+      <div className="relative w-full h-full max-w-[1920px] bg-stone-950 overflow-hidden shadow-2xl flex flex-col">
         {currentView === 'title' && (
           <TitleScreen
             onStartGame={() => setCurrentView('map')}

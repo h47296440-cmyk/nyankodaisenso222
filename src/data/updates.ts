@@ -19,10 +19,37 @@ export interface UpdateEntry {
  */
 export const UPDATE_HISTORY: UpdateEntry[] = [
   {
+    version: 'v1.5',
+    date: '2026-08-18',
+    title: 'iPhone/PWA画面見切れの完全修正 & PWAマニフェスト・高精細SVGファビコン追加',
+    isLatest: true,
+    categories: [
+      {
+        type: 'fix',
+        title: 'iPhone / PWAメニュー見切れの修正',
+        items: [
+          'iPhone PWAの画面上部（ノッチ/Dynamic Island）および画面下部（ホームバー）でのヘッダー・フッター見切れを100dvhとセーフエリア（env）対応で完全解消',
+          'マップ画面の上部ヘッダーを2段レスポンシブ構成に最適化し、章切り替えタブやリソース（統率力・XP・ネコ缶）が画面外にはみ出さないよう調整',
+          '下部ナビゲーションバー（パワーアップ・ガチャ・お宝・図鑑）が画面外に押し出されないようグリッドと高さを最適化',
+          '戦闘画面の所持金表示や出撃スロット、アイテム欄の配置バランスをスマホ画面向けに微調整',
+        ],
+      },
+      {
+        type: 'feature',
+        title: 'PWA & ファビコンSVGの本格対応',
+        items: [
+          'にゃんこ大戦争の愛らしいにゃんこゴールドスタンプをモチーフにしたベクターSVGファビコン（favicon.svg）を追加',
+          'PWAインストール用のマニフェスト（manifest.webmanifest）および192x192 / 512x512アイコン、apple-touch-iconを追加',
+          'ホーム画面に追加してフルスクリーンアプリとして快適に遊べるよう設定',
+        ],
+      },
+    ],
+  },
+  {
     version: 'v1.4',
     date: '2026-08-17',
     title: '第1形態・第2形態の自由切替 & 開発者モード刷新 & 各章オープニング・エンディング巻物シアター追加',
-    isLatest: true,
+    isLatest: false,
     categories: [
       {
         type: 'feature',

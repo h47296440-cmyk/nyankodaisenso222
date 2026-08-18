@@ -30,7 +30,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full bg-gradient-to-b from-sky-400 via-sky-200 to-amber-100 flex flex-col items-center justify-between p-4 sm:p-6 select-none overflow-hidden font-['M_PLUS_Rounded_1c']">
+    <div className="relative w-full h-full min-h-0 bg-gradient-to-b from-sky-400 via-sky-200 to-amber-100 flex flex-col items-center justify-between px-3 sm:px-6 pt-[max(0.5rem,env(safe-area-inset-top,0px))] pb-[calc(max(0.4rem,env(safe-area-inset-bottom,0px))+2px)] select-none overflow-hidden font-['M_PLUS_Rounded_1c']">
       {/* Sun & Clouds */}
       <div className="absolute top-8 left-12 w-28 h-28 bg-yellow-300 rounded-full blur-xl opacity-80 pointer-events-none" />
       <div className="absolute top-16 right-16 w-56 h-20 bg-white/80 rounded-full blur-sm pointer-events-none" />
@@ -48,7 +48,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
             className="text-xs sm:text-sm font-black text-amber-950 bg-amber-200 hover:bg-amber-300 px-3 py-1.5 rounded-full border-2 border-amber-400 shadow-md flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
           >
             <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-            <span>Ver 1.1</span>
+            <span>Ver 1.5</span>
             <span className="text-[10px] text-amber-800 font-bold ml-0.5">アップデート履歴</span>
           </button>
 

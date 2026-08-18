@@ -32,9 +32,9 @@ export const CatEncyclopediaScreen: React.FC<CatEncyclopediaScreenProps> = ({ on
   });
 
   return (
-    <div className="flex flex-col h-full bg-stone-950 text-white select-none font-['M_PLUS_Rounded_1c']">
+    <div className="flex flex-col h-full min-h-0 bg-stone-950 text-white select-none font-['M_PLUS_Rounded_1c'] overflow-hidden">
       {/* Header */}
-      <div className="bg-stone-900 border-b border-stone-800 px-4 py-2.5 flex items-center justify-between shadow">
+      <div className="bg-stone-900 border-b border-stone-800 px-3 sm:px-4 pt-[max(0.5rem,env(safe-area-inset-top,0px))] pb-2.5 flex items-center justify-between shadow">
         <div className="flex items-center gap-3">
           <button
             id="btn-encyclopedia-back"
