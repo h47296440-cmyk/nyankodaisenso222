@@ -96,7 +96,79 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
           </div>
         );
 
+      case 'future_space':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-blue-950 to-indigo-950 overflow-hidden pointer-events-none">
+            {/* Giant Orbiting Moon/Colony */}
+            <div className="absolute top-8 right-16 w-32 h-32 rounded-full bg-cyan-400/20 border-2 border-cyan-300/40 blur-sm animate-pulse" />
+            {/* Space Grid */}
+            <div
+              className="absolute bottom-0 left-0 right-0 h-24 opacity-25"
+              style={{
+                backgroundImage: 'linear-gradient(to right, #38bdf8 1px, transparent 1px), linear-gradient(to bottom, #38bdf8 1px, transparent 1px)',
+                backgroundSize: '30px 12px',
+              }}
+            />
+          </div>
+        );
+
+      case 'cosmos_dimension':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-fuchsia-950 to-purple-950 overflow-hidden pointer-events-none">
+            {/* Divine Dimensional Rift */}
+            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-r from-amber-500/20 via-pink-500/25 to-cyan-500/20 rounded-full blur-3xl animate-pulse" />
+            {/* Dimensional Shards */}
+            {Array.from({ length: 30 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute bg-amber-300/60 rotate-45 animate-ping"
+                style={{
+                  left: `${(i * 33) % 100}%`,
+                  top: `${(i * 27) % 65}%`,
+                  width: `${(i % 4) + 2}px`,
+                  height: `${(i % 4) + 2}px`,
+                  animationDuration: `${2 + (i % 3)}s`,
+                }}
+              />
+            ))}
+          </div>
+        );
+
+      case 'japan_volcano':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-red-950 to-amber-950 overflow-hidden pointer-events-none">
+            {/* Fiery Smoke & Embers */}
+            <div className="absolute top-0 left-1/3 w-80 h-80 bg-red-600/20 rounded-full blur-3xl" />
+            <svg className="absolute bottom-16 left-0 w-full h-44 opacity-50 text-stone-900 fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+              <polygon points="0,100 200,40 400,90 600,20 800,80 1000,100" />
+            </svg>
+          </div>
+        );
+
       case 'cosmos_galaxy':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950 to-slate-950 overflow-hidden pointer-events-none">
+            {/* Stars */}
+            {Array.from({ length: 40 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full bg-white animate-pulse"
+                style={{
+                  left: `${(i * 47) % 100}%`,
+                  top: `${(i * 31) % 70}%`,
+                  width: `${(i % 3) + 1.5}px`,
+                  height: `${(i % 3) + 1.5}px`,
+                  opacity: 0.4 + (i % 6) * 0.1,
+                }}
+              />
+            ))}
+            {/* Nebula glow */}
+            <div className="absolute top-10 left-1/3 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-20 right-1/4 w-80 h-80 bg-pink-600/15 rounded-full blur-3xl pointer-events-none" />
+          </div>
+        );
+
+      case 'japan_city':
         return (
           <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950 to-slate-950 overflow-hidden pointer-events-none">
             {/* Stars */}
@@ -155,9 +227,13 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
   const getGroundColor = () => {
     switch (stage.bgType) {
       case 'future_neon':
+      case 'future_space':
         return 'bg-gradient-to-t from-slate-950 to-slate-900 border-cyan-500';
       case 'cosmos_galaxy':
+      case 'cosmos_dimension':
         return 'bg-gradient-to-t from-black to-purple-950 border-purple-500';
+      case 'japan_volcano':
+        return 'bg-gradient-to-t from-stone-950 to-red-950 border-red-800';
       case 'japan_city':
         return 'bg-gradient-to-t from-stone-800 to-stone-700 border-stone-500';
       default:

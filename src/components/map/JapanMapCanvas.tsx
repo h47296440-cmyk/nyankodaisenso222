@@ -18,9 +18,9 @@ export const JapanMapCanvas: React.FC<JapanMapCanvasProps> = ({
   onSelectStage,
   containerRef,
 }) => {
-  const isJapan = chapter.id === 'japan';
-  const isFuture = chapter.id === 'future';
-  const isCosmos = chapter.id === 'cosmos';
+  const isJapan = chapter.category === 'japan' || chapter.id.startsWith('japan');
+  const isFuture = chapter.category === 'future' || chapter.id.startsWith('future');
+  const isCosmos = chapter.category === 'cosmos' || chapter.id.startsWith('cosmos');
 
   const selectedStage = stages.find((s) => s.id === selectedStageId) || stages[0];
 

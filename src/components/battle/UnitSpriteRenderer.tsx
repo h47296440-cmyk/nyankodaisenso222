@@ -762,6 +762,260 @@ function renderSpriteSvg(
         </svg>
       );
 
+    case 'enemy_alien_pigge':
+      return (
+        <svg width="74" height="62" viewBox="0 0 74 62" className="drop-shadow-lg">
+          {/* Alien Pig Body (Cyan/Teal) */}
+          <ellipse cx="36" cy="32" rx="22" ry="18" fill="#06b6d4" stroke="#083344" strokeWidth="2.5" />
+          {/* Ears */}
+          <polygon points="20,16 26,6 32,16" fill="#0891b2" stroke="#083344" strokeWidth="2" />
+          <polygon points="38,16 44,6 48,16" fill="#0891b2" stroke="#083344" strokeWidth="2" />
+          {/* Snout */}
+          <ellipse cx="52" cy="34" rx="11" ry="9" fill="#22d3ee" stroke="#083344" strokeWidth="2" />
+          <circle cx="48" cy="34" r="2.5" fill="#083344" />
+          <circle cx="55" cy="34" r="2.5" fill="#083344" />
+          {/* Neon Eyes */}
+          <circle cx="32" cy="24" r="3.5" fill="#fef08a" stroke="#083344" strokeWidth="1.5" />
+          <circle cx="42" cy="24" r="3.5" fill="#fef08a" stroke="#083344" strokeWidth="1.5" />
+          {/* Legs */}
+          <rect x={22 + legOffset1} y="46" width="7" height="11" rx="2" fill="#0891b2" stroke="#083344" strokeWidth="2" />
+          <rect x={40 + legOffset2} y="46" width="7" height="11" rx="2" fill="#0891b2" stroke="#083344" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_black_gorilla':
+      return (
+        <svg width="78" height="74" viewBox="0 0 78 74" className="drop-shadow-xl">
+          {/* Black Gorilla Body */}
+          <ellipse cx="38" cy="40" rx="26" ry="24" fill="#18181b" stroke="#09090b" strokeWidth="3" />
+          {/* Chest Muscles */}
+          <path d="M 26 34 Q 38 46 50 34" fill="none" stroke="#3f3f46" strokeWidth="3" />
+          {/* Red Glowing Eyes */}
+          <circle cx="32" cy="26" r="3" fill="#ef4444" />
+          <circle cx="44" cy="26" r="3" fill="#ef4444" />
+          {/* Gorilla Fists */}
+          <ellipse cx={18 + (isAttacking ? 12 : legOffset1)} cy="50" rx="9" ry="9" fill="#27272a" stroke="#09090b" strokeWidth="2" />
+          <ellipse cx={58 + (isAttacking ? -12 : legOffset2)} cy="50" rx="9" ry="9" fill="#27272a" stroke="#09090b" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_star_peng':
+      return (
+        <svg width="68" height="66" viewBox="0 0 68 66" className="drop-shadow-lg">
+          {/* Space Helmet */}
+          <circle cx="34" cy="24" r="18" fill="#38bdf8" fillOpacity="0.4" stroke="#0284c7" strokeWidth="2.5" />
+          {/* Penguin Head */}
+          <circle cx="34" cy="24" r="12" fill="#0f172a" stroke="#0284c7" strokeWidth="1.5" />
+          <polygon points="34,22 46,26 34,30" fill="#facc15" stroke="#0f172a" strokeWidth="1.5" />
+          <circle cx="32" cy="20" r="2.5" fill="#f8fafc" />
+          {/* Space Suit Body */}
+          <ellipse cx="34" cy="46" rx="16" ry="14" fill="#e2e8f0" stroke="#0f172a" strokeWidth="2" />
+          {/* Flippers */}
+          <ellipse cx={20 + legOffset1} cy="46" rx="5" ry="9" fill="#0284c7" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={48 + legOffset2} cy="46" rx="5" ry="9" fill="#0284c7" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
+
+    // ==========================================
+    // 9 CHAPTER UNIQUE BOSSES
+    // ==========================================
+
+    // Chapter 2 Boss: Emperor Nyandam (悪の帝王ニャンダム)
+    case 'enemy_nyandam':
+      return (
+        <svg width="105" height="105" viewBox="0 0 105 105" className="drop-shadow-2xl">
+          {/* Evil Crimson Throne */}
+          <rect x="22" y="30" width="60" height="60" rx="6" fill="#7f1d1d" stroke="#450a0a" strokeWidth="3" />
+          <polygon points="18,30 28,10 40,30" fill="#991b1b" stroke="#450a0a" strokeWidth="2" />
+          <polygon points="64,30 76,10 86,30" fill="#991b1b" stroke="#450a0a" strokeWidth="2" />
+          {/* Horned Demon Overlord */}
+          <ellipse cx="52" cy="48" rx="22" ry="24" fill="#dc2626" stroke="#450a0a" strokeWidth="2.5" />
+          {/* Golden Demonic Horns */}
+          <polygon points="36,32 30,14 42,26" fill="#f59e0b" stroke="#450a0a" strokeWidth="2" />
+          <polygon points="68,32 74,14 62,26" fill="#f59e0b" stroke="#450a0a" strokeWidth="2" />
+          {/* Sinister Red Eyes */}
+          <polygon points="42,42 48,46 44,48" fill="#fef08a" stroke="#0f172a" strokeWidth="1" />
+          <polygon points="62,42 56,46 60,48" fill="#fef08a" stroke="#0f172a" strokeWidth="1" />
+          {/* Wine Glass in Hand */}
+          <polygon points="76,52 86,52 81,64" fill="#991b1b" stroke="#facc15" strokeWidth="1.5" />
+          <line x1="81" y1="64" x2="81" y2="72" stroke="#facc15" strokeWidth="2" />
+          {/* Meteor summoning FX on attack */}
+          {isAttacking && (
+            <g className="animate-ping">
+              <circle cx="52" cy="18" r="16" fill="#f97316" fillOpacity="0.8" stroke="#ef4444" strokeWidth="3" />
+            </g>
+          )}
+        </svg>
+      );
+
+    // Chapter 4 (Future 1) Boss: Alien Clione (侵略生命体クリ・オネ)
+    case 'enemy_clione':
+      return (
+        <svg width="100" height="100" viewBox="0 0 100 100" className="drop-shadow-2xl">
+          {/* Translucent Alien Clione Body */}
+          <path
+            d="M 50 18 Q 70 35 62 70 Q 50 90 38 70 Q 30 35 50 18 Z"
+            fill="#06b6d4"
+            fillOpacity="0.75"
+            stroke="#083344"
+            strokeWidth="3"
+          />
+          {/* Cosmic Glowing Viscera Core */}
+          <circle cx="50" cy="46" r="12" fill="#f43f5e" className="animate-pulse" />
+          {/* Floating Clione Wings */}
+          <ellipse
+            cx={28}
+            cy={42 + walkCycle * 4}
+            rx="16"
+            ry="9"
+            fill="#22d3ee"
+            fillOpacity="0.8"
+            stroke="#083344"
+            strokeWidth="2"
+            transform="rotate(-25 28 42)"
+          />
+          <ellipse
+            cx={72}
+            cy={42 - walkCycle * 4}
+            rx="16"
+            ry="9"
+            fill="#22d3ee"
+            fillOpacity="0.8"
+            stroke="#083344"
+            strokeWidth="2"
+            transform="rotate(25 72 42)"
+          />
+          {/* Piercing Cosmic Laser on Attack */}
+          {isAttacking && (
+            <line x1="50" y1="46" x2="-80" y2="46" stroke="#f43f5e" strokeWidth="8" strokeLinecap="round" className="animate-ping" />
+          )}
+          {/* Buccal Cones (tentacles on head) */}
+          <polygon points="46,18 42,4 48,12" fill="#f43f5e" stroke="#083344" strokeWidth="1.5" />
+          <polygon points="54,18 58,4 52,12" fill="#f43f5e" stroke="#083344" strokeWidth="1.5" />
+        </svg>
+      );
+
+    // Chapter 5 (Future 2) Boss: Corrupted Valkyrie (反逆の戦乙女ヴァルキリー)
+    case 'enemy_valkyrie_corrupt':
+      return (
+        <svg width="105" height="105" viewBox="0 0 105 105" className="drop-shadow-2xl">
+          {/* Dark Cyber Wings */}
+          <polygon points="50,45 10,15 25,60" fill="#0284c7" stroke="#083344" strokeWidth="2.5" />
+          <polygon points="50,45 90,15 75,60" fill="#0284c7" stroke="#083344" strokeWidth="2.5" />
+          {/* Slender Cyber Warrior Body */}
+          <ellipse cx="50" cy="52" rx="14" ry="24" fill="#0f172a" stroke="#38bdf8" strokeWidth="2.5" />
+          {/* Cybernetic Visor Face */}
+          <circle cx="50" cy="30" r="14" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" />
+          <rect x="40" y="26" width="20" height="6" rx="2" fill="#ef4444" className="animate-pulse" />
+          {/* Cyber Valkyrie Spear */}
+          <line
+            x1={isAttacking ? "-10" : "20"}
+            y1="50"
+            x2="80"
+            y2="50"
+            stroke="#38bdf8"
+            strokeWidth="5"
+            strokeLinecap="round"
+          />
+          <polygon points="15,44 0,50 15,56" fill="#facc15" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
+
+    // Chapter 6 (Future 3) Boss: Raging Bahamut (暴走の狂乱ネコムート)
+    case 'enemy_bahamut_corrupt':
+      return (
+        <svg width="115" height="115" viewBox="0 0 115 115" className="drop-shadow-2xl">
+          {/* Massive Dragon Wings */}
+          <path d="M 55 45 Q 10 10 15 70 Z" fill="#4c1d95" stroke="#0f172a" strokeWidth="3" />
+          <path d="M 60 45 Q 105 10 100 70 Z" fill="#4c1d95" stroke="#0f172a" strokeWidth="3" />
+          {/* Ancient Deity Torso */}
+          <ellipse cx="58" cy="58" rx="22" ry="28" fill="#1e1b4b" stroke="#7c3aed" strokeWidth="3" />
+          {/* Ferocious Dragon Skull */}
+          <polygon points="58,15 42,35 74,35" fill="#f8fafc" stroke="#0f172a" strokeWidth="3" />
+          <circle cx="50" cy="28" r="3" fill="#ef4444" />
+          <circle cx="66" cy="28" r="3" fill="#ef4444" />
+          {/* Supernova Dark Ball on attack */}
+          {isAttacking && (
+            <circle cx="58" cy="90" r="22" fill="#7c3aed" stroke="#c084fc" strokeWidth="4" className="animate-ping" />
+          )}
+          {/* Claws */}
+          <ellipse cx={40 + legOffset1} cy="86" rx="8" ry="8" fill="#312e81" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={76 + legOffset2} cy="86" rx="8" ry="8" fill="#312e81" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
+
+    // Chapter 7 (Cosmos 1) Boss: Space Cyclone (スペースサイクロン)
+    case 'enemy_space_cyclone':
+      return (
+        <svg width="110" height="110" viewBox="0 0 110 110" className="drop-shadow-2xl">
+          {/* Swirling Cosmic Vortex Blades */}
+          <g className="animate-spin" style={{ transformOrigin: '55px 55px' }}>
+            <circle cx="55" cy="55" r="48" fill="none" stroke="#06b6d4" strokeWidth="6" strokeDasharray="20,10" />
+            <polygon points="55,10 40,55 55,55" fill="#0891b2" />
+            <polygon points="100,55 55,40 55,55" fill="#0891b2" />
+            <polygon points="55,100 70,55 55,55" fill="#0891b2" />
+            <polygon points="10,55 55,70 55,55" fill="#0891b2" />
+          </g>
+          {/* Dark Event Horizon Core */}
+          <circle cx="55" cy="55" r="26" fill="#09090b" stroke="#22d3ee" strokeWidth="4" />
+          <circle cx="55" cy="55" r="10" fill="#f43f5e" className="animate-pulse" />
+        </svg>
+      );
+
+    // Chapter 8 (Cosmos 2) Boss: Supreme Commander Big Peng (スター司令官ビッグ・ペン)
+    case 'enemy_big_peng':
+      return (
+        <svg width="110" height="110" viewBox="0 0 110 110" className="drop-shadow-2xl">
+          {/* Powered Armor Suit */}
+          <ellipse cx="55" cy="60" rx="36" ry="34" fill="#0284c7" stroke="#082f49" strokeWidth="3.5" />
+          {/* Golden Commander Epaulets */}
+          <polygon points="20,40 32,32 36,46" fill="#fbbf24" stroke="#082f49" strokeWidth="2" />
+          <polygon points="90,40 78,32 74,46" fill="#fbbf24" stroke="#082f49" strokeWidth="2" />
+          {/* Penguin Helmet & Glowing Visor */}
+          <circle cx="55" cy="36" r="20" fill="#0f172a" stroke="#082f49" strokeWidth="3" />
+          <rect x="42" y="32" width="26" height="8" rx="3" fill="#facc15" stroke="#082f49" strokeWidth="1.5" />
+          <polygon points="55,42 68,46 55,50" fill="#f97316" stroke="#082f49" strokeWidth="2" />
+          {/* Twin Heavy Laser Cannons */}
+          <rect x="12" y="55" width="16" height="24" rx="4" fill="#38bdf8" stroke="#082f49" strokeWidth="2" />
+          <rect x="82" y="55" width="16" height="24" rx="4" fill="#38bdf8" stroke="#082f49" strokeWidth="2" />
+        </svg>
+      );
+
+    // Chapter 9 (Cosmos 3) FINAL CLIMAX BOSS: Final Cosmic God Cat (宇宙創世神 ファイナル・ネコゴッド)
+    case 'enemy_cosmos_god_final':
+      return (
+        <svg width="130" height="130" viewBox="0 0 130 130" className="drop-shadow-2xl">
+          {/* Multi-tier Rotating Divine Halo */}
+          <g className="animate-spin" style={{ transformOrigin: '65px 65px' }}>
+            <circle cx="65" cy="65" r="58" fill="none" stroke="#fbbf24" strokeWidth="4" strokeDasharray="14,8" />
+            <circle cx="65" cy="65" r="50" fill="none" stroke="#f59e0b" strokeWidth="3" strokeDasharray="8,6" />
+          </g>
+          {/* Radiant Sunburst Rays */}
+          <polygon points="65,4 69,20 61,20" fill="#fef08a" />
+          <polygon points="126,65 110,69 110,61" fill="#fef08a" />
+          <polygon points="65,126 61,110 69,110" fill="#fef08a" />
+          <polygon points="4,65 20,61 20,69" fill="#fef08a" />
+          {/* Majestic God Face */}
+          <ellipse cx="65" cy="62" rx="36" ry="40" fill="#fef3c7" stroke="#b45309" strokeWidth="3.5" />
+          {/* God Cat Ears */}
+          <polygon points="40,32 30,12 50,26" fill="#fef3c7" stroke="#b45309" strokeWidth="2.5" />
+          <polygon points="90,32 100,12 80,26" fill="#fef3c7" stroke="#b45309" strokeWidth="2.5" />
+          {/* Flowing Golden Divine Beard */}
+          <path d="M 38 72 Q 65 112 92 72 Q 65 92 38 72 Z" fill="#f59e0b" stroke="#b45309" strokeWidth="3" />
+          {/* All-Seeing Cosmic Eyes */}
+          <ellipse cx="52" cy="54" rx="5" ry="6" fill="#3b82f6" stroke="#1e3a8a" strokeWidth="1.5" />
+          <ellipse cx="78" cy="54" rx="5" ry="6" fill="#3b82f6" stroke="#1e3a8a" strokeWidth="1.5" />
+          {/* Third Eye / Universe Core Jewel */}
+          <polygon points="65,30 72,40 65,50 58,40" fill="#ec4899" stroke="#b45309" strokeWidth="2.5" />
+          {/* Divine Thunder Aura on attack */}
+          {isAttacking && (
+            <g className="animate-ping">
+              <polygon points="65,0 80,30 65,40 85,70 50,60 65,0" fill="#fbbf24" fillOpacity="0.8" />
+            </g>
+          )}
+        </svg>
+      );
+
     case 'enemy_future_satellite':
       return (
         <svg width="96" height="96" viewBox="0 0 96 96" className="drop-shadow-2xl">

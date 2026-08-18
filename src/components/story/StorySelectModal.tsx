@@ -28,11 +28,27 @@ export const StorySelectModal: React.FC<StorySelectModalProps> = ({
   // Cosmos Ending: cleared cosmos_3 (or dev mode)
   const isDevUnlocked = !!profile.devMode?.unlocked;
 
-  const isJapanEndingUnlocked = isDevUnlocked || !!profile.clearedStages['japan_12'] || !!profile.clearedStages['japan_6'];
+  const isJapanEndingUnlocked =
+    isDevUnlocked ||
+    !!profile.clearedStages['japan_1_5'] ||
+    !!profile.clearedStages['japan_3_3'] ||
+    !!profile.clearedStages['japan_12'] ||
+    !!profile.clearedStages['japan_6'];
+
   const isFutureOpeningUnlocked = isDevUnlocked || isJapanEndingUnlocked;
-  const isFutureEndingUnlocked = isDevUnlocked || !!profile.clearedStages['future_3'];
+
+  const isFutureEndingUnlocked =
+    isDevUnlocked ||
+    !!profile.clearedStages['future_3_3'] ||
+    !!profile.clearedStages['future_3'];
+
   const isCosmosOpeningUnlocked = isDevUnlocked || isFutureEndingUnlocked;
-  const isCosmosEndingUnlocked = isDevUnlocked || !!profile.clearedStages['cosmos_3'];
+
+  const isCosmosEndingUnlocked =
+    isDevUnlocked ||
+    !!profile.clearedStages['cosmos_3_3'] ||
+    !!profile.clearedStages['cosmos_3'] ||
+    !!profile.clearedStages['cosmos_2'];
 
   const storyItems = [
     {

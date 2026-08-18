@@ -135,16 +135,37 @@ export interface StageWave {
   boss?: boolean;
 }
 
+export type ChapterId =
+  | 'japan_1'
+  | 'japan_2'
+  | 'japan_3'
+  | 'future_1'
+  | 'future_2'
+  | 'future_3'
+  | 'cosmos_1'
+  | 'cosmos_2'
+  | 'cosmos_3'
+  | 'japan'
+  | 'future'
+  | 'cosmos';
+
 export interface StageDefinition {
   id: string;
-  chapterId: 'japan' | 'future' | 'cosmos';
+  chapterId: ChapterId;
   stageNumber: number;
   name: string;
   jpName: string;
   energyCost: number;
   castleHp: number;
   enemyCastleSprite: string;
-  bgType: 'japan_grass' | 'japan_city' | 'future_neon' | 'future_space' | 'cosmos_galaxy';
+  bgType:
+    | 'japan_grass'
+    | 'japan_city'
+    | 'japan_volcano'
+    | 'future_neon'
+    | 'future_space'
+    | 'cosmos_galaxy'
+    | 'cosmos_dimension';
   battlefieldWidth: number;
   baseRewardXp: number;
   baseRewardCatFood: number;
@@ -153,6 +174,8 @@ export interface StageDefinition {
   mapX?: number; // 0-100 percentage on chapter map
   mapY?: number; // 0-100 percentage on chapter map
   treasureFestival?: boolean; // お宝出現率 超UP!!
+  isBossStage?: boolean;
+  isFinalBossStage?: boolean;
 }
 
 export interface BattleActiveItems {
@@ -165,11 +188,15 @@ export interface BattleActiveItems {
 }
 
 export interface ChapterDefinition {
-  id: 'japan' | 'future' | 'cosmos';
+  id: ChapterId;
+  category: 'japan' | 'future' | 'cosmos';
+  chapterNumber: 1 | 2 | 3;
   name: string;
   jpName: string;
   subtitle: string;
   bannerBg: string;
+  bossName: string;
+  bossSprite: string;
   unlockRequirement?: string;
   stages: StageDefinition[];
 }

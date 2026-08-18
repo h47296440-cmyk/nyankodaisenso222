@@ -47,8 +47,12 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
   onOpenStorySelect,
   onBackToTitle,
 }) => {
-  const [selectedChapterId, setSelectedChapterId] = useState<'japan' | 'future' | 'cosmos'>('japan');
-  const currentChapter = CHAPTERS.find((c) => c.id === selectedChapterId) || CHAPTERS[0];
+  const [selectedCategory, setSelectedCategory] = useState<'japan' | 'future' | 'cosmos'>('japan');
+  const [selectedChapterId, setSelectedChapterId] = useState<string>('japan_1');
+
+  // Filter chapters by selected category
+  const categoryChapters = CHAPTERS.filter((c) => c.category === selectedCategory);
+  const currentChapter = CHAPTERS.find((c) => c.id === selectedChapterId) || categoryChapters[0] || CHAPTERS[0];
 
   const isInfiniteEnergy = !!profile.devMode?.infiniteEnergy;
   const isInfiniteXp = !!profile.devMode?.infiniteXp;
@@ -56,7 +60,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
 
   // Stage selection state
   const [selectedStageId, setSelectedStageId] = useState<string>(
-    currentChapter.stages[0]?.id || 'japan_1'
+    currentChapter.stages[0]?.id || 'japan_1_1'
   );
 
   // Active Battle Items toggles
@@ -73,32 +77,45 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
 
   // Sync selected stage when chapter changes
   useEffect(() => {
-    setSelectedStageId(currentChapter.stages[0]?.id || 'japan_1');
+    setSelectedStageId(currentChapter.stages[0]?.id || 'japan_1_1');
   }, [selectedChapterId]);
 
   // Current selected stage index
   const currentIndex = currentChapter.stages.findIndex((s) => s.id === selectedStageId);
   const currentStage = currentChapter.stages[currentIndex] || currentChapter.stages[0];
 
-  // Auto scroll map towards selected stage
-  useEffect(() => {
-    if (mapScrollRef.current && currentStage) {
-      const posX = ((currentStage.mapX ?? 10) / 100) * 1400 + 80;
-      const posY = ((currentStage.mapY ?? 50) / 100) * 700 + 70;
-      const containerWidth = mapScrollRef.current.clientWidth;
-      const containerHeight = mapScrollRef.current.clientHeight;
-
-      mapScrollRef.current.scrollTo({
-        left: Math.max(0, posX - containerWidth / 2),
-        top: Math.max(0, posY - containerHeight / 2),
-        behavior: 'smooth',
-      });
+  // Helper for chapter unlocked check
+  const checkChapterUnlocked = (chId: string): boolean => {
+    switch (chId) {
+      case 'japan_1':
+      case 'japan':
+        return true;
+      case 'japan_2':
+        return !!profile.clearedStages['japan_1_5'] || !!profile.clearedStages['japan_12'] || !!profile.clearedStages['japan_6'];
+      case 'japan_3':
+        return !!profile.clearedStages['japan_2_4'] || !!profile.clearedStages['japan_12'];
+      case 'future_1':
+      case 'future':
+        return !!profile.clearedStages['japan_3_3'] || !!profile.clearedStages['japan_1_5'] || !!profile.clearedStages['japan_12'];
+      case 'future_2':
+        return !!profile.clearedStages['future_1_3'] || !!profile.clearedStages['future_3'];
+      case 'future_3':
+        return !!profile.clearedStages['future_2_3'] || !!profile.clearedStages['future_3'];
+      case 'cosmos_1':
+      case 'cosmos':
+        return !!profile.clearedStages['future_3_3'] || !!profile.clearedStages['future_3'];
+      case 'cosmos_2':
+        return !!profile.clearedStages['cosmos_1_3'] || !!profile.clearedStages['cosmos_2'];
+      case 'cosmos_3':
+        return !!profile.clearedStages['cosmos_2_3'] || !!profile.clearedStages['cosmos_2'];
+      default:
+        return true;
     }
-  }, [selectedStageId]);
+  };
 
-  // Chapter unlock checks
-  const isFutureUnlocked = !!profile.clearedStages['japan_12'] || !!profile.clearedStages['japan_6'];
-  const isCosmosUnlocked = !!profile.clearedStages['future_3'];
+  // Category level unlock checks
+  const isFutureCategoryUnlocked = checkChapterUnlocked('future_1');
+  const isCosmosCategoryUnlocked = checkChapterUnlocked('cosmos_1');
 
   // Toggle item selection
   const handleToggleItem = (key: keyof BattleActiveItems, count: number) => {
@@ -166,13 +183,49 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
               <ArrowLeft size={16} />
             </button>
 
-            {/* Chapter Selector Tabs */}
+            {/* Category Selector Tabs (日本 / 未来 / 宇宙) */}
             <div className="flex items-center bg-stone-950 p-0.5 sm:p-1 rounded-xl border border-stone-800 shrink-0">
-              {CHAPTERS.map((ch) => {
-                const isLocked =
-                  (ch.id === 'future' && !isFutureUnlocked) ||
-                  (ch.id === 'cosmos' && !isCosmosUnlocked);
-                const isSelected = selectedChapterId === ch.id;
+              {[
+                { id: 'japan' as const, name: '日本編', short: '日本', locked: false },
+                { id: 'future' as const, name: '未来編', short: '未来', locked: !isFutureCategoryUnlocked },
+                { id: 'cosmos' as const, name: '宇宙編', short: '宇宙', locked: !isCosmosCategoryUnlocked },
+              ].map((cat) => {
+                const isSelected = selectedCategory === cat.id;
+
+                return (
+                  <button
+                    key={cat.id}
+                    id={`tab-category-${cat.id}`}
+                    disabled={cat.locked}
+                    onClick={() => {
+                      audio.playClick();
+                      setSelectedCategory(cat.id);
+                      const firstCatCh = CHAPTERS.find((c) => c.category === cat.id);
+                      if (firstCatCh) {
+                        setSelectedChapterId(firstCatCh.id);
+                      }
+                    }}
+                    className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-black transition-all flex items-center gap-1 whitespace-nowrap ${
+                      isSelected
+                        ? 'bg-amber-600 text-white shadow-md'
+                        : cat.locked
+                        ? 'text-stone-600 opacity-50 cursor-not-allowed'
+                        : 'text-stone-400 hover:text-white'
+                    }`}
+                  >
+                    {cat.locked && <Lock size={10} />}
+                    <span className="sm:inline hidden">{cat.name}</span>
+                    <span className="sm:hidden inline">{cat.short}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Sub-Chapter Pills (第1章 / 第2章 / 第3章) */}
+            <div className="flex items-center bg-stone-950/80 p-0.5 rounded-lg border border-stone-800/80 shrink-0">
+              {categoryChapters.map((ch) => {
+                const isLocked = !checkChapterUnlocked(ch.id);
+                const isSelected = currentChapter.id === ch.id;
 
                 return (
                   <button
@@ -183,19 +236,21 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                       audio.playClick();
                       setSelectedChapterId(ch.id);
                     }}
-                    className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-black transition-all flex items-center gap-1 whitespace-nowrap ${
+                    className={`px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-black transition-all flex items-center gap-0.5 whitespace-nowrap ${
                       isSelected
-                        ? 'bg-amber-600 text-white shadow-md'
+                        ? 'bg-red-600 text-white shadow ring-1 ring-amber-300'
                         : isLocked
-                        ? 'text-stone-600 opacity-50 cursor-not-allowed'
-                        : 'text-stone-400 hover:text-white'
+                        ? 'text-stone-600 opacity-40 cursor-not-allowed'
+                        : 'text-stone-400 hover:text-amber-300'
                     }`}
+                    title={ch.jpName}
                   >
-                    {isLocked && <Lock size={10} />}
-                    <span className="sm:inline hidden">{ch.name}</span>
-                    <span className="sm:hidden inline">
-                      {ch.id === 'japan' ? '日本' : ch.id === 'future' ? '未来' : '宇宙'}
-                    </span>
+                    {isLocked ? (
+                      <Lock size={9} />
+                    ) : (
+                      <span className="text-amber-400">👑</span>
+                    )}
+                    <span>第{ch.chapterNumber}章</span>
                   </button>
                 );
               })}

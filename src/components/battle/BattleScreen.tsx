@@ -163,11 +163,17 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
   // Start BGM on mount
   useEffect(() => {
-    audio.startBattleBgm();
+    if (stage.isFinalBossStage) {
+      audio.startFinalBossBgm();
+    } else if (stage.isBossStage) {
+      audio.startBossBgm();
+    } else {
+      audio.startBattleBgm();
+    }
     return () => {
       audio.stopBattleBgm();
     };
-  }, []);
+  }, [stage.id, stage.isFinalBossStage, stage.isBossStage]);
 
   // Main 60fps Game Loop
   useEffect(() => {
@@ -206,6 +212,18 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           if (wave.timeSeconds > 0 && battleTimeRef.current >= wave.timeSeconds && !spawnedWaveIndicesRef.current.has(idx)) {
             spawnedWaveIndicesRef.current.add(idx);
             spawnEnemy(wave.enemyId, wave.boss);
+            if (wave.boss) {
+              audio.playBossAlert();
+              if (stage.isFinalBossStage) {
+                audio.startFinalBossBgm();
+              } else {
+                audio.startBossBgm();
+              }
+              if (stage.bossAlert) {
+                setBossAlert(stage.bossAlert);
+                setTimeout(() => setBossAlert(null), 4000);
+              }
+            }
           }
 
           // Castle HP threshold wave
@@ -216,6 +234,11 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
               spawnEnemy(wave.enemyId, wave.boss);
               if (wave.boss) {
                 audio.playBossAlert();
+                if (stage.isFinalBossStage) {
+                  audio.startFinalBossBgm();
+                } else {
+                  audio.startBossBgm();
+                }
                 if (stage.bossAlert) {
                   setBossAlert(stage.bossAlert);
                   setTimeout(() => setBossAlert(null), 4000);
