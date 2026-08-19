@@ -58,9 +58,38 @@ class SoundManager {
 
   public unlockAudio() {
     this.initCtx();
-    if (this.ctx && this.ctx.state === 'suspended') {
+    if (!this.ctx) return;
+    if (this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
     }
+    // Play 1-frame silent buffer synchronously to unlock audio playback on iOS/Safari/Chrome
+    try {
+      const buffer = this.ctx.createBuffer(1, 1, 22050);
+      const source = this.ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.ctx.destination);
+      source.start(0);
+    } catch {}
+  }
+
+  public playTestTone() {
+    this.unlockAudio();
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const t = this.ctx.currentTime;
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, t); // C5
+      osc.frequency.setValueAtTime(659.25, t + 0.1); // E5
+      osc.frequency.setValueAtTime(783.99, t + 0.2); // G5
+      gain.gain.setValueAtTime(0.3, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+      osc.connect(gain);
+      gain.connect(this.masterGain || this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.5);
+    } catch {}
   }
 
   private initCtx() {

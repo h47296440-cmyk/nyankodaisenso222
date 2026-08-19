@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   StageDefinition,
   PlayerProfile,
@@ -15,6 +15,7 @@ import { BattleCanvas } from './BattleCanvas';
 import { BattleHud } from './BattleHud';
 import { BattleResultModal } from './BattleResultModal';
 import { audio } from '../../utils/audio';
+import { useGamepad } from '../../hooks/useGamepad';
 
 interface BattleScreenProps {
   stage: StageDefinition;
@@ -120,6 +121,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const [damageNumbers, setDamageNumbers] = useState<DamageNumber[]>([]);
   const [visualEffects, setVisualEffects] = useState<VisualEffect[]>([]);
   const [deckCooldowns, setDeckCooldowns] = useState<Record<string, number>>({});
+  const [selectedSlotIndex, setSelectedSlotIndex] = useState(0);
 
   // End State
   const [battleResult, setBattleResult] = useState<{
@@ -254,6 +256,14 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         visualEffectsRef.current = visualEffectsRef.current
           .map((fx) => ({ ...fx, lifetime: fx.lifetime + dt }))
           .filter((fx) => fx.lifetime < fx.maxLifetime);
+
+        // Cap arrays to prevent unbounded growth and lag
+        if (damageNumbersRef.current.length > 20) {
+          damageNumbersRef.current = damageNumbersRef.current.slice(-20);
+        }
+        if (visualEffectsRef.current.length > 25) {
+          visualEffectsRef.current = visualEffectsRef.current.slice(-25);
+        }
 
         // 7. Sniper Item Automatic Support
         if (activeItems.sniper && enemiesRef.current.length > 0) {
@@ -943,6 +953,42 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     audio.toggleBgm();
   };
 
+  const handleTestSound = useCallback(() => {
+    audio.unlockAudio();
+    audio.playTestTone();
+    audio.startBattleBgm(stage.chapter, false, stage.isFinalBossStage);
+  }, [stage.chapter, stage.isFinalBossStage]);
+
+  // Controller / Switch bindings
+  const handleDeploySlotByIndex = useCallback(
+    (slotIdx: number) => {
+      const slot = deckSlotDefs[slotIdx];
+      if (slot) {
+        handleSpawnCat(slot.def.id);
+      }
+    },
+    [deckSlotDefs]
+  );
+
+  const handlePanCamera = useCallback((deltaX: number) => {
+    setCameraX((prev) => Math.max(0, Math.min(1000, prev + deltaX)));
+  }, []);
+
+  const gamepadState = useGamepad(
+    {
+      selectedSlotIndex,
+      setSelectedSlotIndex,
+      onDeploySlot: handleDeploySlotByIndex,
+      onUpgradeWorkerCat: handleUpgradeWorker,
+      onFireCannon: handleFireCannon,
+      onToggleAuto: () => setIsAutoBattle((a) => !a),
+      onToggleSpeed: toggleSpeed,
+      onTogglePause: () => setIsPaused((p) => !p),
+      onPanCamera: handlePanCamera,
+    },
+    !battleResult.ended
+  );
+
   return (
     <div className="fixed inset-0 w-screen h-screen bg-stone-950 flex flex-col select-none overflow-hidden font-['M_PLUS_Rounded_1c'] z-50">
       <BattleHud
@@ -967,6 +1013,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         onRetreat={onExit}
         soundEnabled={audio.soundEnabled}
         onToggleSound={toggleSound}
+        onTestSound={handleTestSound}
+        gamepadConnected={gamepadState.isConnected}
+        controllerName={gamepadState.controllerName}
+        selectedSlotIndex={selectedSlotIndex}
       >
         <BattleCanvas
           stage={stage}

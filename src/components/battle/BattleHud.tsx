@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CatDefinition } from '../../types';
-import { Volume2, VolumeX, FastForward, Play, Pause, Bot, Maximize2, Minimize2, LogOut } from 'lucide-react';
+import { Volume2, VolumeX, FastForward, Play, Pause, Bot, Maximize2, Minimize2, LogOut, Gamepad2, Sparkles } from 'lucide-react';
 import { UnitSpriteRenderer } from './UnitSpriteRenderer';
 
 interface BattleHudProps {
@@ -31,6 +31,10 @@ interface BattleHudProps {
   onRetreat: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  onTestSound?: () => void;
+  gamepadConnected?: boolean;
+  controllerName?: string;
+  selectedSlotIndex?: number;
   children?: React.ReactNode;
 }
 
@@ -56,6 +60,10 @@ export const BattleHud: React.FC<BattleHudProps> = ({
   onRetreat,
   soundEnabled,
   onToggleSound,
+  onTestSound,
+  gamepadConnected = false,
+  controllerName = '',
+  selectedSlotIndex = 0,
   children,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -88,15 +96,15 @@ export const BattleHud: React.FC<BattleHudProps> = ({
   return (
     <div className="fixed inset-0 w-screen h-screen flex flex-col bg-stone-950 overflow-hidden select-none font-['M_PLUS_Rounded_1c'] z-50">
       {/* Top Header Bar */}
-      <div className="w-full flex-shrink-0 bg-stone-950/80 backdrop-blur-md px-3 sm:px-6 pt-[max(0.35rem,env(safe-area-inset-top,0px))] pb-2 flex items-center justify-between z-30 pointer-events-auto">
-        {/* Top-Left: Circular Yellow Pause Button + Big Japanese Stage Name (Matching Screenshot) */}
+      <div className="w-full flex-shrink-0 bg-stone-950/85 backdrop-blur-md px-3 sm:px-6 pt-[max(0.35rem,env(safe-area-inset-top,0px))] pb-2 flex items-center justify-between z-30 pointer-events-auto border-b border-stone-800/80">
+        {/* Top-Left: Circular Yellow Pause Button + Big Japanese Stage Name */}
         <div className="flex items-center gap-3">
-          {/* Pause Button */}
+          {/* Pause Button (Switch + / Esc) */}
           <button
             id="btn-toggle-pause"
             onClick={onTogglePause}
-            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-yellow-400 hover:bg-yellow-300 active:scale-90 border-[3.5px] border-black flex items-center justify-center shadow-lg transition-transform"
-            title={isPaused ? '再開' : '一時停止'}
+            className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-yellow-400 hover:bg-yellow-300 active:scale-90 border-[3.5px] border-black flex items-center justify-center shadow-lg transition-transform"
+            title={isPaused ? '再開 (+)' : '一時停止 (+)'}
           >
             {isPaused ? (
               <Play size={20} className="text-black fill-black ml-0.5" />
@@ -106,6 +114,9 @@ export const BattleHud: React.FC<BattleHudProps> = ({
                 <div className="w-1.5 h-4.5 sm:h-5 bg-black rounded-sm" />
               </div>
             )}
+            <span className="absolute -bottom-1 -right-1 bg-stone-900 text-yellow-300 border border-yellow-400 text-[8px] sm:text-[9px] font-black rounded-full px-1">
+              +
+            </span>
           </button>
 
           {/* Stage Name with Thick Black Stroke Typography */}
@@ -120,34 +131,57 @@ export const BattleHud: React.FC<BattleHudProps> = ({
               {stageName || 'ステージ'}
             </span>
           </div>
+
+          {/* Gamepad / Controller Connection Badge */}
+          {gamepadConnected && (
+            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 bg-emerald-950/80 border border-emerald-500/80 rounded-full text-emerald-300 text-[11px] font-black shadow-md animate-pulse">
+              <Gamepad2 size={15} />
+              <span>Switchコントローラー操作対応</span>
+            </div>
+          )}
         </div>
 
         {/* Top Center-Right Utility Controls */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Auto Battle (ニャンピューター) */}
+          {/* Audio Test / Sound Resume Button */}
+          {onTestSound && (
+            <button
+              id="btn-test-sound"
+              onClick={onTestSound}
+              className="px-2 py-1 rounded-lg text-xs font-black bg-stone-800 hover:bg-stone-700 active:scale-95 text-yellow-300 border-2 border-yellow-500/50 flex items-center gap-1 shadow-md"
+              title="BGM・効果音テスト / 音声ロック解除"
+            >
+              <Sparkles size={13} />
+              <span className="hidden sm:inline">音声テスト</span>
+            </button>
+          )}
+
+          {/* Auto Battle (ニャンピューター - Switch Y) */}
           <button
             id="btn-auto-battle"
             onClick={onToggleAutoBattle}
-            className={`px-2 sm:px-3 py-1 rounded-lg text-xs font-black flex items-center gap-1 border-2 transition-all shadow-md ${
+            className={`relative px-2 sm:px-3 py-1 rounded-lg text-xs font-black flex items-center gap-1 border-2 transition-all shadow-md ${
               isAutoBattle
                 ? 'bg-amber-500 text-stone-950 border-yellow-200 shadow-[0_0_12px_rgba(245,158,11,0.6)] animate-pulse'
                 : 'bg-stone-800 text-stone-300 border-stone-600 hover:bg-stone-700'
             }`}
-            title="ニャンピューター (自動戦闘)"
+            title="ニャンピューター (Yボタン)"
           >
             <Bot size={14} />
             <span className="hidden sm:inline">オート</span>
+            <span className="text-[9px] font-mono bg-black/40 text-yellow-300 px-1 rounded">Y</span>
           </button>
 
-          {/* Speed Toggle (x1 / x2) */}
+          {/* Speed Toggle (x1 / x2 - Switch -) */}
           <button
             id="btn-toggle-speed"
             onClick={onToggleSpeed}
-            className="px-2.5 py-1 rounded-lg text-xs font-black bg-stone-800 hover:bg-stone-700 text-cyan-300 border-2 border-cyan-500/50 flex items-center gap-1 shadow-md"
-            title="ゲーム速度切り替え"
+            className="relative px-2.5 py-1 rounded-lg text-xs font-black bg-stone-800 hover:bg-stone-700 text-cyan-300 border-2 border-cyan-500/50 flex items-center gap-1 shadow-md"
+            title="ゲーム速度切り替え (-ボタン)"
           >
             <FastForward size={14} />
             <span>x{gameSpeed}</span>
+            <span className="text-[9px] font-mono bg-black/40 text-cyan-200 px-1 rounded">-</span>
           </button>
 
           {/* Sound Toggle */}
@@ -182,7 +216,7 @@ export const BattleHud: React.FC<BattleHudProps> = ({
           </button>
         </div>
 
-        {/* Top-Right: Money Display (5744/6000円) in Iconic Battle Cats Arcade Font */}
+        {/* Top-Right: Money Display (5744/6000円) */}
         <div className="flex items-center">
           <span
             className="text-2xl sm:text-4xl font-black font-mono tracking-tight text-yellow-400 select-none drop-shadow"
@@ -203,7 +237,7 @@ export const BattleHud: React.FC<BattleHudProps> = ({
 
       {/* Bottom Dock / Deployment Panel Container */}
       <div className="w-full flex-shrink-0 relative z-30 bg-[#1c1917] border-t-2 border-stone-900 shadow-2xl">
-        {/* Sawtooth Ground Chevron Texture on top edge (Matching Battle Cats ground border) */}
+        {/* Sawtooth Ground Chevron Texture */}
         <div className="absolute -top-3 left-0 right-0 h-3 overflow-hidden pointer-events-none flex">
           {Array.from({ length: 80 }).map((_, i) => (
             <div
@@ -216,12 +250,12 @@ export const BattleHud: React.FC<BattleHudProps> = ({
 
         {/* Controls Bar: Worker Cat on Left, 10 Cat Slots in Center, Cannon on Right */}
         <div className="w-full px-2 sm:px-4 pt-2 pb-[calc(max(0.35rem,env(safe-area-inset-bottom,0px))+4px)] flex items-stretch gap-1.5 sm:gap-3">
-          {/* Bottom-Left: Worker Cat (働きネコ) Upgrade Dial */}
+          {/* Bottom-Left: Worker Cat (働きネコ - Switch B) */}
           <button
             id="btn-upgrade-worker"
             disabled={workerLevel >= maxWorkerLevel || money < workerUpgradeCost}
             onClick={onUpgradeWorker}
-            className={`flex-shrink-0 w-20 sm:w-28 rounded-xl border-[3px] flex flex-col items-center justify-between p-1 select-none transition-all active:scale-95 ${
+            className={`relative flex-shrink-0 w-20 sm:w-28 rounded-xl border-[3px] flex flex-col items-center justify-between p-1 select-none transition-all active:scale-95 ${
               workerLevel >= maxWorkerLevel
                 ? 'bg-stone-900 border-stone-700 text-stone-500 opacity-60'
                 : canUpgradeWorker
@@ -229,6 +263,11 @@ export const BattleHud: React.FC<BattleHudProps> = ({
                 : 'bg-stone-900 border-red-800/80 text-stone-300 opacity-80'
             }`}
           >
+            {/* Switch B Button Badge */}
+            <div className="absolute -top-2 -left-2 bg-red-600 border border-white text-white font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center shadow-lg z-20">
+              B
+            </div>
+
             {/* Level Tag Box */}
             <div className="w-full bg-red-600 border border-black rounded px-1 py-0.5 text-center">
               <span className="text-[10px] sm:text-xs font-black text-white uppercase tracking-tighter">
@@ -263,14 +302,15 @@ export const BattleHud: React.FC<BattleHudProps> = ({
             )}
           </button>
 
-          {/* Center: Cat Deployment Deck (10 slots in 2 rows of 5, matching Battle Cats cards) */}
+          {/* Center: Cat Deployment Deck (10 slots in 2 rows of 5) */}
           <div className="flex-1 grid grid-cols-5 grid-rows-2 gap-1 sm:gap-2 min-w-0">
-            {deckCats.map((slot) => {
+            {deckCats.map((slot, index) => {
               const form = slot.def.forms[slot.activeFormIndex];
               const canAfford = money >= slot.cost;
               const isOnCooldown = slot.cooldownRemaining > 0;
               const canSpawn = canAfford && !isOnCooldown;
               const cooldownPercent = (slot.cooldownRemaining / slot.maxCooldown) * 100;
+              const isSelected = selectedSlotIndex === index;
 
               return (
                 <button
@@ -278,7 +318,11 @@ export const BattleHud: React.FC<BattleHudProps> = ({
                   id={`btn-spawn-${slot.def.id}`}
                   disabled={!canSpawn}
                   onClick={() => onSpawnCat(slot.def.id)}
-                  className={`relative rounded-xl border-[2.5px] sm:border-[3px] border-black overflow-hidden flex flex-col justify-between p-0.5 sm:p-1 select-none transition-all active:scale-95 h-12 sm:h-16 ${
+                  className={`relative rounded-xl border-[2.5px] sm:border-[3px] overflow-hidden flex flex-col justify-between p-0.5 sm:p-1 select-none transition-all active:scale-95 h-12 sm:h-16 ${
+                    isSelected
+                      ? 'border-yellow-400 ring-4 ring-yellow-400/80 shadow-[0_0_16px_rgba(250,204,21,0.9)] z-20 scale-[1.03]'
+                      : 'border-black'
+                  } ${
                     canSpawn
                       ? 'bg-white hover:bg-yellow-50 cursor-pointer shadow-md'
                       : canAfford
@@ -286,6 +330,18 @@ export const BattleHud: React.FC<BattleHudProps> = ({
                       : 'bg-stone-400 opacity-60 cursor-not-allowed'
                   }`}
                 >
+                  {/* Selected Switch Cursor Indicator */}
+                  {isSelected && (
+                    <div className="absolute -top-1.5 -right-1.5 bg-yellow-400 border-2 border-black text-black font-black text-[9px] w-5 h-5 rounded-full flex items-center justify-center shadow-lg z-30 animate-bounce">
+                      A
+                    </div>
+                  )}
+
+                  {/* Slot Number Tag */}
+                  <div className="absolute top-0.5 right-1 z-10 opacity-75">
+                    <span className="text-[8px] font-mono font-bold text-stone-500">{index + 1}</span>
+                  </div>
+
                   {/* Cat Sprite Thumbnail */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none scale-75 sm:scale-90">
                     <UnitSpriteRenderer
@@ -337,17 +393,22 @@ export const BattleHud: React.FC<BattleHudProps> = ({
             })}
           </div>
 
-          {/* Bottom-Right: Cat Cannon (にゃんこ砲) Fire Dial */}
+          {/* Bottom-Right: Cat Cannon (にゃんこ砲 - Switch X) */}
           <button
             id="btn-fire-cannon"
             disabled={!isCannonReady}
             onClick={onFireCannon}
-            className={`flex-shrink-0 w-20 sm:w-28 rounded-xl border-[3px] flex flex-col items-center justify-between p-1 select-none transition-all active:scale-95 ${
+            className={`relative flex-shrink-0 w-20 sm:w-28 rounded-xl border-[3px] flex flex-col items-center justify-between p-1 select-none transition-all active:scale-95 ${
               isCannonReady
                 ? 'bg-gradient-to-b from-sky-400 to-blue-700 border-sky-200 text-white shadow-[0_0_15px_rgba(56,189,248,0.8)] animate-bounce active:scale-90'
                 : 'bg-stone-900 border-stone-700 text-stone-400 opacity-75'
             }`}
           >
+            {/* Switch X Button Badge */}
+            <div className="absolute -top-2 -right-2 bg-blue-600 border border-white text-white font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center shadow-lg z-20">
+              X
+            </div>
+
             {/* Cannon Title Tag */}
             <div
               className={`w-full rounded px-1 py-0.5 text-center ${
@@ -399,3 +460,4 @@ export const BattleHud: React.FC<BattleHudProps> = ({
     </div>
   );
 };
+

@@ -207,38 +207,6 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
       {/* Dynamic Background Themes */}
       {renderBackground()}
 
-      {/* Cat Eye Cosmic Vortex in the Sky (Matching Screenshot) */}
-      <div className="absolute top-2 sm:top-4 left-1/2 -translate-x-1/2 pointer-events-none z-10">
-        <svg viewBox="0 0 200 120" className="w-48 sm:w-64 h-28 sm:h-36 drop-shadow-xl overflow-visible">
-          {/* Swirling Dark Void Nebula */}
-          <ellipse cx="100" cy="55" rx="85" ry="42" fill="#1e1b4b" opacity="0.85" />
-          <ellipse cx="100" cy="55" rx="65" ry="30" fill="#311042" opacity="0.9" />
-          <ellipse cx="100" cy="55" rx="45" ry="20" fill="#000000" />
-
-          {/* Radiating Dark Tentacles / Tendrils */}
-          <path
-            d="M 20 60 Q 50 30 100 45 Q 150 30 180 60 Q 140 85 100 70 Q 60 85 20 60 Z"
-            fill="#4a044e"
-            opacity="0.6"
-          />
-          <path
-            d="M 35 45 Q 70 20 100 35 Q 130 20 165 45 Q 135 65 100 55 Q 65 65 35 45 Z"
-            fill="#581c87"
-            opacity="0.5"
-          />
-
-          {/* Glowing Crimson Cat Eyes in the Dark Vortex */}
-          <ellipse cx="82" cy="54" rx="10" ry="14" fill="#ef4444" className="animate-pulse" />
-          <ellipse cx="82" cy="54" rx="2.5" ry="10" fill="#000000" />
-          <ellipse cx="118" cy="54" rx="10" ry="14" fill="#ef4444" className="animate-pulse" />
-          <ellipse cx="118" cy="54" rx="2.5" ry="10" fill="#000000" />
-
-          {/* Eye Sparkles */}
-          <circle cx="80" cy="48" r="2.5" fill="#ffffff" />
-          <circle cx="116" cy="48" r="2.5" fill="#ffffff" />
-        </svg>
-      </div>
-
       {/* Boss Appearance Shock Banner */}
       {bossAlert && (
         <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-red-600 text-white font-black px-6 py-1.5 rounded-full border-2 border-yellow-300 shadow-2xl flex items-center gap-2 animate-bounce z-40">

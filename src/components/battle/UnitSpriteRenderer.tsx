@@ -9,7 +9,7 @@ interface UnitSpriteProps {
   isAttackingWindup?: boolean;
 }
 
-export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = ({
+export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = React.memo(({
   spriteType,
   isCat,
   state,
@@ -70,7 +70,7 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = ({
   const finalY = -(bounceY + attackTranslateY + knockbackElevY);
 
   return (
-    <div className="relative flex flex-col items-center justify-center pointer-events-none select-none">
+    <div className="relative flex flex-col items-center justify-center pointer-events-none select-none will-change-transform">
       {/* Dynamic Ground Shadow */}
       <div
         className="absolute -bottom-1 bg-black/35 rounded-full blur-[1px] transition-all"
@@ -106,7 +106,7 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = ({
       )}
     </div>
   );
-};
+});
 
 function renderSpriteSvg(
   type: string,
@@ -1384,3 +1384,5 @@ function renderSpriteSvg(
       );
   }
 }
+
+
