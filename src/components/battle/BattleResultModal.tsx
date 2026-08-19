@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { StageDefinition, TreasureQuality } from '../../types';
 import { TREASURES } from '../../data/stages';
-import { Trophy, Skull, Sparkles, ArrowRight, RotateCcw, Award } from 'lucide-react';
+import { CAT_DEFINITIONS } from '../../data/units';
+import { Trophy, Skull, Sparkles, ArrowRight, RotateCcw, Award, CheckCircle } from 'lucide-react';
 import { audio } from '../../utils/audio';
 
 interface BattleResultModalProps {
@@ -44,6 +45,10 @@ export const BattleResultModal: React.FC<BattleResultModalProps> = ({
       audio.playDefeat();
     }
   }, [isVictory]);
+
+  const unlockedCatDef = stage.rewardCatUnlockId
+    ? CAT_DEFINITIONS.find((c) => c.id === stage.rewardCatUnlockId)
+    : null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-2 sm:p-4 animate-in fade-in duration-300">
@@ -89,6 +94,22 @@ export const BattleResultModal: React.FC<BattleResultModalProps> = ({
                 <span className="text-amber-300 font-black text-sm sm:text-base">+{catFoodEarned} 缶</span>
               </div>
 
+              {/* Character Unlock Reveal Banner */}
+              {unlockedCatDef && (
+                <div className="bg-gradient-to-r from-purple-900/90 via-fuchsia-900/90 to-purple-900/90 border-2 border-fuchsia-400 rounded-lg p-2 sm:p-2.5 text-center shadow-lg animate-pulse">
+                  <div className="flex items-center justify-center gap-1 text-fuchsia-300 font-black text-xs sm:text-sm">
+                    <Sparkles size={16} className="text-yellow-400" />
+                    <span>新キャラクター解放報酬！</span>
+                  </div>
+                  <div className="text-sm sm:text-base font-black text-yellow-300 mt-0.5">
+                    【{unlockedCatDef.forms[0].name}】を仲間にしたにゃ！
+                  </div>
+                  <div className="text-[11px] sm:text-xs text-purple-200 mt-0.5">
+                    編成画面やパワーアップ画面から出撃・強化できるにゃ！
+                  </div>
+                </div>
+              )}
+
               {/* Treasure Drop Reveal */}
               {treasureDropped ? (
                 <div className="bg-gradient-to-r from-amber-950/80 to-yellow-950/80 border-2 border-yellow-400 rounded-lg p-2 sm:p-2.5 text-center animate-pulse">
@@ -108,7 +129,7 @@ export const BattleResultModal: React.FC<BattleResultModalProps> = ({
                   <div className="text-[11px] sm:text-xs text-amber-200 mt-0.5">{treasureDropped.description}</div>
                 </div>
               ) : (
-                <div className="text-[11px] sm:text-xs text-stone-400">※ 今回はお宝を発見できなかったにゃ…</div>
+                !unlockedCatDef && <div className="text-[11px] sm:text-xs text-stone-400">※ 今回はお宝を発見できなかったにゃ…</div>
               )}
             </div>
           )}

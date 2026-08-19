@@ -65,8 +65,43 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
   const handlePowerUpClick = () => {
     if (category === 'character' || category === 'ex_character') {
       if (!catProgress.unlocked) {
+        // Check if unit is a stage drop / crazed reward
+        if (selectedCatDef.unlockMethod === 'stage_reward') {
+          const reqStageId = selectedCatDef.requiredStageId || '';
+          const isCleared = !!profile.clearedStages?.[reqStageId];
+          if (!isCleared) {
+            alert(selectedCatDef.unlockHint || 'このキャラクターは降臨ステージクリア限定報酬だにゃ！');
+            return;
+          }
+          // If stage was cleared, allow claiming
+          audio.playVictory();
+          onUpdateProfile((prev) => ({
+            ...prev,
+            cats: {
+              ...prev.cats,
+              [selectedCatId]: {
+                catId: selectedCatId,
+                level: 1,
+                unlocked: true,
+                activeForm: 0,
+              },
+            },
+          }));
+          return;
+        }
+
+        // Check if unit is gacha only
+        if (selectedCatDef.unlockMethod === 'gacha' || (!selectedCatDef.unlockCostXp && !selectedCatDef.unlockedAtStart)) {
+          alert(selectedCatDef.unlockHint || 'このキャラクターはレアガチャ限定だにゃ！ガチャ画面で入手してにゃ！');
+          return;
+        }
+
         // Unlock with XP
-        const unlockCost = selectedCatDef.unlockCostXp || 500;
+        const unlockCost = selectedCatDef.unlockCostXp;
+        if (!unlockCost) {
+          alert('このキャラクターはXPでは解放できないにゃ！');
+          return;
+        }
         if (!isInfiniteXp && profile.xp < unlockCost) {
           alert('経験値（XP）が足りないにゃ！');
           return;
@@ -359,14 +394,35 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
                     )}
                   </div>
 
-                  {/* Bottom Black Bar: Required XP */}
+                  {/* Bottom Black Bar: Required XP / Unlock Status */}
                   <div className="bg-black text-white px-2 py-1 flex items-center justify-between border-t-2 border-stone-900 text-xs font-black">
                     <span className="text-stone-300 text-[10px]">必要</span>
                     <div className="flex items-center gap-1">
-                      <span className="text-cyan-400 text-[10px]">XP</span>
-                      <span className="text-yellow-400 text-xs sm:text-sm font-mono font-black">
-                        {!prog.unlocked ? cat.unlockCostXp || 500 : isMax ? 'MAX' : cost.toLocaleString()}
-                      </span>
+                      {!prog.unlocked ? (
+                        cat.unlockMethod === 'stage_reward' ? (
+                          profile.clearedStages?.[cat.requiredStageId || ''] ? (
+                            <span className="text-emerald-400 text-xs font-bold">クリア済 (受取可)</span>
+                          ) : (
+                            <span className="text-rose-400 text-xs font-bold">降臨クリア限定</span>
+                          )
+                        ) : cat.unlockMethod === 'gacha' || (!cat.unlockCostXp && !cat.unlockedAtStart) ? (
+                          <span className="text-amber-400 text-xs font-bold">ガチャ限定</span>
+                        ) : (
+                          <>
+                            <span className="text-cyan-400 text-[10px]">XP</span>
+                            <span className="text-yellow-400 text-xs sm:text-sm font-mono font-black">
+                              {(cat.unlockCostXp || 500).toLocaleString()}
+                            </span>
+                          </>
+                        )
+                      ) : (
+                        <>
+                          <span className="text-cyan-400 text-[10px]">XP</span>
+                          <span className="text-yellow-400 text-xs sm:text-sm font-mono font-black">
+                            {isMax ? 'MAX' : cost.toLocaleString()}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -426,24 +482,92 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
             ACTION SECTION: Big Glowing 「パワーアップ!!」 Button
            ======================================================== */}
         <div className="flex items-center justify-between gap-3 px-2 my-1">
-          {/* Left Big Glowing Button: パワーアップ!! (Magenta outer border & Yellow pill) */}
-          <button
-            id="btn-do-power-up"
-            onClick={handlePowerUpClick}
-            className="group relative rounded-full bg-gradient-to-b from-yellow-300 via-amber-400 to-amber-500 border-[4px] border-fuchsia-600 shadow-[0_0_15px_rgba(217,70,239,0.8),0_4px_0_#701a75] px-6 sm:px-10 py-2.5 sm:py-3 active:scale-95 transition-all flex items-center justify-center cursor-pointer hover:brightness-110"
-          >
-            <span
-              className="text-xl sm:text-2xl font-black text-stone-950 tracking-wider"
-              style={{
-                fontFamily: '"Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
-                textShadow: '0 1px 2px rgba(255,255,255,0.8)',
-              }}
-            >
-              {category !== 'base_skills' && !catProgress.unlocked
-                ? 'キャラクター解放!!'
-                : 'パワーアップ!!'}
-            </span>
-          </button>
+          {/* Left Big Glowing Button */}
+          {(() => {
+            const isCharCategory = category !== 'base_skills';
+            const isUnlocked = isCharCategory ? catProgress.unlocked : true;
+
+            if (isCharCategory && !isUnlocked) {
+              if (selectedCatDef.unlockMethod === 'stage_reward') {
+                const isStageCleared = !!profile.clearedStages?.[selectedCatDef.requiredStageId || ''];
+                if (isStageCleared) {
+                  return (
+                    <button
+                      id="btn-do-power-up"
+                      onClick={handlePowerUpClick}
+                      className="group relative rounded-full bg-gradient-to-b from-emerald-300 via-green-400 to-emerald-600 border-[4px] border-emerald-800 shadow-[0_0_15px_rgba(16,185,129,0.8),0_4px_0_#064e3b] px-6 sm:px-10 py-2.5 sm:py-3 active:scale-95 transition-all flex items-center justify-center cursor-pointer hover:brightness-110"
+                    >
+                      <span className="text-xl sm:text-2xl font-black text-stone-950 tracking-wider">
+                        🎁 報酬を受け取る!!
+                      </span>
+                    </button>
+                  );
+                } else {
+                  return (
+                    <button
+                      id="btn-do-power-up"
+                      onClick={handlePowerUpClick}
+                      className="group relative rounded-full bg-stone-700 border-[4px] border-stone-800 shadow-[0_4px_0_#1c1917] px-6 sm:px-10 py-2.5 sm:py-3 active:scale-95 transition-all flex items-center justify-center cursor-pointer hover:bg-stone-600"
+                    >
+                      <span className="text-base sm:text-xl font-black text-rose-300 tracking-wider">
+                        🔒 降臨ステージ未クリア
+                      </span>
+                    </button>
+                  );
+                }
+              }
+
+              if (selectedCatDef.unlockMethod === 'gacha' || (!selectedCatDef.unlockCostXp && !selectedCatDef.unlockedAtStart)) {
+                return (
+                  <button
+                    id="btn-do-power-up"
+                    onClick={handlePowerUpClick}
+                    className="group relative rounded-full bg-gradient-to-b from-purple-400 via-fuchsia-500 to-purple-700 border-[4px] border-purple-900 shadow-[0_0_15px_rgba(168,85,247,0.8),0_4px_0_#3b0764] px-6 sm:px-10 py-2.5 sm:py-3 active:scale-95 transition-all flex items-center justify-center cursor-pointer hover:brightness-110"
+                  >
+                    <span className="text-base sm:text-xl font-black text-white tracking-wider">
+                      🎰 レアガチャ限定キャラ
+                    </span>
+                  </button>
+                );
+              }
+
+              return (
+                <button
+                  id="btn-do-power-up"
+                  onClick={handlePowerUpClick}
+                  className="group relative rounded-full bg-gradient-to-b from-yellow-300 via-amber-400 to-amber-500 border-[4px] border-fuchsia-600 shadow-[0_0_15px_rgba(217,70,239,0.8),0_4px_0_#701a75] px-6 sm:px-10 py-2.5 sm:py-3 active:scale-95 transition-all flex items-center justify-center cursor-pointer hover:brightness-110"
+                >
+                  <span
+                    className="text-xl sm:text-2xl font-black text-stone-950 tracking-wider"
+                    style={{
+                      fontFamily: '"Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
+                      textShadow: '0 1px 2px rgba(255,255,255,0.8)',
+                    }}
+                  >
+                    キャラクター解放!!
+                  </span>
+                </button>
+              );
+            }
+
+            return (
+              <button
+                id="btn-do-power-up"
+                onClick={handlePowerUpClick}
+                className="group relative rounded-full bg-gradient-to-b from-yellow-300 via-amber-400 to-amber-500 border-[4px] border-fuchsia-600 shadow-[0_0_15px_rgba(217,70,239,0.8),0_4px_0_#701a75] px-6 sm:px-10 py-2.5 sm:py-3 active:scale-95 transition-all flex items-center justify-center cursor-pointer hover:brightness-110"
+              >
+                <span
+                  className="text-xl sm:text-2xl font-black text-stone-950 tracking-wider"
+                  style={{
+                    fontFamily: '"Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
+                    textShadow: '0 1px 2px rgba(255,255,255,0.8)',
+                  }}
+                >
+                  パワーアップ!!
+                </span>
+              </button>
+            );
+          })()}
 
           {/* Form Toggle Button for Evolved Cats (第1形態 ⇄ 第2形態) */}
           {category !== 'base_skills' && catProgress.unlocked && (
@@ -463,13 +587,21 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
         {/* ========================================================
             BOTTOM DESCRIPTION BOX (Dark Brown wooden box with white text)
            ======================================================== */}
-        <div className="bg-[#381c07] border-2 border-amber-900 rounded-2xl p-3 sm:p-4 text-white shadow-xl flex items-center justify-between">
-          <p className="text-xs sm:text-sm font-bold leading-relaxed">
-            {category !== 'base_skills'
-              ? currentForm.description || '安価で生産できる基本キャラ'
-              : baseSkills.find((s) => s.key === selectedBaseSkill)?.desc || '基本能力'}
-          </p>
-          <ChevronDown className="w-5 h-5 text-stone-400 shrink-0 ml-2" />
+        <div className="bg-[#381c07] border-2 border-amber-900 rounded-2xl p-3 sm:p-4 text-white shadow-xl flex flex-col gap-1.5">
+          {category !== 'base_skills' && !catProgress.unlocked && selectedCatDef.unlockHint && (
+            <div className="flex items-center gap-1.5 bg-amber-950/80 border border-amber-500/50 rounded-lg px-2.5 py-1 text-amber-200 text-xs font-black">
+              <span className="text-sm">📌</span>
+              <span>入手条件：{selectedCatDef.unlockHint}</span>
+            </div>
+          )}
+          <div className="flex items-center justify-between">
+            <p className="text-xs sm:text-sm font-bold leading-relaxed">
+              {category !== 'base_skills'
+                ? currentForm.description || '安価で生産できる基本キャラ'
+                : baseSkills.find((s) => s.key === selectedBaseSkill)?.desc || '基本能力'}
+            </p>
+            <ChevronDown className="w-5 h-5 text-stone-400 shrink-0 ml-2" />
+          </div>
         </div>
       </div>
 

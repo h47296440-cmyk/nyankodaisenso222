@@ -1624,37 +1624,238 @@ function renderSpriteSvg(
         </svg>
       );
 
-    // ----------------- CRAZED BOSS ENEMIES (降臨ボス) -----------------
+    // ----------------- CRAZED BOSS ENEMIES (超激ムズ 降臨ボス個別スプライト) -----------------
     case 'enemy_crazed_cat':
+      return (
+        <svg width="115" height="115" viewBox="0 0 115 115" className="drop-shadow-2xl">
+          {/* Crazed Demonic Flame Aura */}
+          <circle cx="58" cy="58" r="50" fill="none" stroke="#7e22ce" strokeWidth="4" strokeDasharray="10,6" className="animate-spin" />
+          <circle cx="58" cy="58" r="44" fill="#18181b" stroke="#dc2626" strokeWidth="3.5" />
+          {/* Crazed Ears */}
+          <polygon points="32,32 20,8 44,24" fill="#dc2626" stroke="#450a0a" strokeWidth="2" />
+          <polygon points="84,32 96,8 72,24" fill="#dc2626" stroke="#450a0a" strokeWidth="2" />
+          {/* Dark Shadow Markings */}
+          <path d="M 38 42 Q 58 36 78 42 Q 58 56 38 42 Z" fill="#27272a" />
+          {/* Crazed Glowing Blood-Red Eyes */}
+          <ellipse cx="44" cy="52" rx="6.5" ry="8.5" fill="#ef4444" stroke="#7f1d1d" strokeWidth="1.5" />
+          <ellipse cx="72" cy="52" rx="6.5" ry="8.5" fill="#ef4444" stroke="#7f1d1d" strokeWidth="1.5" />
+          <circle cx="45" cy="52" r="2.5" fill="#000000" />
+          <circle cx="71" cy="52" r="2.5" fill="#000000" />
+          {/* Sinister Mouth & Sharp Fangs */}
+          <g transform={`rotate(${isAttacking ? 20 : 0} 58 68)`}>
+            <ellipse cx="58" cy="70" rx="16" ry="10" fill="#450a0a" stroke="#dc2626" strokeWidth="1.5" />
+            <polygon points="46,64 50,71 54,64" fill="#ffffff" />
+            <polygon points="56,64 60,72 64,64" fill="#ffffff" />
+            <polygon points="66,64 70,71 74,64" fill="#ffffff" />
+            <polygon points="50,76 54,70 58,76" fill="#ffffff" />
+            <polygon points="60,76 64,70 68,76" fill="#ffffff" />
+          </g>
+          {/* Attack Bite Shockwave */}
+          {isAttacking && (
+            <path d="M 20 50 Q -10 60 10 90 Q 25 70 20 50 Z" fill="#ef4444" className="animate-ping" />
+          )}
+          {/* Agile Paws */}
+          <ellipse cx={46 + legOffset1} cy="98" rx="8" ry="7" fill="#27272a" stroke="#dc2626" strokeWidth="2" />
+          <ellipse cx={70 + legOffset2} cy="98" rx="8" ry="7" fill="#27272a" stroke="#dc2626" strokeWidth="2" />
+        </svg>
+      );
+
     case 'enemy_crazed_tank':
+      return (
+        <svg width="120" height="135" viewBox="0 0 120 135" className="drop-shadow-2xl">
+          {/* Crazed Aura */}
+          <rect x="22" y="12" width="76" height="106" rx="16" fill="none" stroke="#7e22ce" strokeWidth="4" strokeDasharray="12,6" className="animate-pulse" />
+          {/* Heavy Monolithic Body */}
+          <g transform={`rotate(${isAttacking ? 15 : 0} 60 90)`}>
+            <rect x="26" y="16" width="68" height="98" rx="12" fill="#18181b" stroke="#dc2626" strokeWidth="4" />
+            {/* Dark Armor Plating Details */}
+            <line x1="36" y1="20" x2="36" y2="110" stroke="#3f3f46" strokeWidth="2.5" />
+            <line x1="84" y1="20" x2="84" y2="110" stroke="#3f3f46" strokeWidth="2.5" />
+            <line x1="28" y1="65" x2="92" y2="65" stroke="#3f3f46" strokeWidth="2.5" />
+            {/* Small Crazed Ears */}
+            <polygon points="36,18 30,2 48,16" fill="#dc2626" />
+            <polygon points="84,18 90,2 72,16" fill="#dc2626" />
+            {/* Vein of Rage */}
+            <path d="M 52 28 L 56 34 L 50 40 L 58 44" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" />
+            {/* Fierce Angry Eyes */}
+            <polygon points="38,48 52,54 38,58" fill="#ef4444" />
+            <polygon points="82,48 68,54 82,58" fill="#ef4444" />
+            {/* Heavy Iron Gritted Teeth */}
+            <rect x="42" y="74" width="36" height="14" rx="2" fill="#450a0a" stroke="#dc2626" strokeWidth="2" />
+            <line x1="51" y1="74" x2="51" y2="88" stroke="#ffffff" strokeWidth="2" />
+            <line x1="60" y1="74" x2="60" y2="88" stroke="#ffffff" strokeWidth="2" />
+            <line x1="69" y1="74" x2="69" y2="88" stroke="#ffffff" strokeWidth="2" />
+          </g>
+          {/* Ground Slam Quake Effect on Attack */}
+          {isAttacking && (
+            <ellipse cx="60" cy="122" rx="48" ry="10" fill="none" stroke="#ef4444" strokeWidth="5" className="animate-ping" />
+          )}
+          {/* Massive Footpads */}
+          <rect x={32 + legOffset1} y="112" width="22" height="14" rx="4" fill="#09090b" stroke="#71717a" strokeWidth="3" />
+          <rect x={66 + legOffset2} y="112" width="22" height="14" rx="4" fill="#09090b" stroke="#71717a" strokeWidth="3" />
+        </svg>
+      );
+
     case 'enemy_crazed_axe':
+      return (
+        <svg width="125" height="120" viewBox="0 0 125 120" className="drop-shadow-2xl">
+          {/* Demonic Red & Purple Aura */}
+          <circle cx="62" cy="62" r="50" fill="none" stroke="#dc2626" strokeWidth="4" strokeDasharray="12,6" className="animate-spin" />
+          {/* Crazed Berserker Body */}
+          <ellipse cx="62" cy="64" rx="34" ry="32" fill="#18181b" stroke="#b91c1c" strokeWidth="3.5" />
+          {/* Crimson Warrior Headband / Horns */}
+          <path d="M 34 46 Q 62 36 90 46 Q 62 52 34 46 Z" fill="#dc2626" stroke="#450a0a" strokeWidth="2" />
+          <polygon points="38,38 24,14 48,28" fill="#dc2626" stroke="#450a0a" strokeWidth="2" />
+          <polygon points="86,38 100,14 76,28" fill="#dc2626" stroke="#450a0a" strokeWidth="2" />
+          {/* Glaring Slit Eyes */}
+          <ellipse cx="48" cy="56" rx="5" ry="7" fill="#facc15" stroke="#000000" strokeWidth="1.5" />
+          <ellipse cx="76" cy="56" rx="5" ry="7" fill="#facc15" stroke="#000000" strokeWidth="1.5" />
+          <circle cx="49" cy="56" r="2" fill="#dc2626" />
+          <circle cx="75" cy="56" r="2" fill="#dc2626" />
+          {/* Snarl Jaw */}
+          <path d="M 50 74 Q 62 82 74 74" fill="none" stroke="#dc2626" strokeWidth="3" strokeLinecap="round" />
+          {/* Giant Blood-Stained Battleaxe */}
+          <g transform={`rotate(${isAttacking ? -65 : 15} 30 50)`}>
+            {/* Axe Handle */}
+            <rect x="24" y="10" width="8" height="75" rx="3" fill="#78350f" stroke="#000000" strokeWidth="2" />
+            {/* Twin Dark Crimson Axe Blades */}
+            <path d="M 28 20 Q 2 10 0 35 Q 12 50 28 42 Z" fill="#991b1b" stroke="#f87171" strokeWidth="2.5" />
+            <path d="M 28 22 Q 46 14 52 34 Q 40 48 28 42 Z" fill="#991b1b" stroke="#f87171" strokeWidth="2.5" />
+            {/* Axe Skull Emblem */}
+            <circle cx="28" cy="32" r="6" fill="#facc15" stroke="#000000" strokeWidth="1.5" />
+          </g>
+          {/* Cleave Slash Crescent on Attack */}
+          {isAttacking && (
+            <path d="M 5 25 Q -20 60 15 95" fill="none" stroke="#ef4444" strokeWidth="8" strokeLinecap="round" className="animate-ping" />
+          )}
+          {/* Feet */}
+          <ellipse cx={48 + legOffset1} cy="96" rx="8" ry="7" fill="#09090b" stroke="#b91c1c" strokeWidth="2.5" />
+          <ellipse cx={76 + legOffset2} cy="96" rx="8" ry="7" fill="#09090b" stroke="#b91c1c" strokeWidth="2.5" />
+        </svg>
+      );
+
     case 'enemy_crazed_cow':
+      return (
+        <svg width="135" height="105" viewBox="0 0 135 105" className="drop-shadow-2xl">
+          {/* Speed Lines Aura */}
+          <line x1="120" y1="30" x2="140" y2="30" stroke="#dc2626" strokeWidth="3" strokeDasharray="6,4" />
+          <line x1="115" y1="55" x2="142" y2="55" stroke="#7e22ce" strokeWidth="3" strokeDasharray="6,4" />
+          <line x1="110" y1="75" x2="135" y2="75" stroke="#dc2626" strokeWidth="3" strokeDasharray="6,4" />
+          {/* Long Slender Crazed Giraffe/Cow Body */}
+          <ellipse cx="80" cy="55" rx="34" ry="24" fill="#18181b" stroke="#7e22ce" strokeWidth="3.5" />
+          {/* Dark Purple Markings */}
+          <ellipse cx="70" cy="50" rx="8" ry="12" fill="#581c87" />
+          <ellipse cx="92" cy="55" rx="10" ry="8" fill="#581c87" />
+          {/* Ultra Long Neck & Head */}
+          <g transform={`translate(${isAttacking ? -18 : 0}, 0)`}>
+            {/* Long Neck */}
+            <path d="M 60 45 L 25 22 L 32 15 L 72 38 Z" fill="#18181b" stroke="#7e22ce" strokeWidth="3" />
+            {/* Head & Angry Horns */}
+            <ellipse cx="22" cy="18" rx="16" ry="12" fill="#18181b" stroke="#dc2626" strokeWidth="3" />
+            <polygon points="26,10 32,-4 20,4" fill="#dc2626" stroke="#450a0a" strokeWidth="1.5" />
+            <polygon points="12,12 4,0 10,8" fill="#dc2626" stroke="#450a0a" strokeWidth="1.5" />
+            {/* Glowing Red Eyes */}
+            <circle cx="16" cy="16" r="3.5" fill="#ef4444" />
+            <circle cx="16" cy="16" r="1.5" fill="#000000" />
+            {/* Snout */}
+            <ellipse cx="10" cy="22" rx="6" ry="4" fill="#dc2626" />
+          </g>
+          {/* Headbutt Shockwave Sparks on Attack */}
+          {isAttacking && (
+            <g className="animate-ping">
+              <circle cx="2" cy="18" r="14" fill="none" stroke="#ef4444" strokeWidth="4" />
+              <polygon points="0,6 -10,18 0,30" fill="#facc15" />
+            </g>
+          )}
+          {/* Long Galloping Legs */}
+          <line x1="58" y1="75" x2={50 + legOffset1 * 2} y2="98" stroke="#18181b" strokeWidth="6" strokeLinecap="round" />
+          <line x1="72" y1="75" x2={66 + legOffset2 * 2} y2="98" stroke="#18181b" strokeWidth="6" strokeLinecap="round" />
+          <line x1="95" y1="75" x2={90 + legOffset1 * 2} y2="98" stroke="#18181b" strokeWidth="6" strokeLinecap="round" />
+          <line x1="108" y1="75" x2={104 + legOffset2 * 2} y2="98" stroke="#18181b" strokeWidth="6" strokeLinecap="round" />
+        </svg>
+      );
+
     case 'enemy_crazed_lizard':
+      return (
+        <svg width="145" height="110" viewBox="0 0 145 110" className="drop-shadow-2xl">
+          {/* Dark Fire Dragon Tail */}
+          <path d="M 115 65 Q 140 70 142 45 Q 128 55 110 60 Z" fill="#18181b" stroke="#7e22ce" strokeWidth="3" />
+          {/* Spiky Dragon Back Fins */}
+          <polygon points="75,42 82,24 90,44" fill="#dc2626" stroke="#450a0a" strokeWidth="1.5" />
+          <polygon points="92,44 100,28 106,48" fill="#dc2626" stroke="#450a0a" strokeWidth="1.5" />
+          <polygon points="108,48 116,34 122,54" fill="#dc2626" stroke="#450a0a" strokeWidth="1.5" />
+          {/* Dragon Reptilian Body */}
+          <ellipse cx="85" cy="62" rx="36" ry="24" fill="#18181b" stroke="#7e22ce" strokeWidth="3.5" />
+          {/* Long Sinuous Dragon Neck */}
+          <path d="M 65 55 Q 45 45 35 25 Q 52 35 70 48 Z" fill="#18181b" stroke="#7e22ce" strokeWidth="3" />
+          {/* Dragon Head */}
+          <g transform={`rotate(${isAttacking ? -15 : 0} 30 20)`}>
+            {/* Horns */}
+            <polygon points="34,16 48,-2 30,8" fill="#dc2626" stroke="#450a0a" strokeWidth="2" />
+            <polygon points="26,18 36,2 22,12" fill="#dc2626" stroke="#450a0a" strokeWidth="2" />
+            {/* Snout & Gaping Jaws */}
+            <path d="M 38 18 L 8 16 L 24 32 Z" fill="#18181b" stroke="#dc2626" strokeWidth="2.5" />
+            {/* Slit Golden Reptile Eye */}
+            <ellipse cx="26" cy="18" rx="4" ry="5" fill="#facc15" stroke="#000000" strokeWidth="1" />
+            <line x1="26" y1="14" x2="26" y2="22" stroke="#000000" strokeWidth="2" />
+            {/* Razor Fangs in Jaws */}
+            <polygon points="14,17 18,24 22,17" fill="#ffffff" />
+          </g>
+          {/* Hyper Mega Beam Breath Laser on Attack */}
+          {isAttacking && (
+            <g className="animate-pulse">
+              <line x1="8" y1="18" x2="-80" y2="18" stroke="#7e22ce" strokeWidth="16" strokeLinecap="round" opacity="0.6" />
+              <line x1="8" y1="18" x2="-80" y2="18" stroke="#ef4444" strokeWidth="10" strokeLinecap="round" />
+              <line x1="8" y1="18" x2="-80" y2="18" stroke="#ffffff" strokeWidth="4" strokeLinecap="round" />
+              <circle cx="8" cy="18" r="14" fill="#facc15" />
+            </g>
+          )}
+          {/* Dragon Claw Stumps */}
+          <ellipse cx={68 + legOffset1} cy="86" rx="9" ry="8" fill="#09090b" stroke="#7e22ce" strokeWidth="2.5" />
+          <ellipse cx={102 + legOffset2} cy="86" rx="9" ry="8" fill="#09090b" stroke="#7e22ce" strokeWidth="2.5" />
+        </svg>
+      );
+
     case 'enemy_crazed_titan':
       return (
-        <svg width="120" height="120" viewBox="0 0 120 120" className="drop-shadow-2xl">
-          {/* Demonic Boss Aura */}
-          <circle cx="60" cy="60" r="52" fill="none" stroke="#7e22ce" strokeWidth="5" strokeDasharray="14,8" className="animate-spin" />
-          <circle cx="60" cy="60" r="44" fill="#09090b" stroke="#dc2626" strokeWidth="4" />
-          {/* Evil Horns */}
-          <polygon points="34,36 20,10 44,28" fill="#dc2626" stroke="#7f1d1d" strokeWidth="2.5" />
-          <polygon points="86,36 100,10 76,28" fill="#dc2626" stroke="#7f1d1d" strokeWidth="2.5" />
-          {/* Menacing Boss Eyes */}
-          <ellipse cx="45" cy="50" rx="7" ry="9" fill="#ef4444" />
-          <ellipse cx="75" cy="50" rx="7" ry="9" fill="#ef4444" />
-          <ellipse cx="45" cy="50" rx="2" ry="7" fill="#000000" />
-          <ellipse cx="75" cy="50" rx="2" ry="7" fill="#000000" />
-          {/* Jagged Fangs */}
-          <polygon points="50,68 60,82 70,68" fill="#ffffff" />
-          <polygon points="40,70 48,80 52,70" fill="#ffffff" />
-          <polygon points="68,70 72,80 80,70" fill="#ffffff" />
-          {/* Pulsing shockwave on attack */}
-          {isAttacking && (
-            <circle cx="60" cy="60" r="56" fill="none" stroke="#ef4444" strokeWidth="6" className="animate-ping" />
+        <svg width="150" height="150" viewBox="0 0 150 150" className="drop-shadow-2xl">
+          {/* Colossal Demonic Wave Aura */}
+          <circle cx="75" cy="75" r="68" fill="none" stroke="#7e22ce" strokeWidth="6" strokeDasharray="16,8" className="animate-spin" />
+          <circle cx="75" cy="75" r="58" fill="#09090b" stroke="#dc2626" strokeWidth="5" />
+          {/* Red Tribal Tattoo Markings on Chest and Shoulders */}
+          <path d="M 45 45 Q 60 70 75 55 Q 90 70 105 45" fill="none" stroke="#dc2626" strokeWidth="5" strokeLinecap="round" />
+          <path d="M 55 75 Q 75 90 95 75" fill="none" stroke="#dc2626" strokeWidth="4" strokeLinecap="round" />
+          {/* Colossal Horns */}
+          <polygon points="40,36 15,4 55,24" fill="#dc2626" stroke="#450a0a" strokeWidth="3" />
+          <polygon points="110,36 135,4 95,24" fill="#dc2626" stroke="#450a0a" strokeWidth="3" />
+          {/* Glowing Piercing Demonic Eyes */}
+          <ellipse cx="55" cy="50" rx="9" ry="11" fill="#ef4444" stroke="#450a0a" strokeWidth="2" />
+          <ellipse cx="95" cy="50" rx="9" ry="11" fill="#ef4444" stroke="#450a0a" strokeWidth="2" />
+          <ellipse cx="55" cy="50" rx="3" ry="9" fill="#000000" />
+          <ellipse cx="95" cy="50" rx="3" ry="9" fill="#000000" />
+          {/* Terrifying Jagged Maw */}
+          <g transform={`rotate(${isAttacking ? 25 : 0} 75 80)`}>
+            <ellipse cx="75" cy="82" rx="28" ry="16" fill="#450a0a" stroke="#dc2626" strokeWidth="3" />
+            <polygon points="54,74 62,86 70,74" fill="#ffffff" />
+            <polygon points="72,74 80,88 88,74" fill="#ffffff" />
+            <polygon points="60,90 68,78 76,90" fill="#ffffff" />
+            <polygon points="78,90 86,78 94,90" fill="#ffffff" />
+          </g>
+          {/* Titan Massive Fist Smash & Lv5 Shockwave on Attack */}
+          {isAttacking ? (
+            <g>
+              {/* Massive Fist Slamming Down */}
+              <circle cx="20" cy="85" r="26" fill="#18181b" stroke="#dc2626" strokeWidth="4" />
+              {/* Expanding Wave Rings (Lv5 Wave) */}
+              <circle cx="20" cy="115" r="45" fill="none" stroke="#7e22ce" strokeWidth="6" className="animate-ping" />
+              <circle cx="20" cy="115" r="65" fill="none" stroke="#ef4444" strokeWidth="4" className="animate-ping" />
+            </g>
+          ) : (
+            <circle cx="35" cy="90" r="16" fill="#18181b" stroke="#71717a" strokeWidth="3" />
           )}
           {/* Heavy Claw Stompers */}
-          <rect x="36" y="98" width="18" height="14" rx="4" fill="#18181b" stroke="#71717a" strokeWidth="3" />
-          <rect x="66" y="98" width="18" height="14" rx="4" fill="#18181b" stroke="#71717a" strokeWidth="3" />
+          <rect x={44 + legOffset1} y="122" width="26" height="18" rx="6" fill="#18181b" stroke="#71717a" strokeWidth="4" />
+          <rect x={82 + legOffset2} y="122" width="26" height="18" rx="6" fill="#18181b" stroke="#71717a" strokeWidth="4" />
         </svg>
       );
 

@@ -36,6 +36,9 @@ export interface CatDefinition {
   unlockedAtStart?: boolean;
   unlockCostXp?: number;
   unlockCostCatFood?: number;
+  unlockMethod?: 'start' | 'xp' | 'gacha' | 'stage_reward';
+  requiredStageId?: string;
+  unlockHint?: string;
 }
 
 export interface EnemyDefinition {
