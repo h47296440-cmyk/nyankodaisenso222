@@ -17,26 +17,97 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = ({
   scale = 1.0,
   isAttackingWindup = false,
 }) => {
-  // Animation calculations
-  const walkCycle = Math.sin(animTimer * 12);
-  const bounceY = Math.abs(Math.sin(animTimer * 8)) * 4;
-  const attackSwing = isAttackingWindup ? Math.sin(animTimer * 20) * 15 : 0;
-  const knockbackTilt = state === 'knockback' ? (isCat ? -25 : 25) : 0;
-  const knockbackY = state === 'knockback' ? -Math.sin(animTimer * 8) * 15 : 0;
-  const dieOpacity = state === 'die' ? Math.max(0, 1 - animTimer * 2) : 1;
+  // Rich physics and organic squash-stretch calculations
+  const walkPhase = animTimer * 10.5;
+  const walkCycle = Math.sin(walkPhase);
+  const bounceY = state === 'walk' ? Math.abs(Math.sin(walkPhase)) * 5.5 : 0;
+  const walkSquashX = state === 'walk' ? 1 + Math.sin(walkPhase * 2) * 0.04 : 1;
+  const walkSquashY = state === 'walk' ? 1 - Math.sin(walkPhase * 2) * 0.04 : 1;
+  const walkTilt = state === 'walk' ? Math.sin(walkPhase) * 3.5 : 0;
 
+  // Attack windup tension vs explosive strike lunge
+  let attackTilt = 0;
+  let attackTranslateX = 0;
+  let attackTranslateY = 0;
+  let attackScaleX = 1;
+  let attackScaleY = 1;
+
+  if (isAttackingWindup) {
+    // Deep breath & pull-back anticipation
+    const tremor = Math.sin(animTimer * 45) * 2;
+    attackTilt = isCat ? -16 : 16;
+    attackTranslateX = (isCat ? -10 : 10) + tremor;
+    attackTranslateY = -4;
+    attackScaleX = 0.92;
+    attackScaleY = 1.12;
+  } else if (state === 'attack') {
+    // Explosive forward strike snap
+    attackTilt = isCat ? 22 : -22;
+    attackTranslateX = isCat ? 18 : -18;
+    attackTranslateY = 2;
+    attackScaleX = 1.22;
+    attackScaleY = 0.84;
+  }
+
+  // Knockback tumbling arc
+  let knockbackRot = 0;
+  let knockbackElevY = 0;
+  if (state === 'knockback') {
+    const kbProgress = Math.min(1.0, animTimer / 0.4);
+    knockbackElevY = Math.sin(kbProgress * Math.PI) * 26;
+    knockbackRot = (isCat ? -1 : 1) * Math.sin(kbProgress * Math.PI * 0.8) * 35;
+  }
+
+  const dieOpacity = state === 'die' ? Math.max(0, 1 - animTimer * 2.5) : 1;
   const facingTransform = isCat ? 'scaleX(1)' : 'scaleX(-1)';
 
+  const finalScaleX = scale * walkSquashX * attackScaleX;
+  const finalScaleY = scale * walkSquashY * attackScaleY;
+  const finalRot = walkTilt + attackTilt + knockbackRot;
+  const finalY = -(bounceY + attackTranslateY + knockbackElevY);
+
   return (
-    <div
-      className="relative flex items-center justify-center pointer-events-none"
-      style={{
-        transform: `${facingTransform} scale(${scale}) rotate(${knockbackTilt + attackSwing}deg) translateY(${-(bounceY + knockbackY)}px)`,
-        opacity: dieOpacity,
-        transition: 'opacity 0.2s ease',
-      }}
-    >
-      {renderSpriteSvg(spriteType, walkCycle, isAttackingWindup, animTimer)}
+    <div className="relative flex flex-col items-center justify-center pointer-events-none select-none">
+      {/* Dynamic Ground Shadow */}
+      <div
+        className="absolute -bottom-1 bg-black/35 rounded-full blur-[1px] transition-all"
+        style={{
+          width: `${36 * scale}px`,
+          height: `${10 * scale}px`,
+          transform: `scale(${Math.max(0.4, 1 - (bounceY + knockbackElevY) * 0.025)})`,
+          opacity: Math.max(0.2, 0.4 - (bounceY + knockbackElevY) * 0.01),
+        }}
+      />
+
+      {/* Main Animated Unit Sprite */}
+      <div
+        style={{
+          transform: `${facingTransform} scale(${finalScaleX}, ${finalScaleY}) rotate(${finalRot}deg) translate(${attackTranslateX}px, ${finalY}px)`,
+          opacity: dieOpacity,
+          filter: isAttackingWindup
+            ? 'drop-shadow(0 0 6px rgba(250, 204, 21, 0.65))'
+            : state === 'knockback'
+            ? 'drop-shadow(0 0 8px rgba(239, 68, 68, 0.7))'
+            : 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25))',
+          transition: 'filter 0.15s ease',
+        }}
+      >
+        {renderSpriteSvg(spriteType, walkCycle, isAttackingWindup || state === 'attack', animTimer)}
+      </div>
+
+      {/* Knockback Panic Sweat Particles */}
+      {state === 'knockback' && (
+        <div className="absolute -top-6 flex gap-2 animate-ping pointer-events-none">
+          <span className="text-xs font-black text-cyan-300">💦</span>
+        </div>
+      )}
+
+      {/* Attack Charge Sparks */}
+      {isAttackingWindup && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center justify-center pointer-events-none">
+          <div className="w-6 h-6 rounded-full bg-yellow-400/40 border border-yellow-200 animate-ping" />
+        </div>
+      )}
     </div>
   );
 };

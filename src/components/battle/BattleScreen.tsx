@@ -72,7 +72,9 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
   const basePlayerCastleHp = Math.round((2000 + castleHpLevel * 500) * treasureCatHpMult);
   const battlefieldWidth = stage.battlefieldWidth || 1800;
-  const playerCastleX = 100;
+
+  // Allies on Left (x = 140), Enemies on Right (x = battlefieldWidth - 140)
+  const playerCastleX = 140;
   const enemyCastleX = battlefieldWidth - 140;
 
   // Initial Rich Cat item setup
@@ -87,7 +89,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const spawnedThresholdWavesRef = useRef<Set<number>>(new Set());
   const isTerminatedRef = useRef(false);
 
-  // Authoritative Simulation Refs (prevents React closure stale state)
+  // Authoritative Simulation Refs
   const catsRef = useRef<ActiveEntity[]>([]);
   const enemiesRef = useRef<ActiveEntity[]>([]);
   const playerCastleHpRef = useRef(basePlayerCastleHp);
@@ -109,7 +111,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const [gameSpeed, setGameSpeed] = useState(activeItems.speedUp ? 2 : 1);
   const [isPaused, setIsPaused] = useState(false);
   const [isAutoBattle, setIsAutoBattle] = useState(!!activeItems.catCpu);
-  const [cameraX, setCameraX] = useState(0);
+  const [cameraX, setCameraX] = useState(0); // Start showing player base on the left
   const [bossAlert, setBossAlert] = useState<string | null>(null);
 
   // Entities & visual fx for UI
@@ -117,8 +119,6 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const [enemies, setEnemies] = useState<ActiveEntity[]>([]);
   const [damageNumbers, setDamageNumbers] = useState<DamageNumber[]>([]);
   const [visualEffects, setVisualEffects] = useState<VisualEffect[]>([]);
-
-  // Deck cooldowns
   const [deckCooldowns, setDeckCooldowns] = useState<Record<string, number>>({});
 
   // End State
@@ -150,7 +150,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     const catProg = profile.cats[catId];
     const activeFormIndex = catProg ? catProg.activeForm : 0;
     const form = def.forms[activeFormIndex];
-    const cdReduction = (researchLevel - 1) * 0.05; // 5% cd reduction per level
+    const cdReduction = (researchLevel - 1) * 0.05;
     const maxCooldown = Math.max(1.0, form.cooldown * (1 - cdReduction));
     return {
       def,
@@ -161,42 +161,39 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     };
   });
 
-  // Start BGM on mount
+  // Start Battle Music on Mount
   useEffect(() => {
-    if (stage.isFinalBossStage) {
-      audio.startFinalBossBgm();
-    } else if (stage.isBossStage) {
-      audio.startBossBgm();
-    } else {
-      audio.startBattleBgm();
-    }
+    audio.unlockAudio();
+    audio.startBattleBgm(stage.chapter, false, stage.isFinalBossStage);
+
     return () => {
       audio.stopBattleBgm();
     };
-  }, [stage.id, stage.isFinalBossStage, stage.isBossStage]);
+  }, [stage.chapter, stage.isFinalBossStage]);
 
-  // Main 60fps Game Loop
+  // Main 60FPS Game Loop
   useEffect(() => {
     let lastTime = performance.now();
     let animationFrameId: number;
 
-    const gameTick = (now: number) => {
-      const deltaRaw = (now - lastTime) / 1000;
-      lastTime = now;
+    const gameTick = (currentTime: number) => {
+      const rawDelta = (currentTime - lastTime) / 1000;
+      lastTime = currentTime;
+
+      const dt = Math.min(0.1, rawDelta) * gameSpeed;
 
       if (!isPaused && !battleResult.ended && !isTerminatedRef.current) {
-        const dt = Math.min(0.1, deltaRaw) * gameSpeed;
         battleTimeRef.current += dt;
 
         // 1. Money Generation
-        const ratePerSec = (15 + workerLevelRef.current * 12 + (workerRateLevel - 1) * 8) * treasureMoneyRateMult;
+        const ratePerSec = (15 + workerLevelRef.current * 10 + (workerRateLevel - 1) * 4) * treasureMoneyRateMult;
         moneyRef.current = Math.min(maxMoney, moneyRef.current + ratePerSec * dt);
 
-        // 2. Cannon Charging
-        const cannonChargeRate = (1.5 + cannonChargeLevel * 0.4) * treasureCannonChargeMult;
-        cannonProgressRef.current = Math.min(100, cannonProgressRef.current + cannonChargeRate * dt);
+        // 2. Cat Cannon Charging
+        const cannonSecsToFull = Math.max(15, (60 - (cannonChargeLevel - 1) * 3) / treasureCannonChargeMult);
+        cannonProgressRef.current = Math.min(100, cannonProgressRef.current + (100 / cannonSecsToFull) * dt);
 
-        // 3. Deck Cooldown countdowns
+        // 3. Update Deck Cooldowns
         const nextCds: Record<string, number> = {};
         Object.entries(deckCooldownsRef.current).forEach(([id, rem]) => {
           const remNum = Number(rem);
@@ -208,12 +205,11 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
         // 4. Wave Spawner
         stage.waves.forEach((wave, idx) => {
-          // Time-based wave
           if (wave.timeSeconds > 0 && battleTimeRef.current >= wave.timeSeconds && !spawnedWaveIndicesRef.current.has(idx)) {
             spawnedWaveIndicesRef.current.add(idx);
             spawnEnemy(wave.enemyId, wave.boss);
             if (wave.boss) {
-              audio.playBossAlert();
+              audio.playBossAppear();
               if (stage.isFinalBossStage) {
                 audio.startFinalBossBgm();
               } else {
@@ -226,14 +222,13 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
             }
           }
 
-          // Castle HP threshold wave
           if (wave.castleHpThreshold && !spawnedThresholdWavesRef.current.has(idx)) {
             const hpPercent = (enemyCastleHpRef.current / stage.castleHp) * 100;
             if (hpPercent <= wave.castleHpThreshold) {
               spawnedThresholdWavesRef.current.add(idx);
               spawnEnemy(wave.enemyId, wave.boss);
               if (wave.boss) {
-                audio.playBossAlert();
+                audio.playBossAppear();
                 if (stage.isFinalBossStage) {
                   audio.startFinalBossBgm();
                 } else {
@@ -248,7 +243,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           }
         });
 
-        // 5. Update Active Units Physics, Attacks, and States
+        // 5. Update Active Units Physics & Attacks
         updateEntities(dt);
 
         // 6. Update Visual Effects & Damage Numbers
@@ -265,7 +260,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           sniperTimerRef.current += dt;
           if (sniperTimerRef.current >= 8.0) {
             sniperTimerRef.current = 0;
-            // Find foremost enemy (closest to player castle, i.e. lowest X)
+            // Foremost enemy closest to player base (smallest X)
             let foremostEnemy: ActiveEntity | null = null;
             enemiesRef.current.forEach((en) => {
               if (!foremostEnemy || en.x < foremostEnemy.x) {
@@ -280,7 +275,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
               target.hp -= sniperDmg;
               target.state = 'knockback';
               target.knockbackTimer = 0.45;
-              target.knockbackVelocityX = 75; // Knock back towards right
+              target.knockbackVelocityX = 90;
               target.hitFlashTimer = 0.3;
               spawnFx(target.x, target.y + 20, 'hit');
               spawnDamageNum(target.x, target.y + 35, sniperDmg, true, true);
@@ -293,7 +288,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           handleAutoBattleTick();
         }
 
-        // 9. Synchronize ref state to React state for fluid rendering
+        // 9. Synchronize ref state to React state
         setCats([...catsRef.current]);
         setEnemies([...enemiesRef.current]);
         setPlayerCastleHp(playerCastleHpRef.current);
@@ -314,19 +309,16 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
   // Auto Battle AI
   const handleAutoBattleTick = () => {
-    // 1. If money >= worker upgrade cost, upgrade worker first if below cap
     if (workerLevelRef.current < maxWorkerLevel && moneyRef.current >= workerUpgradeCost) {
       handleUpgradeWorker();
       return;
     }
 
-    // 2. Fire cannon if ready
     if (cannonProgressRef.current >= 100 && enemiesRef.current.length > 2) {
       handleFireCannon();
       return;
     }
 
-    // 3. Spawn available units from cheapest meatshield to big hitters
     for (const slot of deckSlotDefs) {
       if (moneyRef.current >= slot.cost && (deckCooldownsRef.current[slot.def.id] || 0) <= 0) {
         handleSpawnCat(slot.def.id);
@@ -335,14 +327,13 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     }
   };
 
-  // Spawn Cat Handler
+  // Spawn Cat Handler (Spawns at playerCastleX on the Left)
   const handleSpawnCat = (catId: string) => {
     const slot = deckSlotDefs.find((s) => s.def.id === catId);
     if (!slot || moneyRef.current < slot.cost || (deckCooldownsRef.current[catId] || 0) > 0) return;
 
     const form = slot.def.forms[slot.activeFormIndex];
     const catLevel = profile.cats[catId]?.level || 1;
-    // Level scaling: +10% HP and +10% ATK per level
     const levelMult = 1 + (catLevel - 1) * 0.1;
 
     const newCat: ActiveEntity = {
@@ -350,7 +341,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       defId: catId,
       name: form.name,
       isCat: true,
-      x: playerCastleX, // spawn near player castle
+      x: playerCastleX,
       y: 0,
       hp: Math.round(form.hp * levelMult * treasureCatHpMult),
       maxHp: Math.round(form.hp * levelMult * treasureCatHpMult),
@@ -382,7 +373,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     audio.playCatSpawn(1.0, slot.def.rarity);
   };
 
-  // Spawn Enemy Helper
+  // Spawn Enemy Helper (Spawns at enemyCastleX on the Right)
   const spawnEnemy = (enemyId: string, isBoss: boolean = false) => {
     const def = ENEMY_DEFINITIONS[enemyId] || ENEMY_DEFINITIONS.enemy_doge;
     const isBossEntity = isBoss || def.isBoss;
@@ -392,7 +383,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       defId: enemyId,
       name: def.name,
       isCat: false,
-      x: enemyCastleX, // spawn near enemy castle
+      x: enemyCastleX,
       y: 0,
       hp: def.hp,
       maxHp: def.hp,
@@ -421,11 +412,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
     enemiesRef.current.push(newEnemy);
 
-    // ★ Boss Spawn Shockwave (ボス出現時の衝撃波＆味方全員吹き飛ばし!)
+    // Boss Spawn Shockwave (Pushes allied cats leftwards towards player base)
     if (isBossEntity) {
-      audio.playBossRoarShockwave();
+      audio.playBossAppear();
       spawnFx(enemyCastleX - 60, 45, 'boss_shockwave');
-      // Push all allied cats backwards towards home base
       catsRef.current.forEach((c) => {
         c.state = 'knockback';
         c.knockbackVelocityX = 220;
@@ -442,20 +432,19 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     moneyRef.current -= workerUpgradeCost;
     workerLevelRef.current += 1;
     setWorkerLevel(workerLevelRef.current);
-    audio.playWorkerLevelUp();
+    audio.playWorkerUpgrade();
   };
 
-  // Fire Cat Cannon (にゃんこ砲)
+  // Fire Cat Cannon (にゃんこ砲 - Shoots from Left Base to Right)
   const handleFireCannon = () => {
     if (cannonProgressRef.current < 100 || isCannonFiring) return;
     setIsCannonFiring(true);
     cannonProgressRef.current = 0;
     setCannonProgress(0);
-    audio.playCannonBlast();
+    audio.playCannonFire();
 
     const cannonDmg = Math.round((400 + cannonPowerLevel * 180) * treasureCannonPowerMult);
 
-    // Blast effect and knockback to ALL active enemies
     setTimeout(() => {
       enemiesRef.current.forEach((enemy) => {
         const nextHp = Math.max(0, enemy.hp - cannonDmg);
@@ -510,12 +499,12 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       return;
     }
 
-    // 1. UPDATE CATS
+    // 1. UPDATE CATS (Moving Rightwards: x increases)
     for (let i = 0; i < catsRef.current.length; i++) {
       const cat = catsRef.current[i];
       cat.animTimer += dt;
 
-      // Knockback handling
+      // Knockback pushes cat leftwards towards player base
       if (cat.state === 'knockback') {
         cat.knockbackTimer -= dt;
         cat.x = Math.max(playerCastleX, cat.x - cat.knockbackVelocityX * dt);
@@ -525,23 +514,21 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         continue;
       }
 
-      // Attack Cooldown
       if (cat.attackTimer > 0) {
         cat.attackTimer -= dt;
       }
 
-      // Find living enemies ahead of this cat
+      // Enemies in front of cat are to the right (e.x >= cat.x - 15)
       const enemiesInFront = enemiesRef.current.filter((e) => e.hp > 0 && e.x >= cat.x - 15);
       const closestEnemyX = enemiesInFront.length > 0 ? Math.min(...enemiesInFront.map((e) => e.x)) : enemyCastleX;
       const targetDistance = Math.max(0, closestEnemyX - cat.x);
 
-      // Clamp position so cat NEVER passes enemy frontline
+      // Clamp so cat never passes enemy frontline
       if (cat.x > closestEnemyX - 5) {
         cat.x = Math.max(playerCastleX, closestEnemyX - 5);
       }
 
       if (targetDistance <= cat.attackRange) {
-        // Within range: Stop and attack
         if (!cat.isWindupActive && cat.attackTimer <= 0) {
           cat.isWindupActive = true;
           cat.attackWindupTimer = 0.25;
@@ -558,7 +545,6 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           }
         }
       } else {
-        // Move forward towards enemy/castle, capped strictly before target
         cat.state = 'walk';
         cat.isWindupActive = false;
         const nextX = cat.x + cat.speed * dt;
@@ -566,12 +552,12 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       }
     }
 
-    // 2. UPDATE ENEMIES
+    // 2. UPDATE ENEMIES (Moving Leftwards: x decreases)
     for (let i = 0; i < enemiesRef.current.length; i++) {
       const enemy = enemiesRef.current[i];
       enemy.animTimer += dt;
 
-      // Knockback handling
+      // Knockback pushes enemy rightwards towards enemy castle
       if (enemy.state === 'knockback') {
         enemy.knockbackTimer -= dt;
         enemy.x = Math.min(enemyCastleX, enemy.x + enemy.knockbackVelocityX * dt);
@@ -581,23 +567,21 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         continue;
       }
 
-      // Attack Cooldown
       if (enemy.attackTimer > 0) {
         enemy.attackTimer -= dt;
       }
 
-      // Find living cats ahead of this enemy
+      // Cats in front of enemy are to the left (c.x <= enemy.x + 15)
       const catsInFront = catsRef.current.filter((c) => c.hp > 0 && c.x <= enemy.x + 15);
       const closestCatX = catsInFront.length > 0 ? Math.max(...catsInFront.map((c) => c.x)) : playerCastleX;
       const targetDistance = Math.max(0, enemy.x - closestCatX);
 
-      // Clamp position so enemy NEVER passes cat frontline
+      // Clamp so enemy never passes cat frontline
       if (enemy.x < closestCatX + 5) {
         enemy.x = Math.min(enemyCastleX, closestCatX + 5);
       }
 
       if (targetDistance <= enemy.attackRange) {
-        // Within range: Stop and attack
         if (!enemy.isWindupActive && enemy.attackTimer <= 0) {
           enemy.isWindupActive = true;
           enemy.attackWindupTimer = 0.25;
@@ -614,7 +598,6 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           }
         }
       } else {
-        // Move leftwards towards player base, capped strictly before cat
         enemy.state = 'walk';
         enemy.isWindupActive = false;
         const nextX = enemy.x - enemy.speed * dt;
@@ -639,24 +622,22 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     enemiesRef.current = enemiesRef.current.filter((e) => e.hp > 0);
   };
 
-  // Cat Attacks: Single-target vs Area Attack!
+  // Cat Attacks: Single-target vs Area Attack (Attacking Rightwards)
   const executeCatAttack = (cat: ActiveEntity) => {
     const isArea = cat.attackType === 'area';
-    // Jura / Jurasaurus has massive critical rate (50% / 75%)
     let critChance = 0.15;
     if (cat.defId === 'cat_jura') {
       critChance = cat.formIndex === 1 ? 0.75 : 0.5;
     }
     const isCrit = Math.random() < critChance;
 
-    // Find enemies in reach (in front of cat within range + buffer)
+    // Enemies within reach to the right of cat
     const enemiesInReach = enemiesRef.current.filter(
       (e) => e.hp > 0 && e.x >= cat.x - 25 && e.x <= cat.x + cat.attackRange + 30
     );
 
     if (enemiesInReach.length > 0) {
       if (isArea) {
-        // ★ AREA ATTACK (範囲攻撃): Hits ALL enemies in range!
         audio.playHit(isCrit, true);
         spawnFx(cat.x + cat.attackRange * 0.5, 20, isCrit ? 'crit_flash' : 'aoe_burst');
 
@@ -668,15 +649,14 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
               actualDmg = Math.round(cat.attackPower * 2.0);
               spawnFx(e.x, 25, 'crit_flash');
             } else {
-              actualDmg = 1; // Metal deflection
+              actualDmg = 1;
               spawnFx(e.x, 25, 'metal_spark');
             }
           }
 
-          // Surfer / Castaway freeze against Alien
           if (cat.defId === 'cat_surfer' && e.traits?.includes('alien')) {
             if (Math.random() < 0.6) {
-              e.attackTimer = 2.5; // Freeze enemy
+              e.attackTimer = 2.5;
               spawnFx(e.x, 35, 'freeze_fx');
             }
           }
@@ -685,7 +665,6 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           e.hp = nextHp;
           spawnDamageNum(e.x, 25, actualDmg, isCrit, true);
 
-          // Knockback if crossed KB threshold
           const kbThreshold = e.maxHp / e.maxKnockbacks;
           const currentKBs = Math.floor((e.maxHp - nextHp) / kbThreshold);
           const shouldKb = currentKBs > e.knockbackCount;
@@ -708,10 +687,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           }
         });
       } else {
-        // ★ SINGLE TARGET ATTACK (単体攻撃): Hits ONLY the front-most enemy!
+        // Single target: closest enemy to cat (smallest x)
         audio.playHit(isCrit, false);
         const target = [...enemiesInReach].sort((a, b) => a.x - b.x)[0];
-        
+
         const isMetal = target.traits?.includes('metal');
         let actualDmg = Math.round(cat.attackPower * (isCrit ? 2.0 : 1.0));
         if (isMetal) {
@@ -719,17 +698,16 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
             actualDmg = Math.round(cat.attackPower * 2.0);
             spawnFx(target.x, 25, 'crit_flash');
           } else {
-            actualDmg = 1; // Metal deflection
+            actualDmg = 1;
             spawnFx(target.x, 25, 'metal_spark');
           }
         } else {
           spawnFx(target.x, 20, isCrit ? 'crit_flash' : 'hit');
         }
 
-        // Surfer / Castaway freeze against Alien
         if (cat.defId === 'cat_surfer' && target.traits?.includes('alien')) {
           if (Math.random() < 0.6) {
-            target.attackTimer = 2.5; // Freeze enemy
+            target.attackTimer = 2.5;
             spawnFx(target.x, 35, 'freeze_fx');
           }
         }
@@ -761,7 +739,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         }
       }
     } else {
-      // Hit Enemy Castle if in reach
+      // Hit Enemy Castle on Right
       if (enemyCastleX - cat.x <= cat.attackRange + 30) {
         audio.playHit(false, false);
         spawnFx(enemyCastleX, 40, isArea ? 'aoe_burst' : 'hit');
@@ -775,12 +753,12 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     }
   };
 
-  // Enemy Attacks: Single-target vs Area Attack!
+  // Enemy Attacks: Single-target vs Area Attack (Attacking Leftwards)
   const executeEnemyAttack = (enemy: ActiveEntity) => {
     const isArea = enemy.attackType === 'area';
     const dmg = enemy.attackPower;
 
-    // Find cats in reach (in front of enemy towards player castle)
+    // Cats within reach to the left of enemy
     const catsInReach = catsRef.current.filter(
       (c) => c.hp > 0 && c.x <= enemy.x + 25 && c.x >= enemy.x - enemy.attackRange - 30
     );
@@ -811,7 +789,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         });
       } else {
         audio.playHit(false, false);
-        // Frontmost cat is closest to enemy base (largest x)
+        // Frontmost cat is closest to enemy (largest x)
         const target = [...catsInReach].sort((a, b) => b.x - a.x)[0];
         spawnFx(target.x, 20, 'hit');
         spawnDamageNum(target.x, 25, dmg, false, false);
@@ -834,22 +812,20 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         }
       }
 
-      // ★ Wave Attack Mechanics (エリザベスやボスの波動攻撃!)
+      // Wave Attack Mechanics
       if (enemy.waveLevel && enemy.waveLevel > 0) {
         audio.playWaveAttack();
         const waveLvl = enemy.waveLevel;
         const waveReach = waveLvl * 220;
         const startWaveX = enemy.x - 20;
 
-        // Visual pulses traveling across the screen
         for (let i = 1; i <= waveLvl; i++) {
           setTimeout(() => {
             const pulseX = Math.max(playerCastleX, startWaveX - i * 160);
-            spawnFx(pulseX, 20, 'wave_blast');
+            spawnFx(pulseX, 20, 'aoe_burst');
           }, (i - 1) * 110);
         }
 
-        // Damage cats along the wave's path
         const waveHitCats = catsRef.current.filter(
           (c) => c.hp > 0 && c.x <= startWaveX && c.x >= startWaveX - waveReach
         );
@@ -874,7 +850,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         });
       }
     } else {
-      // Hit Player Castle
+      // Hit Player Castle on Left
       if (enemy.x - playerCastleX <= enemy.attackRange + 30) {
         audio.playHit(false, false);
         audio.playCastleDamage();
@@ -898,7 +874,6 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       audio.playDefeat();
     }
 
-    // Treasure drop roll if victory
     let treasureDrop: { name: string; quality: TreasureQuality; description: string } | null = null;
     let treasureQuality: TreasureQuality = 'none';
 
@@ -906,27 +881,18 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       const trDef = TREASURES[stage.id];
       if (trDef) {
         if (activeItems.treasureRadar) {
-          // Guaranteed Gold Treasure with Radar!
           treasureQuality = 'gold';
         } else {
           const isFestival = !!stage.treasureFestival;
           const roll = Math.random();
           if (isFestival) {
-            if (roll < 0.65) {
-              treasureQuality = 'gold';
-            } else if (roll < 0.90) {
-              treasureQuality = 'silver';
-            } else {
-              treasureQuality = 'bronze';
-            }
+            if (roll < 0.65) treasureQuality = 'gold';
+            else if (roll < 0.90) treasureQuality = 'silver';
+            else treasureQuality = 'bronze';
           } else {
-            if (roll < 0.35) {
-              treasureQuality = 'gold';
-            } else if (roll < 0.65) {
-              treasureQuality = 'silver';
-            } else if (roll < 0.88) {
-              treasureQuality = 'bronze';
-            }
+            if (roll < 0.35) treasureQuality = 'gold';
+            else if (roll < 0.65) treasureQuality = 'silver';
+            else if (roll < 0.88) treasureQuality = 'bronze';
           }
         }
 
@@ -973,8 +939,9 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full bg-stone-950 flex flex-col select-none overflow-hidden font-['M_PLUS_Rounded_1c']">
+    <div className="fixed inset-0 w-screen h-screen bg-stone-950 flex flex-col select-none overflow-hidden font-['M_PLUS_Rounded_1c'] z-50">
       <BattleHud
+        stageName={stage.name}
         money={money}
         maxMoney={maxMoney}
         workerLevel={workerLevel}
@@ -1027,7 +994,6 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           }}
           onReturnToMap={onExit}
           onRetry={() => {
-            // Reset battle
             setPlayerCastleHp(basePlayerCastleHp);
             setEnemyCastleHp(stage.castleHp);
             setWorkerLevel(1);
@@ -1049,6 +1015,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
               catFoodEarned: 0,
               treasureDropped: null,
             });
+            audio.startBattleBgm(stage.chapter, false, stage.isFinalBossStage);
           }}
           hasNextStage={hasNextStage}
         />

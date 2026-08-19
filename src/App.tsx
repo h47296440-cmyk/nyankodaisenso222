@@ -45,7 +45,7 @@ export default function App() {
     if (currentView === 'title') {
       audio.switchBgm('title');
     } else if (currentView === 'battle') {
-      audio.switchBgm('battle');
+      // Handled inside BattleScreen based on stage
     } else {
       audio.switchBgm('map');
     }
