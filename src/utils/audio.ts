@@ -59,17 +59,7 @@ class SoundManager {
   public unlockAudio() {
     this.initCtx();
     if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume().then(() => {
-        if (this.pendingBgm !== 'none' && this.bgmEnabled) {
-          const track = this.pendingBgm;
-          this.pendingBgm = 'none';
-          this.switchBgm(track);
-        }
-      }).catch(() => {});
-    } else if (this.pendingBgm !== 'none' && this.bgmEnabled) {
-      const track = this.pendingBgm;
-      this.pendingBgm = 'none';
-      this.switchBgm(track);
+      this.ctx.resume().catch(() => {});
     }
   }
 
@@ -414,7 +404,10 @@ class SoundManager {
     this.stopBgm();
     this.currentBgm = track;
     if (this.bgmEnabled && track !== 'none') {
-      this.pendingBgm = track;
+      this.initCtx();
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
       this.startMusicScheduler(track);
     }
   }
@@ -470,7 +463,6 @@ class SoundManager {
   }
 
   private startMusicScheduler(track: BgmTrack) {
-    this.unlockAudio();
     if (!this.ctx) return;
 
     if (this.schedulerTimerId !== null) {
@@ -491,8 +483,9 @@ class SoundManager {
     else if (track === 'battle_japan') this.tempoBpm = 136;
     else this.tempoBpm = 120; // title / map
 
+    const bpm = Math.max(60, this.tempoBpm || 120);
     // 16th note duration in seconds
-    const secondsPer16th = (60 / this.tempoBpm) / 4;
+    const secondsPer16th = (60 / bpm) / 4;
 
     // Schedule 120ms into future every 25ms
     this.schedulerTimerId = window.setInterval(() => {
@@ -506,7 +499,8 @@ class SoundManager {
         this.nextNoteTime = this.ctx.currentTime + 0.02;
       }
 
-      while (this.nextNoteTime < this.ctx.currentTime + 0.12) {
+      let maxIterations = 8;
+      while (this.nextNoteTime < this.ctx.currentTime + 0.12 && maxIterations-- > 0) {
         this.scheduleStep(track, this.currentStep, this.nextNoteTime, secondsPer16th);
         this.nextNoteTime += secondsPer16th;
         this.currentStep = (this.currentStep + 1) % 64; // 4-bar loop of 16ths

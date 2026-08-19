@@ -145,19 +145,19 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const maxWorkerLevel = 8;
 
   // Deck definition mapping
-  const deckSlotDefs = profile.deck.slice(0, 10).map((catId) => {
+  const deckSlotDefs = (profile.deck || []).slice(0, 10).map((catId) => {
     const def = CAT_DEFINITIONS.find((c) => c.id === catId) || CAT_DEFINITIONS[0];
-    const catProg = profile.cats[catId];
-    const activeFormIndex = catProg ? catProg.activeForm : 0;
-    const form = def.forms[activeFormIndex];
+    const catProg = profile.cats ? profile.cats[catId] : undefined;
+    const activeFormIndex = catProg ? (catProg.activeForm || 0) : 0;
+    const form = def?.forms?.[activeFormIndex] || def?.forms?.[0] || CAT_DEFINITIONS[0].forms[0];
     const cdReduction = (researchLevel - 1) * 0.05;
-    const maxCooldown = Math.max(1.0, form.cooldown * (1 - cdReduction));
+    const maxCooldown = Math.max(1.0, (form?.cooldown || 2.0) * (1 - cdReduction));
     return {
       def,
       activeFormIndex,
       cooldownRemaining: deckCooldowns[catId] || 0,
       maxCooldown,
-      cost: form.cost,
+      cost: form?.cost || 100,
     };
   });
 
@@ -665,9 +665,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           e.hp = nextHp;
           spawnDamageNum(e.x, 25, actualDmg, isCrit, true);
 
-          const kbThreshold = e.maxHp / e.maxKnockbacks;
+          const maxKbs = Math.max(1, e.maxKnockbacks || 1);
+          const kbThreshold = e.maxHp / maxKbs;
           const currentKBs = Math.floor((e.maxHp - nextHp) / kbThreshold);
-          const shouldKb = currentKBs > e.knockbackCount;
+          const shouldKb = currentKBs > (e.knockbackCount || 0);
 
           if (nextHp <= 0) {
             const def = ENEMY_DEFINITIONS[e.defId];
@@ -717,9 +718,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         const nextHp = Math.max(0, target.hp - actualDmg);
         target.hp = nextHp;
 
-        const kbThreshold = target.maxHp / target.maxKnockbacks;
+        const maxKbs = Math.max(1, target.maxKnockbacks || 1);
+        const kbThreshold = target.maxHp / maxKbs;
         const currentKBs = Math.floor((target.maxHp - nextHp) / kbThreshold);
-        const shouldKb = currentKBs > target.knockbackCount;
+        const shouldKb = currentKBs > (target.knockbackCount || 0);
 
         if (nextHp <= 0) {
           const def = ENEMY_DEFINITIONS[target.defId];
@@ -773,9 +775,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           c.hp = nextHp;
           spawnDamageNum(c.x, 25, dmg, false, false);
 
-          const kbThreshold = c.maxHp / c.maxKnockbacks;
+          const maxKbs = Math.max(1, c.maxKnockbacks || 1);
+          const kbThreshold = c.maxHp / maxKbs;
           const currentKBs = Math.floor((c.maxHp - nextHp) / kbThreshold);
-          const shouldKb = currentKBs > c.knockbackCount;
+          const shouldKb = currentKBs > (c.knockbackCount || 0);
 
           if (shouldKb) {
             audio.playKnockback();
@@ -797,9 +800,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         const nextHp = Math.max(0, target.hp - dmg);
         target.hp = nextHp;
 
-        const kbThreshold = target.maxHp / target.maxKnockbacks;
+        const maxKbs = Math.max(1, target.maxKnockbacks || 1);
+        const kbThreshold = target.maxHp / maxKbs;
         const currentKBs = Math.floor((target.maxHp - nextHp) / kbThreshold);
-        const shouldKb = currentKBs > target.knockbackCount;
+        const shouldKb = currentKBs > (target.knockbackCount || 0);
 
         if (shouldKb) {
           audio.playKnockback();
@@ -836,9 +840,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           c.hp = nextHp;
           spawnDamageNum(c.x, 30, waveDmg, false, false);
 
-          const kbThreshold = c.maxHp / c.maxKnockbacks;
+          const maxKbs = Math.max(1, c.maxKnockbacks || 1);
+          const kbThreshold = c.maxHp / maxKbs;
           const currentKBs = Math.floor((c.maxHp - nextHp) / kbThreshold);
-          if (currentKBs > c.knockbackCount) {
+          if (currentKBs > (c.knockbackCount || 0)) {
             audio.playKnockback();
             c.knockbackCount = currentKBs;
             c.state = 'knockback';

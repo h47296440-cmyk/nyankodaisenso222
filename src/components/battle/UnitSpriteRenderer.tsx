@@ -17,8 +17,11 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = ({
   scale = 1.0,
   isAttackingWindup = false,
 }) => {
+  const safeTimer = isFinite(animTimer) ? animTimer : 0;
+  const safeScale = isFinite(scale) && scale > 0 ? scale : 1.0;
+
   // Rich physics and organic squash-stretch calculations
-  const walkPhase = animTimer * 10.5;
+  const walkPhase = safeTimer * 10.5;
   const walkCycle = Math.sin(walkPhase);
   const bounceY = state === 'walk' ? Math.abs(Math.sin(walkPhase)) * 5.5 : 0;
   const walkSquashX = state === 'walk' ? 1 + Math.sin(walkPhase * 2) * 0.04 : 1;
@@ -34,7 +37,7 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = ({
 
   if (isAttackingWindup) {
     // Deep breath & pull-back anticipation
-    const tremor = Math.sin(animTimer * 45) * 2;
+    const tremor = Math.sin(safeTimer * 45) * 2;
     attackTilt = isCat ? -16 : 16;
     attackTranslateX = (isCat ? -10 : 10) + tremor;
     attackTranslateY = -4;
@@ -53,16 +56,16 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = ({
   let knockbackRot = 0;
   let knockbackElevY = 0;
   if (state === 'knockback') {
-    const kbProgress = Math.min(1.0, animTimer / 0.4);
+    const kbProgress = Math.min(1.0, safeTimer / 0.4);
     knockbackElevY = Math.sin(kbProgress * Math.PI) * 26;
     knockbackRot = (isCat ? -1 : 1) * Math.sin(kbProgress * Math.PI * 0.8) * 35;
   }
 
-  const dieOpacity = state === 'die' ? Math.max(0, 1 - animTimer * 2.5) : 1;
+  const dieOpacity = state === 'die' ? Math.max(0, 1 - safeTimer * 2.5) : 1;
   const facingTransform = isCat ? 'scaleX(1)' : 'scaleX(-1)';
 
-  const finalScaleX = scale * walkSquashX * attackScaleX;
-  const finalScaleY = scale * walkSquashY * attackScaleY;
+  const finalScaleX = safeScale * walkSquashX * attackScaleX;
+  const finalScaleY = safeScale * walkSquashY * attackScaleY;
   const finalRot = walkTilt + attackTilt + knockbackRot;
   const finalY = -(bounceY + attackTranslateY + knockbackElevY);
 
@@ -72,8 +75,8 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = ({
       <div
         className="absolute -bottom-1 bg-black/35 rounded-full blur-[1px] transition-all"
         style={{
-          width: `${36 * scale}px`,
-          height: `${10 * scale}px`,
+          width: `${36 * safeScale}px`,
+          height: `${10 * safeScale}px`,
           transform: `scale(${Math.max(0.4, 1 - (bounceY + knockbackElevY) * 0.025)})`,
           opacity: Math.max(0.2, 0.4 - (bounceY + knockbackElevY) * 0.01),
         }}
@@ -92,15 +95,8 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = ({
           transition: 'filter 0.15s ease',
         }}
       >
-        {renderSpriteSvg(spriteType, walkCycle, isAttackingWindup || state === 'attack', animTimer)}
+        {renderSpriteSvg(spriteType, walkCycle, isAttackingWindup || state === 'attack', safeTimer)}
       </div>
-
-      {/* Knockback Panic Sweat Particles */}
-      {state === 'knockback' && (
-        <div className="absolute -top-6 flex gap-2 animate-ping pointer-events-none">
-          <span className="text-xs font-black text-cyan-300">💦</span>
-        </div>
-      )}
 
       {/* Attack Charge Sparks */}
       {isAttackingWindup && (
