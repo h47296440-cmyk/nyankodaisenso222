@@ -118,16 +118,6 @@ export const GachaScreen: React.FC<GachaScreenProps> = ({
     }, 1200);
   };
 
-  // Free daily bonus Cat Food gift
-  const handleClaimFreeCatFood = () => {
-    audio.playVictory();
-    onUpdateProfile((prev) => ({
-      ...prev,
-      catFood: prev.catFood + 150,
-    }));
-    alert('無料ネコ缶 +150缶 をプレゼントしたにゃ！');
-  };
-
   return (
     <div className="flex flex-col h-full min-h-0 bg-stone-950 text-white select-none font-['M_PLUS_Rounded_1c'] overflow-hidden">
       {/* Top Header */}
@@ -146,20 +136,12 @@ export const GachaScreen: React.FC<GachaScreenProps> = ({
           <h2 className="text-base sm:text-lg font-black text-amber-300">にゃんこレアガチャ</h2>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            id="btn-claim-free-catfood"
-            onClick={handleClaimFreeCatFood}
-            className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white text-xs font-black px-2.5 py-1 rounded-full border border-pink-300 flex items-center gap-1 shadow animate-bounce"
-          >
-            <Gift size={13} />
-            <span>ネコ缶無料受取</span>
-          </button>
           <div className={`px-3 py-1 rounded-full font-black text-xs border ${
             isInfiniteCatFood
               ? 'bg-amber-950 border-amber-400 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.5)] animate-pulse'
               : 'bg-stone-800 border-amber-500/50 text-amber-300'
           }`}>
-            <span className="text-[10px] text-amber-400 mr-1">所持ネコ缶</span>
+            <span className="text-[10px] text-amber-400 mr-1">所持ネコカン</span>
             <span className="text-sm">
               {isInfiniteCatFood ? '∞ (MAX)' : profile.catFood}
             </span>

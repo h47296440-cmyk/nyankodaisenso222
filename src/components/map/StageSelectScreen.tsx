@@ -47,7 +47,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
   onOpenStorySelect,
   onBackToTitle,
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<'japan' | 'future' | 'cosmos'>('japan');
+  const [selectedCategory, setSelectedCategory] = useState<'japan' | 'future' | 'cosmos' | 'legend' | 'crazed'>('japan');
   const [selectedChapterId, setSelectedChapterId] = useState<string>('japan_1');
 
   // Filter chapters by selected category
@@ -98,24 +98,31 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
       case 'future':
         return !!profile.clearedStages['japan_3_3'] || !!profile.clearedStages['japan_1_5'] || !!profile.clearedStages['japan_12'];
       case 'future_2':
-        return !!profile.clearedStages['future_1_3'] || !!profile.clearedStages['future_3'];
+        return !!profile.clearedStages['future_1_3'] || !!profile.clearedStages['future_1_6'];
       case 'future_3':
-        return !!profile.clearedStages['future_2_3'] || !!profile.clearedStages['future_3'];
+        return !!profile.clearedStages['future_2_4'] || !!profile.clearedStages['future_1_6'];
       case 'cosmos_1':
       case 'cosmos':
-        return !!profile.clearedStages['future_3_3'] || !!profile.clearedStages['future_3'];
+        return !!profile.clearedStages['future_3_6'] || !!profile.clearedStages['future_1_6'];
       case 'cosmos_2':
-        return !!profile.clearedStages['cosmos_1_3'] || !!profile.clearedStages['cosmos_2'];
+        return !!profile.clearedStages['cosmos_1_6'];
       case 'cosmos_3':
-        return !!profile.clearedStages['cosmos_2_3'] || !!profile.clearedStages['cosmos_2'];
+        return !!profile.clearedStages['cosmos_2_6'];
+      case 'legend_1':
+      case 'legend':
+        return !!profile.clearedStages['japan_1_5'] || !!profile.clearedStages['japan_1_8'] || !!profile.clearedStages['japan_12'] || !!profile.clearedStages['japan_3_3'];
+      case 'crazed_event':
+      case 'crazed':
+        return !!profile.clearedStages['japan_1_5'] || !!profile.clearedStages['japan_1_8'] || !!profile.clearedStages['japan_12'] || !!profile.clearedStages['japan_3_3'];
       default:
         return true;
     }
   };
 
-  // Category level unlock checks
   const isFutureCategoryUnlocked = checkChapterUnlocked('future_1');
   const isCosmosCategoryUnlocked = checkChapterUnlocked('cosmos_1');
+  const isLegendCategoryUnlocked = checkChapterUnlocked('legend_1');
+  const isCrazedCategoryUnlocked = checkChapterUnlocked('crazed_event');
 
   // Toggle item selection
   const handleToggleItem = (key: keyof BattleActiveItems, count: number) => {
@@ -183,12 +190,14 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
               <ArrowLeft size={16} />
             </button>
 
-            {/* Category Selector Tabs (日本 / 未来 / 宇宙) */}
-            <div className="flex items-center bg-stone-950 p-0.5 sm:p-1 rounded-xl border border-stone-800 shrink-0">
+            {/* Category Selector Tabs (日本 / 未来 / 宇宙 / レジェンド / 狂乱降臨) */}
+            <div className="flex items-center bg-stone-950 p-0.5 sm:p-1 rounded-xl border border-stone-800 shrink-0 max-w-[50vw] sm:max-w-none overflow-x-auto no-scrollbar">
               {[
-                { id: 'japan' as const, name: '日本編', short: '日本', locked: false },
-                { id: 'future' as const, name: '未来編', short: '未来', locked: !isFutureCategoryUnlocked },
-                { id: 'cosmos' as const, name: '宇宙編', short: '宇宙', locked: !isCosmosCategoryUnlocked },
+                { id: 'japan' as const, name: '日本編', short: '日本', locked: false, badge: '' },
+                { id: 'future' as const, name: '未来編', short: '未来', locked: !isFutureCategoryUnlocked, badge: '' },
+                { id: 'cosmos' as const, name: '宇宙編', short: '宇宙', locked: !isCosmosCategoryUnlocked, badge: '' },
+                { id: 'legend' as const, name: 'レジェンド', short: '伝説', locked: !isLegendCategoryUnlocked, badge: 'NEW' },
+                { id: 'crazed' as const, name: '狂乱降臨', short: '狂乱', locked: !isCrazedCategoryUnlocked, badge: '降臨' },
               ].map((cat) => {
                 const isSelected = selectedCategory === cat.id;
 
@@ -205,9 +214,13 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                         setSelectedChapterId(firstCatCh.id);
                       }
                     }}
-                    className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-black transition-all flex items-center gap-1 whitespace-nowrap ${
+                    className={`relative px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-black transition-all flex items-center gap-1 whitespace-nowrap ${
                       isSelected
-                        ? 'bg-amber-600 text-white shadow-md'
+                        ? cat.id === 'crazed'
+                          ? 'bg-gradient-to-r from-purple-700 to-rose-700 text-white shadow-md ring-1 ring-purple-400'
+                          : cat.id === 'legend'
+                          ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-white shadow-md ring-1 ring-amber-300'
+                          : 'bg-amber-600 text-white shadow-md'
                         : cat.locked
                         ? 'text-stone-600 opacity-50 cursor-not-allowed'
                         : 'text-stone-400 hover:text-white'
@@ -216,6 +229,11 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                     {cat.locked && <Lock size={10} />}
                     <span className="sm:inline hidden">{cat.name}</span>
                     <span className="sm:hidden inline">{cat.short}</span>
+                    {cat.badge && !cat.locked && (
+                      <span className="text-[8px] bg-red-600 text-white px-1 py-0.2 rounded font-black leading-none">
+                        {cat.badge}
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -278,9 +296,9 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                 audio.playClick();
                 onOpenUpdateHistory();
               }}
-              className="text-[10px] font-black text-amber-950 bg-amber-300 hover:bg-amber-200 px-1.5 sm:px-2 py-0.5 rounded-full shadow border border-amber-400 active:scale-95 whitespace-nowrap"
+              className="text-[10px] font-black text-amber-950 bg-amber-300 hover:bg-amber-200 px-1.5 sm:px-2 py-0.5 rounded-full shadow border border-amber-400 active:scale-95 whitespace-nowrap animate-pulse"
             >
-              v1.4
+              v2.0 NEW!
             </button>
 
             {/* Dev Mode Button in Map Header */}

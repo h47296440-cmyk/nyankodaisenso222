@@ -9,6 +9,10 @@ export type BgmTrack =
   | 'boss_normal'
   | 'boss_bunbun'
   | 'boss_final'
+  | 'opening'
+  | 'epilogue'
+  | 'legend_battle'
+  | 'crazed_boss'
   | 'none';
 
 type InstrumentType = 'brass' | 'accordion' | 'bass' | 'organ' | 'synth' | 'bell' | 'strings';
@@ -441,19 +445,41 @@ class SoundManager {
     }
   }
 
-  public startBattleBgm(stageChapter?: number, isBoss?: boolean, isFinal?: boolean) {
+  public startBattleBgm(
+    chapterIdentifier?: string | number,
+    isBoss?: boolean,
+    isFinal?: boolean
+  ) {
+    const chapStr = String(chapterIdentifier || '').toLowerCase();
+
+    if (chapStr.includes('crazed') || chapStr === 'crazed_event') {
+      this.switchBgm('crazed_boss');
+      return;
+    }
+
+    if (chapStr.includes('legend')) {
+      if (isFinal) {
+        this.switchBgm('boss_final');
+      } else if (isBoss) {
+        this.switchBgm('boss_bunbun');
+      } else {
+        this.switchBgm('legend_battle');
+      }
+      return;
+    }
+
     if (isFinal) {
       this.switchBgm('boss_final');
     } else if (isBoss) {
-      if (stageChapter && stageChapter >= 3) {
+      if (chapStr.includes('cosmos') || chapStr.includes('future') || (typeof chapterIdentifier === 'number' && chapterIdentifier >= 3)) {
         this.switchBgm('boss_bunbun');
       } else {
         this.switchBgm('boss_normal');
       }
     } else {
-      if (stageChapter && stageChapter >= 7) {
+      if (chapStr.includes('cosmos') || (typeof chapterIdentifier === 'number' && chapterIdentifier >= 7)) {
         this.switchBgm('battle_cosmos');
-      } else if (stageChapter && stageChapter >= 4) {
+      } else if (chapStr.includes('future') || (typeof chapterIdentifier === 'number' && chapterIdentifier >= 4)) {
         this.switchBgm('battle_future');
       } else {
         this.switchBgm('battle_japan');
@@ -504,12 +530,16 @@ class SoundManager {
     this.nextNoteTime = this.ctx.currentTime + 0.05;
 
     // Tempo mapping
-    if (track === 'boss_final') this.tempoBpm = 152;
+    if (track === 'crazed_boss') this.tempoBpm = 160;
+    else if (track === 'boss_final') this.tempoBpm = 152;
     else if (track === 'boss_bunbun') this.tempoBpm = 148;
+    else if (track === 'legend_battle') this.tempoBpm = 144;
     else if (track === 'boss_normal') this.tempoBpm = 142;
     else if (track === 'battle_cosmos') this.tempoBpm = 138;
     else if (track === 'battle_future') this.tempoBpm = 134;
     else if (track === 'battle_japan') this.tempoBpm = 136;
+    else if (track === 'opening') this.tempoBpm = 126;
+    else if (track === 'epilogue') this.tempoBpm = 104;
     else this.tempoBpm = 120; // title / map
 
     const bpm = Math.max(60, this.tempoBpm || 120);
@@ -860,6 +890,195 @@ class SoundManager {
       if (step % 4 === 0) this.playDrum('kick', time, 0.7);
       if (step % 4 === 2) this.playDrum('snare', time, 0.65);
       if (step % 2 === 1) this.playDrum('hihat', time, 0.25);
+    }
+
+    // =========================================================================
+    // 9. OPENING PROLOGUE MARCH (壮大な巻物オープニング・序曲)
+    // =========================================================================
+    if (track === 'opening') {
+      const melodyOpening: number[] = [
+        // Bar 1 (Epic Horn Fanfare)
+        N.C4, 0, N.G4, 0, N.C5, 0, N.E5, N.D5,
+        N.C5, 0, N.G4, 0, N.E4, 0, N.G4, 0,
+        // Bar 2
+        N.F4, 0, N.A4, 0, N.C5, 0, N.B4, N.A4,
+        N.G4, 0, N.F4, 0, N.E4, 0, 0, 0,
+        // Bar 3 (Rising Call)
+        N.G4, 0, N.C5, 0, N.E5, 0, N.G5, N.F5,
+        N.E5, 0, N.D5, 0, N.C5, N.D5, N.E5, 0,
+        // Bar 4 (Grand resolution)
+        N.F5, 0, N.E5, 0, N.D5, 0, N.G4, 0,
+        N.C5, 0, N.G4, 0, N.C5, 0, 0, 0,
+      ];
+
+      const bassOpening: number[] = [
+        N.C3, 0, N.G2, 0, N.C3, 0, N.E3, 0,
+        N.C3, 0, N.G2, 0, N.C3, 0, N.G2, 0,
+        N.F2, 0, N.C3, 0, N.F2, 0, N.A2, 0,
+        N.G2, 0, N.D3, 0, N.G2, 0, N.B2, 0,
+        N.E2, 0, N.B2, 0, N.E3, 0, N.G2, 0,
+        N.A2, 0, N.E3, 0, N.A2, 0, N.C3, 0,
+        N.F2, 0, N.A2, 0, N.G2, 0, N.B2, 0,
+        N.C3, 0, N.G2, 0, N.C3, 0, N.C2, 0,
+      ];
+
+      const mNote = melodyOpening[step];
+      if (mNote > 0) {
+        this.playInstrumentNote(mNote, 'brass', dur4, 0.85, time);
+        this.playInstrumentNote(mNote, 'strings', dur4, 0.5, time);
+      }
+
+      const bNote = bassOpening[step];
+      if (bNote > 0) {
+        this.playInstrumentNote(bNote, 'bass', dur2, 0.85, time);
+      }
+
+      if (step % 8 === 0) this.playDrum('timpani', time, 0.85);
+      if (step % 4 === 0) this.playDrum('kick', time, 0.65);
+      if (step % 4 === 2) this.playDrum('snare', time, 0.6);
+      if (step % 2 === 1) this.playDrum('hihat', time, 0.3);
+    }
+
+    // =========================================================================
+    // 10. EPILOGUE TWILIGHT WALTZ (哀愁と感動の黄昏エピローグ)
+    // =========================================================================
+    if (track === 'epilogue') {
+      const melodyEpilogue: number[] = [
+        // Bar 1 (Warm nostalgic waltz)
+        N.G4, 0, 0, N.C5, 0, 0, N.E5, 0,
+        N.D5, 0, 0, N.C5, 0, 0, N.B4, 0,
+        // Bar 2
+        N.A4, 0, 0, N.C5, 0, 0, N.F5, 0,
+        N.E5, 0, 0, N.D5, 0, 0, N.C5, 0,
+        // Bar 3
+        N.E5, 0, 0, N.G5, 0, 0, N.C6, 0,
+        N.B5, 0, 0, N.A5, 0, 0, N.G5, 0,
+        // Bar 4 (Sweet ending)
+        N.F5, 0, 0, N.E5, 0, 0, N.D5, 0,
+        N.C5, 0, 0, 0, 0, 0, 0, 0,
+      ];
+
+      const bassEpilogue: number[] = [
+        N.C3, 0, 0, N.G3, 0, 0, N.E3, 0,
+        N.A2, 0, 0, N.E3, 0, 0, N.C3, 0,
+        N.F2, 0, 0, N.C3, 0, 0, N.A2, 0,
+        N.G2, 0, 0, N.D3, 0, 0, N.B2, 0,
+        N.C3, 0, 0, N.G3, 0, 0, N.E3, 0,
+        N.F2, 0, 0, N.C3, 0, 0, N.A2, 0,
+        N.G2, 0, 0, N.D3, 0, 0, N.G2, 0,
+        N.C3, 0, 0, N.G2, 0, 0, N.C2, 0,
+      ];
+
+      const mNote = melodyEpilogue[step];
+      if (mNote > 0) {
+        this.playInstrumentNote(mNote, 'bell', dur4, 0.75, time);
+        this.playInstrumentNote(mNote, 'accordion', dur4, 0.45, time);
+        this.playInstrumentNote(mNote, 'strings', dur4, 0.55, time);
+      }
+
+      const bNote = bassEpilogue[step];
+      if (bNote > 0) {
+        this.playInstrumentNote(bNote, 'bass', dur2, 0.75, time);
+      }
+
+      if (step % 8 === 0) this.playDrum('kick', time, 0.5);
+      if (step % 8 === 4) this.playDrum('hihat', time, 0.25);
+    }
+
+    // =========================================================================
+    // 11. LEGEND STORY BATTLE (古代の冒険・レジェンドストーリー戦闘BGM)
+    // =========================================================================
+    if (track === 'legend_battle') {
+      const melodyLegend: number[] = [
+        // Bar 1 (Exotic fast adventure theme)
+        N.D4, N.E4, N.F4, 0, N.A4, 0, N.D5, N.C5,
+        N.A4, 0, N.F4, 0, N.G4, N.A4, N.Bb4, 0,
+        // Bar 2
+        N.A4, 0, N.F4, 0, N.D4, 0, N.F4, N.E4,
+        N.D4, 0, N.C4, 0, N.D4, 0, 0, 0,
+        // Bar 3 (Driving heroic phrase)
+        N.D5, 0, N.D5, 0, N.C5, 0, N.A4, 0,
+        N.Bb4, 0, N.A4, 0, N.G4, N.F4, N.E4, 0,
+        // Bar 4
+        N.F4, 0, N.G4, 0, N.A4, 0, N.C5, 0,
+        N.D5, 0, N.A4, 0, N.D5, 0, 0, 0,
+      ];
+
+      const bassLegend: number[] = [
+        N.D3, N.D3, N.A2, N.A2, N.D3, N.D3, N.F3, N.E3,
+        N.D3, N.D3, N.A2, N.A2, N.G2, N.G2, N.Bb2, N.C3,
+        N.D3, N.D3, N.A2, N.A2, N.D3, N.D3, N.C3, N.C3,
+        N.Bb2, N.Bb2, N.A2, N.A2, N.D3, N.D3, N.D2, N.D2,
+        N.Bb2, N.Bb2, N.F3, N.F3, N.C3, N.C3, N.G3, N.G3,
+        N.G2, N.G2, N.D3, N.D3, N.A2, N.A2, N.E3, N.E3,
+        N.Bb2, N.Bb2, N.C3, N.C3, N.D3, N.D3, N.F3, N.F3,
+        N.D3, N.D3, N.A2, N.A2, N.D3, 0, 0, 0,
+      ];
+
+      const mNote = melodyLegend[step];
+      if (mNote > 0) {
+        this.playInstrumentNote(mNote, 'brass', dur2, 0.85, time);
+        this.playInstrumentNote(mNote, 'synth', dur1, 0.5, time);
+      }
+
+      const bNote = bassLegend[step];
+      if (bNote > 0) {
+        this.playInstrumentNote(bNote, 'bass', dur1, 0.9, time);
+      }
+
+      if (step % 4 === 0) this.playDrum('kick', time, 0.85);
+      if (step % 4 === 2) this.playDrum('snare', time, 0.8);
+      if (step % 2 === 1) this.playDrum('hihat', time, 0.4);
+      if (step === 30 || step === 62) this.playDrum('cymbal', time, 0.7);
+    }
+
+    // =========================================================================
+    // 12. CRAZED BOSS CAT THEME (狂乱降臨ステージ - 絶望の高速激熱メタルBGM)
+    // =========================================================================
+    if (track === 'crazed_boss') {
+      const melodyCrazed: number[] = [
+        // Bar 1 (Aggressive distorted riff)
+        N.E4, N.E4, N.G4, N.E4, N.Bb4, N.A4, N.G4, N.E4,
+        N.D4, N.E4, N.G4, N.E4, N.Bb4, N.A4, N.G4, N.F4,
+        // Bar 2 (Furious descent)
+        N.E4, N.E4, N.G4, N.E4, N.C5, N.B4, N.Bb4, N.A4,
+        N.G4, N.E4, N.D4, N.Ds4, N.E4, 0, 0, 0,
+        // Bar 3 (Screaming octaves)
+        N.E5, N.E5, N.G5, N.E5, N.Bb5, N.A5, N.G5, N.E5,
+        N.D5, N.E5, N.G5, N.E5, N.C6, N.B5, N.Bb5, N.A5,
+        // Bar 4 (Breakdown)
+        N.G5, N.Fs5, N.F5, N.E5, N.Ds5, N.D5, N.Cs5, N.C5,
+        N.B4, N.Bb4, N.A4, N.Gs4, N.G4, 0, N.E4, 0,
+      ];
+
+      const bassCrazed: number[] = [
+        N.E2, N.E2, N.E2, N.E2, N.E2, N.E2, N.G2, N.A2,
+        N.E2, N.E2, N.E2, N.E2, N.Bb2, N.A2, N.G2, N.F2,
+        N.E2, N.E2, N.E2, N.E2, N.C3, N.B2, N.Bb2, N.A2,
+        N.G2, N.E2, N.D2, N.Ds2, N.E2, N.E2, N.E2, N.E2,
+        N.C3, N.C3, N.G2, N.G2, N.D3, N.D3, N.A2, N.A2,
+        N.E2, N.E2, N.B2, N.B2, N.C3, N.C3, N.D3, N.D3,
+        N.E2, N.E2, N.E2, N.E2, N.Bb2, N.Bb2, N.A2, N.A2,
+        N.E2, N.E2, N.B2, N.B2, N.E3, 0, N.E2, 0,
+      ];
+
+      const mNote = melodyCrazed[step];
+      if (mNote > 0) {
+        this.playInstrumentNote(mNote, 'organ', dur1, 0.85, time);
+        this.playInstrumentNote(mNote, 'synth', dur1, 0.75, time);
+      }
+
+      const bNote = bassCrazed[step];
+      if (bNote > 0) {
+        this.playInstrumentNote(bNote, 'bass', dur1, 0.95, time);
+      }
+
+      // Fast Double-Kick Rock Percussion
+      if (step % 2 === 0) this.playDrum('kick', time, 0.95);
+      if (step % 4 === 2) this.playDrum('snare', time, 0.9);
+      this.playDrum('hihat', time, 0.35);
+      if (step % 16 === 0) this.playDrum('cymbal', time, 0.85);
+      if (step === 28 || step === 60) this.playDrum('timpani', time, 0.95);
     }
   }
 

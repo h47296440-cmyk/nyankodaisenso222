@@ -21,6 +21,7 @@ export interface UnitForm {
   scale?: number;
   colorTheme?: string;
   spriteType: string;
+  waveLevel?: number; // 波動レベル
   traitBonus?: {
     trait: EnemyTrait;
     multiplier: number;
@@ -147,9 +148,15 @@ export type ChapterId =
   | 'cosmos_1'
   | 'cosmos_2'
   | 'cosmos_3'
+  | 'legend_1'
+  | 'legend_2'
+  | 'legend_3'
+  | 'crazed_event'
   | 'japan'
   | 'future'
-  | 'cosmos';
+  | 'cosmos'
+  | 'legend'
+  | 'crazed';
 
 export interface StageDefinition {
   id: string;
@@ -167,7 +174,10 @@ export interface StageDefinition {
     | 'future_neon'
     | 'future_space'
     | 'cosmos_galaxy'
-    | 'cosmos_dimension';
+    | 'cosmos_dimension'
+    | 'legend_ancient'
+    | 'legend_cave'
+    | 'crazed_hell';
   battlefieldWidth: number;
   baseRewardXp: number;
   baseRewardCatFood: number;
@@ -178,6 +188,7 @@ export interface StageDefinition {
   treasureFestival?: boolean; // お宝出現率 超UP!!
   isBossStage?: boolean;
   isFinalBossStage?: boolean;
+  rewardCatUnlockId?: string; // 狂乱ステージクリア時のキャラ報酬アンロックID
 }
 
 export interface BattleActiveItems {
@@ -191,8 +202,8 @@ export interface BattleActiveItems {
 
 export interface ChapterDefinition {
   id: ChapterId;
-  category: 'japan' | 'future' | 'cosmos';
-  chapterNumber: 1 | 2 | 3;
+  category: 'japan' | 'future' | 'cosmos' | 'legend' | 'crazed';
+  chapterNumber: number;
   name: string;
   jpName: string;
   subtitle: string;

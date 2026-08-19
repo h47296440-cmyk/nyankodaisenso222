@@ -96,22 +96,22 @@ export const BattleHud: React.FC<BattleHudProps> = ({
   return (
     <div className="fixed inset-0 w-screen h-screen flex flex-col bg-stone-950 overflow-hidden select-none font-['M_PLUS_Rounded_1c'] z-50">
       {/* Top Header Bar */}
-      <div className="w-full flex-shrink-0 bg-stone-950/85 backdrop-blur-md px-3 sm:px-6 pt-[max(0.35rem,env(safe-area-inset-top,0px))] pb-2 flex items-center justify-between z-30 pointer-events-auto border-b border-stone-800/80">
-        {/* Top-Left: Circular Yellow Pause Button + Big Japanese Stage Name */}
-        <div className="flex items-center gap-3">
+      <div className="w-full flex-shrink-0 bg-stone-950/90 backdrop-blur-md px-2 sm:px-4 md:px-6 pt-[max(0.35rem,env(safe-area-inset-top,0px))] pb-1.5 sm:pb-2 flex items-center justify-between gap-2 z-30 pointer-events-auto border-b border-stone-800/80">
+        {/* Top-Left: Circular Yellow Pause Button + Stage Name */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink">
           {/* Pause Button (Switch + / Esc) */}
           <button
             id="btn-toggle-pause"
             onClick={onTogglePause}
-            className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-yellow-400 hover:bg-yellow-300 active:scale-90 border-[3.5px] border-black flex items-center justify-center shadow-lg transition-transform"
+            className="relative flex-shrink-0 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-yellow-400 hover:bg-yellow-300 active:scale-90 border-[3px] border-black flex items-center justify-center shadow-lg transition-transform"
             title={isPaused ? '再開 (+)' : '一時停止 (+)'}
           >
             {isPaused ? (
-              <Play size={20} className="text-black fill-black ml-0.5" />
+              <Play size={18} className="text-black fill-black ml-0.5" />
             ) : (
               <div className="flex items-center gap-1">
-                <div className="w-1.5 h-4.5 sm:h-5 bg-black rounded-sm" />
-                <div className="w-1.5 h-4.5 sm:h-5 bg-black rounded-sm" />
+                <div className="w-1.5 h-4 sm:h-4.5 bg-black rounded-sm" />
+                <div className="w-1.5 h-4 sm:h-4.5 bg-black rounded-sm" />
               </div>
             )}
             <span className="absolute -bottom-1 -right-1 bg-stone-900 text-yellow-300 border border-yellow-400 text-[8px] sm:text-[9px] font-black rounded-full px-1">
@@ -119,13 +119,13 @@ export const BattleHud: React.FC<BattleHudProps> = ({
             </span>
           </button>
 
-          {/* Stage Name with Thick Black Stroke Typography */}
-          <div className="flex flex-col">
+          {/* Stage Name with Black Stroke Typography and truncation */}
+          <div className="min-w-0 max-w-[150px] sm:max-w-[260px] md:max-w-[380px] lg:max-w-[500px]">
             <span
-              className="text-2xl sm:text-4xl font-black tracking-wide text-yellow-400 drop-shadow select-none"
+              className="block truncate text-base sm:text-xl md:text-2xl lg:text-3xl font-black tracking-wide text-yellow-400 drop-shadow select-none"
               style={{
                 textShadow:
-                  '-2.5px -2.5px 0 #000, 2.5px -2.5px 0 #000, -2.5px 2.5px 0 #000, 2.5px 2.5px 0 #000, 0 3px 6px rgba(0,0,0,0.9)',
+                  '-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 3px 6px rgba(0,0,0,0.9)',
               }}
             >
               {stageName || 'ステージ'}
@@ -134,25 +134,25 @@ export const BattleHud: React.FC<BattleHudProps> = ({
 
           {/* Gamepad / Controller Connection Badge */}
           {gamepadConnected && (
-            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 bg-emerald-950/80 border border-emerald-500/80 rounded-full text-emerald-300 text-[11px] font-black shadow-md animate-pulse">
+            <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 bg-emerald-950/80 border border-emerald-500/80 rounded-full text-emerald-300 text-[11px] font-black shadow-md animate-pulse whitespace-nowrap">
               <Gamepad2 size={15} />
-              <span>Switchコントローラー操作対応</span>
+              <span>Switchコントローラー</span>
             </div>
           )}
         </div>
 
         {/* Top Center-Right Utility Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 flex-shrink-0">
           {/* Audio Test / Sound Resume Button */}
           {onTestSound && (
             <button
               id="btn-test-sound"
               onClick={onTestSound}
-              className="px-2 py-1 rounded-lg text-xs font-black bg-stone-800 hover:bg-stone-700 active:scale-95 text-yellow-300 border-2 border-yellow-500/50 flex items-center gap-1 shadow-md"
+              className="p-1 sm:px-2 sm:py-1 rounded-lg text-xs font-black bg-stone-800 hover:bg-stone-700 active:scale-95 text-yellow-300 border border-yellow-500/50 flex items-center gap-1 shadow-md"
               title="BGM・効果音テスト / 音声ロック解除"
             >
               <Sparkles size={13} />
-              <span className="hidden sm:inline">音声テスト</span>
+              <span className="hidden md:inline text-[11px]">音声テスト</span>
             </button>
           )}
 
@@ -160,73 +160,75 @@ export const BattleHud: React.FC<BattleHudProps> = ({
           <button
             id="btn-auto-battle"
             onClick={onToggleAutoBattle}
-            className={`relative px-2 sm:px-3 py-1 rounded-lg text-xs font-black flex items-center gap-1 border-2 transition-all shadow-md ${
+            className={`relative p-1 sm:px-2.5 sm:py-1 rounded-lg text-xs font-black flex items-center gap-1 border transition-all shadow-md ${
               isAutoBattle
                 ? 'bg-amber-500 text-stone-950 border-yellow-200 shadow-[0_0_12px_rgba(245,158,11,0.6)] animate-pulse'
                 : 'bg-stone-800 text-stone-300 border-stone-600 hover:bg-stone-700'
             }`}
             title="ニャンピューター (Yボタン)"
           >
-            <Bot size={14} />
-            <span className="hidden sm:inline">オート</span>
+            <Bot size={13} />
+            <span className="hidden md:inline text-[11px]">オート</span>
             <span className="text-[9px] font-mono bg-black/40 text-yellow-300 px-1 rounded">Y</span>
           </button>
 
-          {/* Speed Toggle (x1 / x2 - Switch -) */}
+          {/* Speed Toggle (x1 / x2 / x3 - Switch -) */}
           <button
             id="btn-toggle-speed"
             onClick={onToggleSpeed}
-            className="relative px-2.5 py-1 rounded-lg text-xs font-black bg-stone-800 hover:bg-stone-700 text-cyan-300 border-2 border-cyan-500/50 flex items-center gap-1 shadow-md"
+            className="relative px-1.5 sm:px-2.5 py-1 rounded-lg text-xs font-black bg-stone-800 hover:bg-stone-700 text-cyan-300 border border-cyan-500/50 flex items-center gap-0.5 sm:gap-1 shadow-md"
             title="ゲーム速度切り替え (-ボタン)"
           >
-            <FastForward size={14} />
-            <span>x{gameSpeed}</span>
-            <span className="text-[9px] font-mono bg-black/40 text-cyan-200 px-1 rounded">-</span>
+            <FastForward size={13} />
+            <span className="text-xs">x{gameSpeed}</span>
+            <span className="text-[9px] font-mono bg-black/40 text-cyan-200 px-1 rounded hidden sm:inline">-</span>
           </button>
 
           {/* Sound Toggle */}
           <button
             id="btn-toggle-sound"
             onClick={onToggleSound}
-            className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 border-2 border-stone-600 shadow-md"
+            className="p-1 sm:p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-600 shadow-md"
             title="サウンドON/OFF"
           >
-            {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} className="text-stone-500" />}
+            {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} className="text-stone-500" />}
           </button>
 
           {/* Fullscreen Toggle */}
           <button
             id="btn-toggle-fullscreen"
             onClick={toggleFullscreen}
-            className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 border-2 border-stone-600 shadow-md"
+            className="p-1 sm:p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-600 shadow-md"
             title="フルスクリーン切り替え"
           >
-            {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+            {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
           </button>
 
           {/* Retreat Button */}
           <button
             id="btn-retreat"
             onClick={onRetreat}
-            className="px-2.5 py-1 rounded-lg text-xs font-black bg-rose-900/80 hover:bg-rose-800 text-rose-100 border-2 border-rose-600 flex items-center gap-1 shadow-md"
+            className="p-1 sm:px-2.5 sm:py-1 rounded-lg text-xs font-black bg-rose-900/80 hover:bg-rose-800 text-rose-100 border border-rose-600 flex items-center gap-1 shadow-md"
             title="撤退する"
           >
             <LogOut size={13} />
-            <span className="hidden sm:inline">撤退</span>
+            <span className="hidden sm:inline text-[11px]">撤退</span>
           </button>
         </div>
 
-        {/* Top-Right: Money Display (5744/6000円) */}
-        <div className="flex items-center">
-          <span
-            className="text-2xl sm:text-4xl font-black font-mono tracking-tight text-yellow-400 select-none drop-shadow"
-            style={{
-              textShadow:
-                '-2.5px -2.5px 0 #000, 2.5px -2.5px 0 #000, -2.5px 2.5px 0 #000, 2.5px 2.5px 0 #000, 0 3px 6px rgba(0,0,0,0.9)',
-            }}
-          >
-            {Math.floor(money)}/{maxMoney}円
-          </span>
+        {/* Top-Right: Money Display */}
+        <div className="flex items-center flex-shrink-0">
+          <div className="bg-black/80 px-2 sm:px-3 py-0.5 sm:py-1 rounded-xl border border-yellow-500/60 shadow-inner">
+            <span
+              className="text-base sm:text-xl md:text-2xl lg:text-3xl font-black font-mono tracking-tight text-yellow-400 select-none drop-shadow whitespace-nowrap"
+              style={{
+                textShadow:
+                  '-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000',
+              }}
+            >
+              {Math.floor(money)}/{maxMoney}円
+            </span>
+          </div>
         </div>
       </div>
 

@@ -145,6 +145,47 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
           </div>
         );
 
+      case 'legend_ancient':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-amber-950 via-yellow-950 to-stone-900 overflow-hidden pointer-events-none">
+            <div className="absolute top-4 left-1/4 w-72 h-72 bg-amber-500/20 rounded-full blur-3xl" />
+            {/* Distant Ancient Ruins */}
+            <svg
+              className="absolute bottom-16 left-0 w-full h-40 opacity-40 text-amber-950 fill-current"
+              viewBox="0 0 1000 100"
+              preserveAspectRatio="none"
+            >
+              <polygon points="0,100 100,50 150,50 160,80 300,30 360,30 380,85 600,40 680,40 700,90 850,25 920,25 1000,100" />
+            </svg>
+          </div>
+        );
+
+      case 'legend_cave':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-stone-900 to-amber-950 overflow-hidden pointer-events-none">
+            {/* Stalactites */}
+            <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-stone-900 to-transparent flex justify-around opacity-60">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="w-8 bg-stone-800 rounded-b-full"
+                  style={{ height: `${30 + (i % 4) * 20}px` }}
+                />
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'crazed_hell':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-950 via-red-950 to-stone-950 overflow-hidden pointer-events-none">
+            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-red-600/30 rounded-full blur-3xl animate-pulse" />
+            {/* Dark Storm Clouds */}
+            <div className="absolute top-2 left-10 w-96 h-20 bg-purple-900/40 rounded-full blur-xl" />
+            <div className="absolute top-6 right-20 w-80 h-24 bg-red-900/40 rounded-full blur-xl" />
+          </div>
+        );
+
       default:
         // Classic Battle Cats Sky & Plains (Matching Screenshot)
         return (
@@ -186,6 +227,12 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
         return 'bg-gradient-to-r from-purple-950 via-fuchsia-950 to-slate-950 border-pink-500';
       case 'japan_volcano':
         return 'bg-gradient-to-r from-stone-900 via-red-950 to-stone-900 border-amber-600';
+      case 'legend_ancient':
+        return 'bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 border-amber-700';
+      case 'legend_cave':
+        return 'bg-gradient-to-r from-stone-950 via-stone-900 to-stone-950 border-stone-700';
+      case 'crazed_hell':
+        return 'bg-gradient-to-r from-purple-950 via-stone-900 to-red-950 border-rose-800';
       default:
         // Classic Battle Cats Japanese Grassy/Dirt Battlefield Ground
         return 'bg-[#78350f] border-[#92400e]';

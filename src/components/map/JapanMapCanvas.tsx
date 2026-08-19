@@ -21,6 +21,8 @@ export const JapanMapCanvas: React.FC<JapanMapCanvasProps> = ({
   const isJapan = chapter.category === 'japan' || chapter.id.startsWith('japan');
   const isFuture = chapter.category === 'future' || chapter.id.startsWith('future');
   const isCosmos = chapter.category === 'cosmos' || chapter.id.startsWith('cosmos');
+  const isLegend = chapter.category === 'legend' || chapter.id.startsWith('legend');
+  const isCrazed = chapter.category === 'crazed' || chapter.id.startsWith('crazed');
 
   const selectedStage = stages.find((s) => s.id === selectedStageId) || stages[0];
 
@@ -32,7 +34,11 @@ export const JapanMapCanvas: React.FC<JapanMapCanvasProps> = ({
           ? 'bg-[#ded4bc]'
           : isFuture
           ? 'bg-[#0a1224]'
-          : 'bg-[#050510]'
+          : isCosmos
+          ? 'bg-[#050510]'
+          : isLegend
+          ? 'bg-[#261d15]'
+          : 'bg-[#18081f]'
       }`}
       style={{
         backgroundImage: isJapan
@@ -46,15 +52,30 @@ export const JapanMapCanvas: React.FC<JapanMapCanvasProps> = ({
             linear-gradient(to right, rgba(34, 211, 238, 0.1) 1px, transparent 1px),
             linear-gradient(to bottom, rgba(34, 211, 238, 0.1) 1px, transparent 1px)
           `
-          : `
+          : isCosmos
+          ? `
             radial-gradient(white 1px, transparent 1px),
             radial-gradient(rgba(147, 51, 234, 0.4) 1px, transparent 1px)
+          `
+          : isLegend
+          ? `
+            radial-gradient(#d97706 1px, transparent 1px),
+            linear-gradient(to right, rgba(217, 119, 6, 0.15) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(217, 119, 6, 0.15) 1px, transparent 1px)
+          `
+          : `
+            radial-gradient(#f43f5e 1.5px, transparent 1.5px),
+            radial-gradient(rgba(168, 85, 247, 0.3) 1px, transparent 1px)
           `,
         backgroundSize: isJapan
           ? '40px 40px, 40px 40px, 40px 40px'
           : isFuture
           ? '50px 50px, 50px 50px'
-          : '80px 80px, 120px 120px',
+          : isCosmos
+          ? '80px 80px, 120px 120px'
+          : isLegend
+          ? '45px 45px, 45px 45px, 45px 45px'
+          : '60px 60px, 90px 90px',
       }}
     >
       {/* Scrollable Stage Area: 1600px x 850px */}

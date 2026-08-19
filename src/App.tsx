@@ -135,8 +135,23 @@ export default function App() {
       }
 
       const nextClearedStages = { ...prev.clearedStages };
+      const nextCats = { ...prev.cats };
+
       if (result.victory) {
         nextClearedStages[activeStage.id] = true;
+
+        // Unlock stage-specific reward characters (e.g. Crazed Series)
+        if (activeStage.rewardCatUnlockId) {
+          const unlockId = activeStage.rewardCatUnlockId;
+          if (!nextCats[unlockId]) {
+            nextCats[unlockId] = {
+              unlocked: true,
+              level: 1,
+              plusLevel: 0,
+              activeForm: 0,
+            };
+          }
+        }
 
         // Check if clearing final stage of a chapter to trigger Ending cutscene
         if (activeStage.id === 'japan_12' || activeStage.id === 'japan_6') {
@@ -154,6 +169,7 @@ export default function App() {
         catFood: prev.catFood + result.catFoodEarned,
         clearedStages: nextClearedStages,
         treasures: nextTreasures,
+        cats: nextCats,
       };
     });
   };

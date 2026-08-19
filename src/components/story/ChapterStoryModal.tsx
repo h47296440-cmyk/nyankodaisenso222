@@ -46,15 +46,19 @@ export const ChapterStoryModal: React.FC<ChapterStoryModalProps> = ({
     setHasReachedEnd(false);
 
     if (story.type === 'ending') {
-      audio.playVictory();
+      audio.switchBgm('epilogue');
       confetti({
         particleCount: 70,
         spread: 80,
         origin: { y: 0.4 },
       });
     } else {
-      audio.playWorkerLevelUp();
+      audio.switchBgm('opening');
     }
+
+    return () => {
+      audio.switchBgm('map');
+    };
   }, [storyKey]);
 
   // Smooth auto-scrolling loop

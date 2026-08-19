@@ -29,7 +29,7 @@ export function getDefaultPlayerProfile(): PlayerProfile {
 
   return {
     xp: 2500, // starting XP bonus for player to try upgrades
-    catFood: 150, // 1 free rare gacha roll at start!
+    catFood: 30, // Regular starting balance (Free cat food campaign ended)
     energy: 100,
     maxEnergy: 100,
     lastEnergyRefillTime: Date.now(),
