@@ -2,7 +2,7 @@ export type AttackType = 'single' | 'area';
 
 export type Rarity = 'normal' | 'rare' | 'super_rare' | 'uber_rare';
 
-export type EnemyTrait = 'white' | 'red' | 'floating' | 'black' | 'alien' | 'angel' | 'boss';
+export type EnemyTrait = 'white' | 'red' | 'floating' | 'black' | 'alien' | 'angel' | 'metal' | 'boss';
 
 export interface UnitForm {
   name: string;
@@ -24,7 +24,7 @@ export interface UnitForm {
   traitBonus?: {
     trait: EnemyTrait;
     multiplier: number;
-    effect?: 'strong' | 'massive_damage' | 'resist' | 'knockback';
+    effect?: 'strong' | 'massive_damage' | 'resist' | 'knockback' | 'freeze';
   };
 }
 
@@ -108,7 +108,7 @@ export interface VisualEffect {
   id: string;
   x: number;
   y: number;
-  type: 'hit' | 'aoe_burst' | 'cannon_beam' | 'cannon_charge' | 'smoke' | 'sparkle' | 'crit_flash' | 'boss_roar' | 'wave_blast' | 'boss_shockwave';
+  type: 'hit' | 'aoe_burst' | 'cannon_beam' | 'cannon_charge' | 'smoke' | 'sparkle' | 'crit_flash' | 'boss_roar' | 'wave_blast' | 'boss_shockwave' | 'cat_soul' | 'dust_puff' | 'freeze_fx' | 'metal_spark';
   lifetime: number;
   maxLifetime: number;
   scale?: number;

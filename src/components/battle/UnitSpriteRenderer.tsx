@@ -1044,6 +1044,270 @@ function renderSpriteSvg(
         </svg>
       );
 
+    // --- NEW PLAYABLE CATS ---
+    case 'cat_macho':
+    case 'cat_mohican':
+      const isMohican = type === 'cat_mohican';
+      return (
+        <svg width="60" height="66" viewBox="0 0 60 66" className="drop-shadow-md">
+          {/* Mohican Hair */}
+          {isMohican && (
+            <path d="M 30 2 L 24 16 L 36 16 Z M 30 6 L 26 22 L 34 22 Z" fill="#ef4444" stroke="#7f1d1d" strokeWidth="2" />
+          )}
+          {/* Ears */}
+          <polygon points="16,20 20,8 27,18" fill="#ffffff" stroke="#000000" strokeWidth="2.5" />
+          <polygon points="33,18 40,8 44,20" fill="#ffffff" stroke="#000000" strokeWidth="2.5" />
+          {/* Ripped Body */}
+          <ellipse cx="30" cy="34" rx="19" ry="18" fill="#ffffff" stroke="#000000" strokeWidth="2.8" />
+          {/* Fierce Macho Eyes */}
+          <line x1="20" y1="26" x2="26" y2="30" stroke="#000000" strokeWidth="3" strokeLinecap="round" />
+          <line x1="40" y1="26" x2="34" y2="30" stroke="#000000" strokeWidth="3" strokeLinecap="round" />
+          <circle cx="23" cy="29" r="1.5" fill="#000000" />
+          <circle cx="37" cy="29" r="1.5" fill="#000000" />
+          {/* Macho Muscle Abs */}
+          <path d="M 24 36 Q 30 40 36 36 M 30 36 L 30 48 M 26 42 L 34 42" stroke="#000000" strokeWidth="2" strokeLinecap="round" />
+          {/* Legs */}
+          <ellipse cx={20 + legOffset1} cy="56" rx="5" ry="6" fill="#ffffff" stroke="#000000" strokeWidth="2.5" />
+          <ellipse cx={40 + legOffset2} cy="56" rx="5" ry="6" fill="#ffffff" stroke="#000000" strokeWidth="2.5" />
+        </svg>
+      );
+
+    case 'cat_jura':
+    case 'cat_jurasaurus':
+      const isSaurus = type === 'cat_jurasaurus';
+      return (
+        <svg width="68" height="66" viewBox="0 0 68 66" className="drop-shadow-md">
+          {/* Dino Skull Helmet */}
+          <path d="M 16 26 Q 34 4 52 26 Q 34 20 16 26 Z" fill={isSaurus ? "#fed7aa" : "#e2e8f0"} stroke="#0f172a" strokeWidth="2.5" />
+          {/* Sharp Dino Teeth on Helmet */}
+          <polygon points="22,24 25,29 28,24" fill="#ffffff" stroke="#0f172a" strokeWidth="1" />
+          <polygon points="32,23 35,28 38,23" fill="#ffffff" stroke="#0f172a" strokeWidth="1" />
+          <polygon points="42,24 45,29 48,24" fill="#ffffff" stroke="#0f172a" strokeWidth="1" />
+          {/* Cat Head underneath */}
+          <ellipse cx="34" cy="34" rx="18" ry="16" fill="#ffffff" stroke="#0f172a" strokeWidth="2.5" />
+          {/* Eyes */}
+          <ellipse cx="26" cy="32" rx="2.5" ry="3.5" fill="#0f172a" />
+          <ellipse cx="42" cy="32" rx="2.5" ry="3.5" fill="#0f172a" />
+          {/* Club / Bone Weapon */}
+          <g transform={isAttacking ? "rotate(45 52 36)" : "rotate(-15 52 36)"} className="transition-transform duration-100">
+            <rect x="50" y="16" width="6" height="28" rx="2" fill="#78350f" stroke="#0f172a" strokeWidth="1.5" />
+            <circle cx="53" cy="14" r="8" fill="#e2e8f0" stroke="#0f172a" strokeWidth="2" />
+          </g>
+          {/* Legs */}
+          <ellipse cx={24 + legOffset1} cy="52" rx="4.5" ry="5.5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={44 + legOffset2} cy="52" rx="4.5" ry="5.5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_surfer':
+    case 'cat_castaway':
+      const isCastaway = type === 'cat_castaway';
+      return (
+        <svg width="78" height="70" viewBox="0 0 78 70" className="drop-shadow-lg">
+          {/* Cosmic Surfboard */}
+          <ellipse cx="39" cy="56" rx="34" ry="7" fill={isCastaway ? "#38bdf8" : "#f59e0b"} stroke="#0f172a" strokeWidth="2.5" transform={`rotate(${walkCycle * 6} 39 56)`} />
+          {/* Surfing Water / Cosmic Splashes */}
+          <path d="M 6 56 Q 16 46 22 56 Q 28 66 34 56" fill="none" stroke="#67e8f9" strokeWidth="3" strokeLinecap="round" />
+          {/* Cool Sunglasses & Head */}
+          <ellipse cx="39" cy="28" rx="18" ry="17" fill="#ffffff" stroke="#0f172a" strokeWidth="2.5" />
+          <polygon points="26,18 29,6 36,16" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <polygon points="42,16 49,6 52,18" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          {/* Sunglasses */}
+          <rect x="25" y="24" width="13" height="8" rx="2" fill="#0f172a" />
+          <rect x="40" y="24" width="13" height="8" rx="2" fill="#0f172a" />
+          <line x1="38" y1="28" x2="40" y2="28" stroke="#0f172a" strokeWidth="2" />
+          {/* Cool Smirk */}
+          <path d="M 34 38 Q 42 42 45 36" fill="none" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" />
+          {/* Freezing Wave Particles on attack */}
+          {isAttacking && (
+            <circle cx="68" cy="30" r="12" fill="#38bdf8" fillOpacity="0.8" stroke="#0284c7" strokeWidth="2" className="animate-ping" />
+          )}
+        </svg>
+      );
+
+    case 'cat_bancho':
+    case 'cat_bancho_rage':
+      const isRage = type === 'cat_bancho_rage';
+      return (
+        <svg width="84" height="84" viewBox="0 0 84 84" className="drop-shadow-xl">
+          {/* Flowing Delinquent Long Coat (Gakuran) */}
+          <path d="M 22 36 Q 10 50 14 74 Q 42 66 70 74 Q 74 50 62 36 Z" fill="#09090b" stroke="#3f3f46" strokeWidth="2.5" />
+          {/* Bancho Hat with Gold Cat Emblem */}
+          <polygon points="20,24 64,24 58,12 26,12" fill="#09090b" stroke="#3f3f46" strokeWidth="2.5" />
+          <circle cx="42" cy="18" r="4" fill="#fbbf24" stroke="#000000" strokeWidth="1.5" />
+          {/* Intimidating Face */}
+          <ellipse cx="42" cy="32" rx="16" ry="14" fill="#ffffff" stroke="#000000" strokeWidth="2.5" />
+          <line x1="30" y1="28" x2="38" y2="32" stroke="#000000" strokeWidth="3" strokeLinecap="round" />
+          <line x1="54" y1="28" x2="46" y2="32" stroke="#000000" strokeWidth="3" strokeLinecap="round" />
+          {/* Rapid Punch Effect on attack */}
+          {isAttacking && (
+            <g className="animate-pulse">
+              <ellipse cx="72" cy="36" rx="14" ry="10" fill="#f59e0b" stroke="#b45309" strokeWidth="2" />
+              <ellipse cx="76" cy="50" rx="14" ry="10" fill="#f59e0b" stroke="#b45309" strokeWidth="2" />
+            </g>
+          )}
+        </svg>
+      );
+
+    case 'cat_aphrodite':
+    case 'cat_aphrodite_true':
+      const isTrueAphrodite = type === 'cat_aphrodite_true';
+      return (
+        <svg width="95" height="95" viewBox="0 0 95 95" className="drop-shadow-2xl">
+          {/* Golden Angel Wings */}
+          <path d="M 45 40 Q 15 15 20 65 Z" fill={isTrueAphrodite ? "#fbbf24" : "#fef08a"} stroke="#b45309" strokeWidth="2" />
+          <path d="M 50 40 Q 80 15 75 65 Z" fill={isTrueAphrodite ? "#fbbf24" : "#fef08a"} stroke="#b45309" strokeWidth="2" />
+          {/* Slender Goddess Robes */}
+          <path d="M 35 45 Q 47.5 90 60 45 Z" fill="#ffffff" stroke="#e2e8f0" strokeWidth="2" />
+          {/* Divine Long Hair & Tiara */}
+          <circle cx="47.5" cy="30" r="16" fill="#fef3c7" stroke="#b45309" strokeWidth="2" />
+          <polygon points="40,16 47.5,8 55,16" fill="#fbbf24" stroke="#b45309" strokeWidth="1.5" />
+          {/* Long Golden Bow */}
+          <path d="M 68 15 Q 85 47.5 68 80" fill="none" stroke="#fbbf24" strokeWidth="4" strokeLinecap="round" />
+          <line x1="68" y1="15" x2="68" y2="80" stroke="#fef08a" strokeWidth="1.5" strokeDasharray="3,3" />
+          {/* Light Arrow on Attack */}
+          {isAttacking && (
+            <line x1="68" y1="47.5" x2="-60" y2="47.5" stroke="#38bdf8" strokeWidth="6" strokeLinecap="round" className="animate-ping" />
+          )}
+        </svg>
+      );
+
+    case 'cat_god':
+    case 'cat_god_divine':
+      const isDivine = type === 'cat_god_divine';
+      return (
+        <svg width="105" height="105" viewBox="0 0 105 105" className="drop-shadow-2xl">
+          {/* Golden Rotating Sunburst Halo */}
+          <circle cx="52" cy="52" r="44" fill="none" stroke="#fbbf24" strokeWidth="4" strokeDasharray="10,6" className="animate-spin" />
+          {/* God Cloud Platform */}
+          <ellipse cx="52" cy="80" rx="34" ry="12" fill="#ffffff" stroke="#cbd5e1" strokeWidth="2" />
+          {/* Majestic God Face */}
+          <ellipse cx="52" cy="46" rx="26" ry="28" fill="#fef3c7" stroke="#b45309" strokeWidth="3" />
+          <path d="M 34 54 Q 52 82 70 54 Q 52 68 34 54 Z" fill="#f59e0b" stroke="#b45309" strokeWidth="2" />
+          {/* God Cat Ears */}
+          <polygon points="34,24 24,8 42,18" fill="#fef3c7" stroke="#b45309" strokeWidth="2" />
+          <polygon points="70,24 80,8 62,18" fill="#fef3c7" stroke="#b45309" strokeWidth="2" />
+          {/* Thunder Lightning on Attack */}
+          {isAttacking && (
+            <g className="animate-ping">
+              <polygon points="52,0 64,24 52,32 68,56 40,48 52,0" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2" />
+            </g>
+          )}
+        </svg>
+      );
+
+    // --- NEW ENEMIES ---
+    case 'enemy_metal_hippoe':
+      return (
+        <svg width="90" height="70" viewBox="0 0 90 70" className="drop-shadow-2xl">
+          {/* Steel Plated Heavy Armor Hippo */}
+          <path d="M 18 52 Q 10 22 45 20 Q 75 20 85 45 Q 80 58 55 56 Q 30 58 18 52 Z" fill="#94a3b8" stroke="#334155" strokeWidth="3" />
+          {/* Metallic Bolt Rivets */}
+          <circle cx="28" cy="28" r="2.5" fill="#475569" />
+          <circle cx="48" cy="26" r="2.5" fill="#475569" />
+          <circle cx="68" cy="30" r="2.5" fill="#475569" />
+          {/* Heavy Steel Snout & Giant Metal Teeth */}
+          <rect x="65" y="38" width="18" height="16" rx="4" fill="#64748b" stroke="#1e293b" strokeWidth="2.5" />
+          <polygon points="70,54 74,46 78,54" fill="#f8fafc" stroke="#1e293b" strokeWidth="1.5" />
+          {/* Glowing Red Robotic Eye */}
+          <circle cx="58" cy="30" r="4" fill="#ef4444" stroke="#7f1d1d" strokeWidth="1.5" className="animate-pulse" />
+          {/* Steel Stomp Feet */}
+          <rect x={28 + legOffset1} y="54" width="14" height="12" rx="3" fill="#64748b" stroke="#1e293b" strokeWidth="2" />
+          <rect x={54 + legOffset2} y="54" width="14" height="12" rx="3" fill="#64748b" stroke="#1e293b" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_red_face':
+      return (
+        <svg width="105" height="105" viewBox="0 0 105 105" className="drop-shadow-2xl">
+          {/* Massive Crimson Floating Head */}
+          <ellipse cx="52" cy="50" rx="38" ry="42" fill="#dc2626" stroke="#450a0a" strokeWidth="3.5" />
+          {/* Fiery Red Face Brows */}
+          <polygon points="26,26 48,34 32,38" fill="#7f1d1d" />
+          <polygon points="78,26 56,34 72,38" fill="#7f1d1d" />
+          {/* Piercing Demon Eyes */}
+          <ellipse cx="36" cy="38" rx="6" ry="7" fill="#fef08a" stroke="#000000" strokeWidth="1.5" />
+          <ellipse cx="68" cy="38" rx="6" ry="7" fill="#fef08a" stroke="#000000" strokeWidth="1.5" />
+          <circle cx="36" cy="38" r="2.5" fill="#000000" />
+          <circle cx="68" cy="38" r="2.5" fill="#000000" />
+          {/* Huge Jaws Chomp Attack */}
+          <path
+            d={isAttacking ? "M 24 54 Q 52 88 80 54 Q 52 100 24 54 Z" : "M 30 62 Q 52 74 74 62 Q 52 80 30 62 Z"}
+            fill="#450a0a"
+            stroke="#000000"
+            strokeWidth="3"
+          />
+          {/* Sharp Fangs */}
+          <polygon points="38,58 42,66 46,58" fill="#ffffff" />
+          <polygon points="58,58 62,66 66,58" fill="#ffffff" />
+        </svg>
+      );
+
+    case 'enemy_gorilla':
+      return (
+        <svg width="78" height="74" viewBox="0 0 78 74" className="drop-shadow-lg">
+          {/* Muscular Gorilla Torso */}
+          <ellipse cx="39" cy="42" rx="26" ry="24" fill="#334155" stroke="#0f172a" strokeWidth="3" />
+          {/* Gorilla Head & Crest */}
+          <circle cx="39" cy="22" r="16" fill="#1e293b" stroke="#0f172a" strokeWidth="2.5" />
+          <polygon points="34,8 39,2 44,8" fill="#1e293b" stroke="#0f172a" strokeWidth="1.5" />
+          {/* Eyes & Nostrils */}
+          <ellipse cx="33" cy="20" rx="2.5" ry="3" fill="#f8fafc" />
+          <ellipse cx="45" cy="20" rx="2.5" ry="3" fill="#f8fafc" />
+          <circle cx="33" cy="20" r="1.2" fill="#000000" />
+          <circle cx="45" cy="20" r="1.2" fill="#000000" />
+          <ellipse cx="39" cy="28" rx="6" ry="4" fill="#475569" />
+          {/* Heavy Fist Slam Arms */}
+          <ellipse cx={18 + legOffset1} cy="52" rx="9" ry="14" fill="#1e293b" stroke="#0f172a" strokeWidth="2.5" />
+          <ellipse cx={60 + legOffset2} cy="52" rx="9" ry="14" fill="#1e293b" stroke="#0f172a" strokeWidth="2.5" />
+        </svg>
+      );
+
+    case 'enemy_angel_hippoe':
+      return (
+        <svg width="90" height="75" viewBox="0 0 90 75" className="drop-shadow-2xl">
+          {/* Golden Divine Halo */}
+          <ellipse cx="45" cy="10" rx="18" ry="6" fill="none" stroke="#fbbf24" strokeWidth="3" className="animate-pulse" />
+          {/* Angel Wings */}
+          <path d="M 28 26 Q 10 10 20 40 Z" fill="#ffffff" stroke="#fbbf24" strokeWidth="2" />
+          {/* Holy White Hippo Body */}
+          <path d="M 18 52 Q 10 22 45 20 Q 75 20 85 45 Q 80 58 55 56 Q 30 58 18 52 Z" fill="#fefce8" stroke="#b45309" strokeWidth="2.8" />
+          {/* Pure Golden Snout */}
+          <rect x="65" y="38" width="18" height="16" rx="4" fill="#fef08a" stroke="#b45309" strokeWidth="2" />
+          {/* Eyes */}
+          <circle cx="58" cy="30" r="3.5" fill="#3b82f6" stroke="#1e3a8a" strokeWidth="1" />
+          {/* Legs */}
+          <rect x={28 + legOffset1} y="54" width="14" height="12" rx="3" fill="#fefce8" stroke="#b45309" strokeWidth="2" />
+          <rect x={54 + legOffset2} y="54" width="14" height="12" rx="3" fill="#fefce8" stroke="#b45309" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_god_final':
+      return (
+        <svg width="135" height="135" viewBox="0 0 135 135" className="drop-shadow-2xl">
+          {/* Ultra Cosmic God Wheel */}
+          <g className="animate-spin" style={{ transformOrigin: '67px 67px' }}>
+            <circle cx="67" cy="67" r="62" fill="none" stroke="#fbbf24" strokeWidth="5" strokeDasharray="16,8" />
+            <circle cx="67" cy="67" r="52" fill="none" stroke="#ec4899" strokeWidth="3" strokeDasharray="10,6" />
+          </g>
+          {/* God Head */}
+          <ellipse cx="67" cy="65" rx="38" ry="42" fill="#fef3c7" stroke="#b45309" strokeWidth="4" />
+          <polygon points="42,32 30,10 54,24" fill="#fef3c7" stroke="#b45309" strokeWidth="3" />
+          <polygon points="92,32 104,10 80,24" fill="#fef3c7" stroke="#b45309" strokeWidth="3" />
+          {/* Flowing Golden Beard */}
+          <path d="M 40 76 Q 67 122 94 76 Q 67 96 40 76 Z" fill="#f59e0b" stroke="#b45309" strokeWidth="3.5" />
+          {/* Third Eye of Omniscience */}
+          <polygon points="67,32 75,44 67,56 59,44" fill="#ec4899" stroke="#b45309" strokeWidth="2.5" />
+          {/* Super Mega Wave Lightning on Attack */}
+          {isAttacking && (
+            <g className="animate-ping">
+              <circle cx="67" cy="67" r="50" fill="#fbbf24" fillOpacity="0.4" stroke="#f59e0b" strokeWidth="4" />
+            </g>
+          )}
+        </svg>
+      );
+
+
     default:
       return (
         <svg width="50" height="50" viewBox="0 0 50 50">

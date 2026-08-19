@@ -465,6 +465,68 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
                   </div>
                 </div>
               )}
+              {fx.type === 'cat_soul' && (
+                <div
+                  className="relative flex flex-col items-center pointer-events-none"
+                  style={{ transform: `translateY(-${progress * 60}px)` }}
+                >
+                  {/* Glowing Cat Angel Soul Ascending */}
+                  <svg width="44" height="44" viewBox="0 0 44 44" className="drop-shadow-lg animate-bounce">
+                    {/* Golden Halo */}
+                    <ellipse cx="22" cy="6" rx="10" ry="3" fill="none" stroke="#fbbf24" strokeWidth="2" />
+                    {/* Angel Wings */}
+                    <path d="M 12 18 Q 2 8 8 28 Z" fill="#ffffff" fillOpacity="0.8" stroke="#38bdf8" strokeWidth="1.5" />
+                    <path d="M 32 18 Q 42 8 36 28 Z" fill="#ffffff" fillOpacity="0.8" stroke="#38bdf8" strokeWidth="1.5" />
+                    {/* Cat Spirit Head */}
+                    <circle cx="22" cy="20" r="11" fill="#ffffff" fillOpacity="0.9" stroke="#94a3b8" strokeWidth="1.5" />
+                    {/* Cat Ears */}
+                    <polygon points="15,13 18,6 21,12" fill="#ffffff" stroke="#94a3b8" strokeWidth="1" />
+                    <polygon points="23,12 26,6 29,13" fill="#ffffff" stroke="#94a3b8" strokeWidth="1" />
+                    {/* Peaceful Sleeping Eyes */}
+                    <path d="M 16 20 Q 18 22 20 20" fill="none" stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" />
+                    <path d="M 24 20 Q 26 22 28 20" fill="none" stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" />
+                    {/* Little cute smile */}
+                    <path d="M 20 24 Q 22 26 24 24" fill="none" stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                  <span className="text-[9px] font-black text-amber-300 drop-shadow">昇天〜</span>
+                </div>
+              )}
+              {fx.type === 'dust_puff' && (
+                <div className="relative flex items-center justify-center">
+                  <div
+                    className="w-8 h-4 bg-amber-200/50 rounded-full blur-xs"
+                    style={{ transform: `scale(${1 + progress * 1.5})` }}
+                  />
+                </div>
+              )}
+              {fx.type === 'metal_spark' && (
+                <div className="relative flex items-center justify-center">
+                  <div className="w-10 h-10 bg-cyan-200 rounded-full blur-sm animate-ping" />
+                  <span className="absolute text-xs font-black text-cyan-200 stroke-cyan-900 drop-shadow">
+                    ガキィン!
+                  </span>
+                </div>
+              )}
+              {fx.type === 'freeze_fx' && (
+                <div className="relative flex flex-col items-center">
+                  <div className="w-20 h-20 bg-sky-400/30 border-2 border-cyan-300 rounded-xl backdrop-blur-xs animate-pulse flex items-center justify-center">
+                    <span className="text-xl">❄️</span>
+                  </div>
+                  <span className="text-[10px] font-black text-cyan-200 bg-blue-900/80 px-2 py-0.5 rounded border border-cyan-300 drop-shadow">
+                    停止(フリーズ)!
+                  </span>
+                </div>
+              )}
+              {fx.type === 'crit_flash' && (
+                <div className="relative flex items-center justify-center">
+                  <div className="w-32 h-32 bg-yellow-300/40 rounded-full blur-md animate-ping" />
+                  <div className="absolute w-24 h-1 bg-yellow-200 rotate-45 animate-pulse" />
+                  <div className="absolute w-24 h-1 bg-yellow-200 -rotate-45 animate-pulse" />
+                  <span className="absolute text-sm font-black text-red-600 bg-yellow-300 px-2 py-0.5 rounded border border-red-600 drop-shadow-lg animate-bounce">
+                    CRITICAL!
+                  </span>
+                </div>
+              )}
             </div>
           );
         })}

@@ -622,7 +622,19 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       }
     }
 
-    // Filter dead entities
+    // Filter dead entities with soul ascension FX
+    catsRef.current.forEach((c) => {
+      if (c.hp <= 0) {
+        spawnFx(c.x, 30, 'cat_soul');
+      }
+    });
+
+    enemiesRef.current.forEach((e) => {
+      if (e.hp <= 0) {
+        spawnFx(e.x, 25, 'aoe_burst');
+      }
+    });
+
     catsRef.current = catsRef.current.filter((c) => c.hp > 0);
     enemiesRef.current = enemiesRef.current.filter((e) => e.hp > 0);
   };
@@ -630,8 +642,12 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   // Cat Attacks: Single-target vs Area Attack!
   const executeCatAttack = (cat: ActiveEntity) => {
     const isArea = cat.attackType === 'area';
-    const isCrit = Math.random() < 0.15; // 15% crit chance
-    const dmg = Math.round(cat.attackPower * (isCrit ? 2.0 : 1.0));
+    // Jura / Jurasaurus has massive critical rate (50% / 75%)
+    let critChance = 0.15;
+    if (cat.defId === 'cat_jura') {
+      critChance = cat.formIndex === 1 ? 0.75 : 0.5;
+    }
+    const isCrit = Math.random() < critChance;
 
     // Find enemies in reach (in front of cat within range + buffer)
     const enemiesInReach = enemiesRef.current.filter(
@@ -642,12 +658,32 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       if (isArea) {
         // ★ AREA ATTACK (範囲攻撃): Hits ALL enemies in range!
         audio.playHit(isCrit, true);
-        spawnFx(cat.x + cat.attackRange * 0.5, 20, 'aoe_burst');
+        spawnFx(cat.x + cat.attackRange * 0.5, 20, isCrit ? 'crit_flash' : 'aoe_burst');
 
         enemiesInReach.forEach((e) => {
-          const nextHp = Math.max(0, e.hp - dmg);
+          const isMetal = e.traits?.includes('metal');
+          let actualDmg = Math.round(cat.attackPower * (isCrit ? 2.0 : 1.0));
+          if (isMetal) {
+            if (isCrit) {
+              actualDmg = Math.round(cat.attackPower * 2.0);
+              spawnFx(e.x, 25, 'crit_flash');
+            } else {
+              actualDmg = 1; // Metal deflection
+              spawnFx(e.x, 25, 'metal_spark');
+            }
+          }
+
+          // Surfer / Castaway freeze against Alien
+          if (cat.defId === 'cat_surfer' && e.traits?.includes('alien')) {
+            if (Math.random() < 0.6) {
+              e.attackTimer = 2.5; // Freeze enemy
+              spawnFx(e.x, 35, 'freeze_fx');
+            }
+          }
+
+          const nextHp = Math.max(0, e.hp - actualDmg);
           e.hp = nextHp;
-          spawnDamageNum(e.x, 25, dmg, isCrit, true);
+          spawnDamageNum(e.x, 25, actualDmg, isCrit, true);
 
           // Knockback if crossed KB threshold
           const kbThreshold = e.maxHp / e.maxKnockbacks;
@@ -675,10 +711,32 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         // ★ SINGLE TARGET ATTACK (単体攻撃): Hits ONLY the front-most enemy!
         audio.playHit(isCrit, false);
         const target = [...enemiesInReach].sort((a, b) => a.x - b.x)[0];
-        spawnFx(target.x, 20, 'hit');
-        spawnDamageNum(target.x, 25, dmg, isCrit, true);
+        
+        const isMetal = target.traits?.includes('metal');
+        let actualDmg = Math.round(cat.attackPower * (isCrit ? 2.0 : 1.0));
+        if (isMetal) {
+          if (isCrit) {
+            actualDmg = Math.round(cat.attackPower * 2.0);
+            spawnFx(target.x, 25, 'crit_flash');
+          } else {
+            actualDmg = 1; // Metal deflection
+            spawnFx(target.x, 25, 'metal_spark');
+          }
+        } else {
+          spawnFx(target.x, 20, isCrit ? 'crit_flash' : 'hit');
+        }
 
-        const nextHp = Math.max(0, target.hp - dmg);
+        // Surfer / Castaway freeze against Alien
+        if (cat.defId === 'cat_surfer' && target.traits?.includes('alien')) {
+          if (Math.random() < 0.6) {
+            target.attackTimer = 2.5; // Freeze enemy
+            spawnFx(target.x, 35, 'freeze_fx');
+          }
+        }
+
+        spawnDamageNum(target.x, 25, actualDmg, isCrit, true);
+
+        const nextHp = Math.max(0, target.hp - actualDmg);
         target.hp = nextHp;
 
         const kbThreshold = target.maxHp / target.maxKnockbacks;
@@ -707,6 +765,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       if (enemyCastleX - cat.x <= cat.attackRange + 30) {
         audio.playHit(false, false);
         spawnFx(enemyCastleX, 40, isArea ? 'aoe_burst' : 'hit');
+        const dmg = Math.round(cat.attackPower * (isCrit ? 2.0 : 1.0));
         spawnDamageNum(enemyCastleX, 40, dmg, isCrit, true);
         enemyCastleHpRef.current = Math.max(0, enemyCastleHpRef.current - dmg);
         if (enemyCastleHpRef.current <= 0 && !battleResult.ended) {
