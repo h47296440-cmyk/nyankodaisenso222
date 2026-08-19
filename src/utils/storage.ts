@@ -136,3 +136,22 @@ export function getCatLevelUpCost(catRarity: string, currentLevel: number): numb
 export function getBaseUpgradeCost(currentLevel: number): number {
   return Math.floor(200 * Math.pow(currentLevel, 1.5));
 }
+
+// Calculate User Rank = Sum of all character levels + all base upgrade levels (ユーザーランクはレベルの合計)
+export function calculateUserRank(profile: PlayerProfile): number {
+  let rank = 0;
+  if (profile.cats) {
+    Object.values(profile.cats).forEach((cat) => {
+      if (cat.unlocked) {
+        rank += cat.level || 1;
+      }
+    });
+  }
+  if (profile.upgrades) {
+    Object.values(profile.upgrades).forEach((lv) => {
+      rank += lv || 1;
+    });
+  }
+  return rank;
+}
+

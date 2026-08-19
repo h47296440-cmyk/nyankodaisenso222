@@ -3,6 +3,7 @@ import { PlayerProfile, StageDefinition, TreasureQuality, BattleActiveItems } fr
 import { loadProfile, saveProfile, resetProfile } from './utils/storage';
 import { CHAPTERS } from './data/stages';
 import { TitleScreen } from './components/title/TitleScreen';
+import { CatBaseScreen } from './components/base/CatBaseScreen';
 import { StageSelectScreen } from './components/map/StageSelectScreen';
 import { BattleScreen } from './components/battle/BattleScreen';
 import { PowerUpScreen } from './components/upgrade/PowerUpScreen';
@@ -13,9 +14,15 @@ import { UpdateHistoryModal } from './components/updates/UpdateHistoryModal';
 import { DeveloperModeModal } from './components/dev/DeveloperModeModal';
 import { ChapterStoryModal } from './components/story/ChapterStoryModal';
 import { StorySelectModal } from './components/story/StorySelectModal';
+import { ItemShopModal } from './components/base/ItemShopModal';
+import { UserRankRewardsModal } from './components/base/UserRankRewardsModal';
+import { GamatotoModal } from './components/base/GamatotoModal';
+import { StorageModal } from './components/base/StorageModal';
+import { MenuModal } from './components/base/MenuModal';
+import { DeckFormationModal } from './components/upgrade/DeckFormationModal';
 import { audio } from './utils/audio';
 
-type AppView = 'title' | 'map' | 'battle' | 'upgrade' | 'gacha' | 'treasures' | 'encyclopedia';
+type AppView = 'title' | 'base' | 'map' | 'battle' | 'upgrade' | 'gacha' | 'treasures' | 'encyclopedia';
 
 export default function App() {
   const [profile, setProfile] = useState<PlayerProfile>(loadProfile);
@@ -25,6 +32,12 @@ export default function App() {
   const [showUpdateHistory, setShowUpdateHistory] = useState(false);
   const [showDevModal, setShowDevModal] = useState(false);
   const [showStorySelectModal, setShowStorySelectModal] = useState(false);
+  const [showItemShopModal, setShowItemShopModal] = useState(false);
+  const [showUserRankRewardsModal, setShowUserRankRewardsModal] = useState(false);
+  const [showGamatotoModal, setShowGamatotoModal] = useState(false);
+  const [showStorageModal, setShowStorageModal] = useState(false);
+  const [showMenuModal, setShowMenuModal] = useState(false);
+  const [showDeckFormationModal, setShowDeckFormationModal] = useState(false);
   const [activeStoryKey, setActiveStoryKey] = useState<string | null>(null);
 
   // Sync BGM with current view
@@ -179,10 +192,28 @@ export default function App() {
       <div className="relative w-full h-full max-w-[1920px] bg-stone-950 overflow-hidden shadow-2xl flex flex-col">
         {currentView === 'title' && (
           <TitleScreen
-            onStartGame={() => setCurrentView('map')}
+            onStartGame={() => setCurrentView('base')}
             onResetData={handleResetData}
             onOpenUpdateHistory={() => setShowUpdateHistory(true)}
             onOpenDevMode={() => setShowDevModal(true)}
+          />
+        )}
+
+        {currentView === 'base' && (
+          <CatBaseScreen
+            profile={profile}
+            onStartBattle={() => setCurrentView('map')}
+            onOpenPowerUp={() => setCurrentView('upgrade')}
+            onOpenDeckFormation={() => setShowDeckFormationModal(true)}
+            onOpenGacha={() => setCurrentView('gacha')}
+            onOpenTreasures={() => setCurrentView('treasures')}
+            onOpenEncyclopedia={() => setCurrentView('encyclopedia')}
+            onOpenItemShop={() => setShowItemShopModal(true)}
+            onOpenUserRankRewards={() => setShowUserRankRewardsModal(true)}
+            onOpenGamatoto={() => setShowGamatotoModal(true)}
+            onOpenStorage={() => setShowStorageModal(true)}
+            onOpenMenu={() => setShowMenuModal(true)}
+            onBackToTitle={() => setCurrentView('title')}
           />
         )}
 
@@ -197,7 +228,7 @@ export default function App() {
             onOpenUpdateHistory={() => setShowUpdateHistory(true)}
             onOpenDevMode={() => setShowDevModal(true)}
             onOpenStorySelect={() => setShowStorySelectModal(true)}
-            onBackToTitle={() => setCurrentView('title')}
+            onBackToTitle={() => setCurrentView('base')}
           />
         )}
 
@@ -217,7 +248,7 @@ export default function App() {
           <PowerUpScreen
             profile={profile}
             onUpdateProfile={handleUpdateProfile}
-            onBack={() => setCurrentView('map')}
+            onBack={() => setCurrentView('base')}
           />
         )}
 
@@ -225,20 +256,20 @@ export default function App() {
           <GachaScreen
             profile={profile}
             onUpdateProfile={handleUpdateProfile}
-            onBack={() => setCurrentView('map')}
+            onBack={() => setCurrentView('base')}
           />
         )}
 
         {currentView === 'treasures' && (
           <TreasuresScreen
             profile={profile}
-            onBack={() => setCurrentView('map')}
+            onBack={() => setCurrentView('base')}
           />
         )}
 
         {currentView === 'encyclopedia' && (
           <CatEncyclopediaScreen
-            onBack={() => setCurrentView('map')}
+            onBack={() => setCurrentView('base')}
           />
         )}
 
@@ -269,6 +300,79 @@ export default function App() {
           isOpen={showDevModal}
           profile={profile}
           onClose={() => setShowDevModal(false)}
+          onUpdateProfile={handleUpdateProfile}
+        />
+
+        {/* Item Shop Modal */}
+        <ItemShopModal
+          isOpen={showItemShopModal}
+          profile={profile}
+          onClose={() => setShowItemShopModal(false)}
+          onUpdateProfile={handleUpdateProfile}
+        />
+
+        {/* User Rank Rewards Modal */}
+        <UserRankRewardsModal
+          isOpen={showUserRankRewardsModal}
+          profile={profile}
+          onClose={() => setShowUserRankRewardsModal(false)}
+          onUpdateProfile={handleUpdateProfile}
+        />
+
+        {/* Gamatoto Expedition Modal */}
+        <GamatotoModal
+          isOpen={showGamatotoModal}
+          profile={profile}
+          onClose={() => setShowGamatotoModal(false)}
+          onUpdateProfile={handleUpdateProfile}
+        />
+
+        {/* Storage / Refrigerator Modal */}
+        <StorageModal
+          isOpen={showStorageModal}
+          profile={profile}
+          onClose={() => setShowStorageModal(false)}
+          onOpenGacha={() => {
+            setShowStorageModal(false);
+            setCurrentView('gacha');
+          }}
+        />
+
+        {/* Base Menu Modal */}
+        <MenuModal
+          isOpen={showMenuModal}
+          onClose={() => setShowMenuModal(false)}
+          onOpenTreasures={() => {
+            setShowMenuModal(false);
+            setCurrentView('treasures');
+          }}
+          onOpenEncyclopedia={() => {
+            setShowMenuModal(false);
+            setCurrentView('encyclopedia');
+          }}
+          onOpenStorySelect={() => {
+            setShowMenuModal(false);
+            setShowStorySelectModal(true);
+          }}
+          onOpenUpdateHistory={() => {
+            setShowMenuModal(false);
+            setShowUpdateHistory(true);
+          }}
+          onOpenDevMode={() => {
+            setShowMenuModal(false);
+            setShowDevModal(true);
+          }}
+          onBackToTitle={() => {
+            setShowMenuModal(false);
+            setCurrentView('title');
+          }}
+        />
+
+        {/* Character Deck Formation Modal */}
+        <DeckFormationModal
+          isOpen={showDeckFormationModal}
+          profile={profile}
+          onClose={() => setShowDeckFormationModal(false)}
           onUpdateProfile={handleUpdateProfile}
         />
       </div>
