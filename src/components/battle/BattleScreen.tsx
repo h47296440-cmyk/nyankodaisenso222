@@ -385,6 +385,8 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   // Spawn Enemy Helper
   const spawnEnemy = (enemyId: string, isBoss: boolean = false) => {
     const def = ENEMY_DEFINITIONS[enemyId] || ENEMY_DEFINITIONS.enemy_doge;
+    const isBossEntity = isBoss || def.isBoss;
+
     const newEnemy: ActiveEntity = {
       instanceId: `enemy_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
       defId: enemyId,
@@ -408,7 +410,8 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       spriteType: def.spriteType,
       scale: def.scale || 1.0,
       formIndex: 0,
-      isBoss: isBoss || def.isBoss,
+      isBoss: isBossEntity,
+      waveLevel: def.waveLevel,
       state: 'walk',
       animTimer: 0,
       knockbackVelocityX: 0,
@@ -417,6 +420,20 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     };
 
     enemiesRef.current.push(newEnemy);
+
+    // ★ Boss Spawn Shockwave (ボス出現時の衝撃波＆味方全員吹き飛ばし!)
+    if (isBossEntity) {
+      audio.playBossRoarShockwave();
+      spawnFx(enemyCastleX - 60, 45, 'boss_shockwave');
+      // Push all allied cats backwards towards home base
+      catsRef.current.forEach((c) => {
+        c.state = 'knockback';
+        c.knockbackVelocityX = 220;
+        c.knockbackTimer = 0.55;
+        c.x = Math.max(playerCastleX, c.x - 130);
+        c.isWindupActive = false;
+      });
+    }
   };
 
   // Upgrade Worker Cat
@@ -756,6 +773,46 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           target.x = Math.max(playerCastleX, target.x - 60);
           target.isWindupActive = false;
         }
+      }
+
+      // ★ Wave Attack Mechanics (エリザベスやボスの波動攻撃!)
+      if (enemy.waveLevel && enemy.waveLevel > 0) {
+        audio.playWaveAttack();
+        const waveLvl = enemy.waveLevel;
+        const waveReach = waveLvl * 220;
+        const startWaveX = enemy.x - 20;
+
+        // Visual pulses traveling across the screen
+        for (let i = 1; i <= waveLvl; i++) {
+          setTimeout(() => {
+            const pulseX = Math.max(playerCastleX, startWaveX - i * 160);
+            spawnFx(pulseX, 20, 'wave_blast');
+          }, (i - 1) * 110);
+        }
+
+        // Damage cats along the wave's path
+        const waveHitCats = catsRef.current.filter(
+          (c) => c.hp > 0 && c.x <= startWaveX && c.x >= startWaveX - waveReach
+        );
+
+        waveHitCats.forEach((c) => {
+          const waveDmg = Math.round(dmg * 0.9);
+          const nextHp = Math.max(0, c.hp - waveDmg);
+          c.hp = nextHp;
+          spawnDamageNum(c.x, 30, waveDmg, false, false);
+
+          const kbThreshold = c.maxHp / c.maxKnockbacks;
+          const currentKBs = Math.floor((c.maxHp - nextHp) / kbThreshold);
+          if (currentKBs > c.knockbackCount) {
+            audio.playKnockback();
+            c.knockbackCount = currentKBs;
+            c.state = 'knockback';
+            c.knockbackVelocityX = 190;
+            c.knockbackTimer = 0.45;
+            c.x = Math.max(playerCastleX, c.x - 70);
+            c.isWindupActive = false;
+          }
+        });
       }
     } else {
       // Hit Player Castle

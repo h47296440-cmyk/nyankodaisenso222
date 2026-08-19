@@ -443,6 +443,28 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
               {fx.type === 'boss_roar' && (
                 <div className="w-36 h-36 rounded-full border-4 border-red-500/80 animate-ping" />
               )}
+              {fx.type === 'boss_shockwave' && (
+                <div className="relative flex items-center justify-center pointer-events-none">
+                  {/* Expanding Giant Shockwave Rings */}
+                  <div className="w-64 h-64 rounded-full border-4 border-yellow-400 bg-yellow-300/20 blur-sm animate-ping" />
+                  <div className="absolute w-96 h-96 rounded-full border-2 border-red-500/80 animate-pulse" />
+                  {/* Wind / Blast Streaks */}
+                  <div className="absolute -inset-x-32 h-16 bg-gradient-to-r from-transparent via-white/50 to-transparent blur-xs animate-pulse" />
+                  <div className="absolute -top-12 bg-red-600/90 text-white font-black text-xs sm:text-sm px-3 py-1 rounded-full border-2 border-yellow-400 shadow-2xl animate-bounce">
+                    ⚠ BOSS 出現衝撃波 ⚠
+                  </div>
+                </div>
+              )}
+              {fx.type === 'wave_blast' && (
+                <div className="relative flex flex-col items-center pointer-events-none">
+                  {/* Vertical Wave Shockwave Column (波動) */}
+                  <div className="w-20 h-44 bg-gradient-to-t from-cyan-400 via-sky-300 to-transparent opacity-85 blur-xs rounded-t-full animate-pulse" />
+                  <div className="absolute bottom-0 w-28 h-8 bg-cyan-200 rounded-full blur-sm animate-ping" />
+                  <div className="absolute top-2 text-[10px] font-black text-cyan-200 stroke-cyan-900 drop-shadow-md">
+                    波動!!
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}

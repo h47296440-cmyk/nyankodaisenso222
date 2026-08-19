@@ -280,6 +280,56 @@ class SoundManager {
     } catch {}
   }
 
+  // Boss Shockwave / Roar on Spawn
+  public playBossRoarShockwave() {
+    if (!this.soundEnabled) return;
+    this.unlockAudio();
+    if (!this.ctx || !this.sfxGain) return;
+
+    try {
+      const t = this.ctx.currentTime;
+      // Heavy boom + sweeping roar
+      const osc = this.ctx.createOscillator();
+      const noiseGain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, t);
+      osc.frequency.exponentialRampToValueAtTime(35, t + 0.7);
+
+      noiseGain.gain.setValueAtTime(0.45, t);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.75);
+
+      osc.connect(noiseGain);
+      noiseGain.connect(this.sfxGain);
+      osc.start(t);
+      osc.stop(t + 0.8);
+    } catch {}
+  }
+
+  // Elizabeth / Wave Blast Attack (波動)
+  public playWaveAttack() {
+    if (!this.soundEnabled) return;
+    this.unlockAudio();
+    if (!this.ctx || !this.sfxGain) return;
+
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(110, t);
+      osc.frequency.linearRampToValueAtTime(330, t + 0.15);
+      osc.frequency.exponentialRampToValueAtTime(45, t + 0.5);
+
+      gain.gain.setValueAtTime(0.35, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+      osc.start(t);
+      osc.stop(t + 0.6);
+    } catch {}
+  }
+
   // Cannon Blast (laser beam blast sound)
   public playCannonBlast() {
     this.playCannonFire();

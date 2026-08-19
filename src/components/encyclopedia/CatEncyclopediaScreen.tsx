@@ -110,9 +110,9 @@ export const CatEncyclopediaScreen: React.FC<CatEncyclopediaScreenProps> = ({ on
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-        {/* Left List Grid */}
-        <div className="w-full md:w-5/12 bg-stone-900/50 border-r border-stone-800 overflow-y-auto p-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-2 gap-2">
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
+        {/* Left/Top List Grid */}
+        <div className="w-full md:w-5/12 bg-stone-900/50 border-b md:border-b-0 md:border-r border-stone-800 shrink-0 max-h-40 sm:max-h-48 md:max-h-none md:flex-1 overflow-y-auto p-2 sm:p-3 grid grid-cols-4 sm:grid-cols-5 md:grid-cols-2 gap-1.5 sm:gap-2">
           {tab === 'cats'
             ? filteredCats.map((cat) => {
                 const isSelected = selectedCatId === cat.id;
@@ -127,7 +127,7 @@ export const CatEncyclopediaScreen: React.FC<CatEncyclopediaScreenProps> = ({ on
                       setSelectedCatId(cat.id);
                       setSelectedCatFormIndex(0);
                     }}
-                    className={`p-2 rounded-xl border-2 flex flex-col items-center justify-between text-center transition-all ${
+                    className={`p-1.5 sm:p-2 rounded-xl border-2 flex flex-col items-center justify-between text-center transition-all ${
                       isSelected
                         ? 'bg-amber-950 border-yellow-400 shadow-lg scale-105'
                         : 'bg-stone-900 border-stone-700 hover:border-stone-500'
@@ -141,20 +141,20 @@ export const CatEncyclopediaScreen: React.FC<CatEncyclopediaScreenProps> = ({ on
                       >
                         {form.attackType === 'area' ? '範囲' : '単体'}
                       </span>
-                      <span className="text-amber-400">{cat.rarity.replace('_', ' ')}</span>
+                      <span className="text-amber-400">{cat.rarity[0].toUpperCase()}</span>
                     </div>
 
-                    <div className="my-1.5 scale-90">
+                    <div className="my-0.5 sm:my-1 scale-75 sm:scale-90">
                       <UnitSpriteRenderer
                         spriteType={form.spriteType}
                         isCat={true}
                         state="walk"
                         animTimer={0.5}
-                        scale={0.8}
+                        scale={0.75}
                       />
                     </div>
 
-                    <div className="text-[11px] font-black text-white truncate w-full">{form.name}</div>
+                    <div className="text-[10px] sm:text-[11px] font-black text-white truncate w-full">{form.name}</div>
                   </button>
                 );
               })
@@ -169,7 +169,7 @@ export const CatEncyclopediaScreen: React.FC<CatEncyclopediaScreenProps> = ({ on
                       audio.playClick();
                       setSelectedEnemyId(enemy.id);
                     }}
-                    className={`p-2 rounded-xl border-2 flex flex-col items-center justify-between text-center transition-all ${
+                    className={`p-1.5 sm:p-2 rounded-xl border-2 flex flex-col items-center justify-between text-center transition-all ${
                       isSelected
                         ? 'bg-rose-950 border-rose-400 shadow-lg scale-105'
                         : 'bg-stone-900 border-stone-700 hover:border-stone-500'
@@ -186,24 +186,24 @@ export const CatEncyclopediaScreen: React.FC<CatEncyclopediaScreenProps> = ({ on
                       {enemy.isBoss && <span className="text-yellow-400 font-bold">BOSS</span>}
                     </div>
 
-                    <div className="my-1.5 scale-90">
+                    <div className="my-0.5 sm:my-1 scale-75 sm:scale-90">
                       <UnitSpriteRenderer
                         spriteType={enemy.spriteType}
                         isCat={false}
                         state="walk"
                         animTimer={0.5}
-                        scale={0.8}
+                        scale={0.75}
                       />
                     </div>
 
-                    <div className="text-[11px] font-black text-white truncate w-full">{enemy.name}</div>
+                    <div className="text-[10px] sm:text-[11px] font-black text-white truncate w-full">{enemy.name}</div>
                   </button>
                 );
               })}
         </div>
 
-        {/* Right Details Panel */}
-        <div className="flex-1 p-4 md:p-6 overflow-y-auto flex flex-col justify-between">
+        {/* Right Details Panel - Clear and Scrollable */}
+        <div className="flex-1 p-3 sm:p-4 md:p-6 overflow-y-auto min-h-0 flex flex-col justify-start">
           {tab === 'cats' ? (
             <div>
               {/* Header */}

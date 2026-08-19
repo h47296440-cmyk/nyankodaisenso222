@@ -54,31 +54,27 @@ function renderSpriteSvg(
     // ----------------- CATS -----------------
     case 'cat_basic':
       return (
-        <svg width="54" height="54" viewBox="0 0 54 54" className="drop-shadow-sm">
+        <svg width="56" height="56" viewBox="0 0 56 56" className="drop-shadow-md">
           {/* Ears */}
-          <polygon points="12,18 16,6 23,15" fill="#f8fafc" stroke="#0f172a" strokeWidth="2.5" strokeLinejoin="round" />
-          <polygon points="31,15 38,6 42,18" fill="#f8fafc" stroke="#0f172a" strokeWidth="2.5" strokeLinejoin="round" />
-          {/* Inner ears */}
-          <polygon points="14,16 16,9 20,15" fill="#fda4af" />
-          <polygon points="34,15 38,9 40,16" fill="#fda4af" />
+          <polygon points="12,18 16,4 25,14" fill="#ffffff" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
+          <polygon points="31,14 40,4 44,18" fill="#ffffff" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
           {/* Body */}
-          <ellipse cx="27" cy="28" rx="19" ry="18" fill="#f8fafc" stroke="#0f172a" strokeWidth="2.5" />
+          <ellipse cx="28" cy="29" rx="21" ry="20" fill="#ffffff" stroke="#000000" strokeWidth="3" />
           {/* Eyes */}
-          <ellipse cx="20" cy="25" rx="2.5" ry="3" fill="#0f172a" />
-          <ellipse cx="34" cy="25" rx="2.5" ry="3" fill="#0f172a" />
-          {/* Cheeks */}
-          <ellipse cx="14" cy="30" rx="3" ry="2" fill="#fecdd3" opacity="0.8" />
-          <ellipse cx="40" cy="30" rx="3" ry="2" fill="#fecdd3" opacity="0.8" />
-          {/* Nose & Mouth */}
-          <path d="M 27 27 L 27 30 M 24 32 Q 27 34 27 30 Q 27 34 30 32" fill="none" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" />
+          <ellipse cx="19" cy="24" rx="2.8" ry="3.5" fill="#000000" />
+          <ellipse cx="37" cy="24" rx="2.8" ry="3.5" fill="#000000" />
+          {/* Open tongue mouth (Classic Battle Cats style) */}
+          <path d="M 25 31 Q 28 38 31 31 Z" fill="#fb7185" stroke="#000000" strokeWidth="2" strokeLinejoin="round" />
+          {/* Nose & 'w' shape snout */}
+          <path d="M 28 26 L 28 30 M 22 30 Q 25 34 28 30 Q 31 34 34 30" fill="none" stroke="#000000" strokeWidth="2.8" strokeLinecap="round" />
           {/* Whiskers */}
-          <line x1="8" y1="26" x2="16" y2="28" stroke="#0f172a" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="8" y1="32" x2="16" y2="31" stroke="#0f172a" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="46" y1="26" x2="38" y2="28" stroke="#0f172a" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="46" y1="32" x2="38" y2="31" stroke="#0f172a" strokeWidth="1.5" strokeLinecap="round" />
+          <line x1="7" y1="26" x2="16" y2="28" stroke="#000000" strokeWidth="2" strokeLinecap="round" />
+          <line x1="7" y1="32" x2="16" y2="31" stroke="#000000" strokeWidth="2" strokeLinecap="round" />
+          <line x1="49" y1="26" x2="40" y2="28" stroke="#000000" strokeWidth="2" strokeLinecap="round" />
+          <line x1="49" y1="32" x2="40" y2="31" stroke="#000000" strokeWidth="2" strokeLinecap="round" />
           {/* Legs */}
-          <ellipse cx={20 + legOffset1} cy="46" rx="4" ry="5" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" />
-          <ellipse cx={34 + legOffset2} cy="46" rx="4" ry="5" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={20 + legOffset1} cy="48" rx="4.5" ry="5.5" fill="#ffffff" stroke="#000000" strokeWidth="2.5" />
+          <ellipse cx={36 + legOffset2} cy="48" rx="4.5" ry="5.5" fill="#ffffff" stroke="#000000" strokeWidth="2.5" />
         </svg>
       );
 

@@ -55,6 +55,7 @@ export interface EnemyDefinition {
   spriteType: string;
   scale?: number;
   isBoss?: boolean;
+  waveLevel?: number; // 波動レベル (e.g. 1 to 4)
 }
 
 export interface ActiveEntity {
@@ -82,6 +83,7 @@ export interface ActiveEntity {
   scale: number;
   formIndex: number; // 0 or 1 for cats
   isBoss?: boolean;
+  waveLevel?: number; // 波動レベル
   
   // Animation states
   state: 'walk' | 'attack' | 'knockback' | 'die';
@@ -106,7 +108,7 @@ export interface VisualEffect {
   id: string;
   x: number;
   y: number;
-  type: 'hit' | 'aoe_burst' | 'cannon_beam' | 'cannon_charge' | 'smoke' | 'sparkle' | 'crit_flash' | 'boss_roar';
+  type: 'hit' | 'aoe_burst' | 'cannon_beam' | 'cannon_charge' | 'smoke' | 'sparkle' | 'crit_flash' | 'boss_roar' | 'wave_blast' | 'boss_shockwave';
   lifetime: number;
   maxLifetime: number;
   scale?: number;
