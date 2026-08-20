@@ -2,7 +2,31 @@ export type AttackType = 'single' | 'area';
 
 export type Rarity = 'normal' | 'rare' | 'super_rare' | 'uber_rare';
 
-export type EnemyTrait = 'white' | 'red' | 'floating' | 'black' | 'alien' | 'angel' | 'metal' | 'boss';
+export type EnemyTrait =
+  | 'white'
+  | 'red'
+  | 'floating'
+  | 'black'
+  | 'alien'
+  | 'angel'
+  | 'metal'
+  | 'zombie'
+  | 'boss';
+
+export interface AbilityDefinition {
+  freeze?: { chance: number; duration: number; traits?: EnemyTrait[] };
+  slow?: { chance: number; duration: number; traits?: EnemyTrait[] };
+  weaken?: { chance: number; duration: number; mult: number; traits?: EnemyTrait[] };
+  knockback?: { chance: number; traits?: EnemyTrait[] };
+  massiveDamage?: { mult: number; traits?: EnemyTrait[] };
+  strong?: { traits?: EnemyTrait[] };
+  resist?: { traits?: EnemyTrait[] };
+  zombieKiller?: boolean;
+  burrow?: { count: number; distance: number };
+  revive?: { count: number; hpPercent: number; delaySeconds: number };
+  criticalChance?: number;
+  wave?: { level: number; chance?: number };
+}
 
 export interface UnitForm {
   name: string;
@@ -25,8 +49,9 @@ export interface UnitForm {
   traitBonus?: {
     trait: EnemyTrait;
     multiplier: number;
-    effect?: 'strong' | 'massive_damage' | 'resist' | 'knockback' | 'freeze';
+    effect?: 'strong' | 'massive_damage' | 'resist' | 'knockback' | 'freeze' | 'slow' | 'weaken' | 'zombie_killer';
   };
+  abilities?: AbilityDefinition;
 }
 
 export interface CatDefinition {
@@ -60,6 +85,7 @@ export interface EnemyDefinition {
   scale?: number;
   isBoss?: boolean;
   waveLevel?: number; // 波動レベル (e.g. 1 to 4)
+  abilities?: AbilityDefinition;
 }
 
 export interface ActiveEntity {
@@ -88,9 +114,26 @@ export interface ActiveEntity {
   formIndex: number; // 0 or 1 for cats
   isBoss?: boolean;
   waveLevel?: number; // 波動レベル
+  abilities?: AbilityDefinition;
   
+  // Status condition effects
+  freezeTimer?: number;
+  slowTimer?: number;
+  weakenTimer?: number;
+  weakenMultiplier?: number;
+
+  // Zombie mechanics
+  burrowRemaining?: number;
+  isBurrowing?: boolean;
+  burrowDistanceLeft?: number;
+  reviveCountRemaining?: number;
+  isReviving?: boolean;
+  reviveTimer?: number;
+  reviveHpPercent?: number;
+  isPermadead?: boolean;
+
   // Animation states
-  state: 'walk' | 'attack' | 'knockback' | 'die';
+  state: 'walk' | 'attack' | 'knockback' | 'die' | 'burrow' | 'revive';
   animTimer: number;
   knockbackVelocityX: number;
   knockbackTimer: number;
@@ -112,7 +155,26 @@ export interface VisualEffect {
   id: string;
   x: number;
   y: number;
-  type: 'hit' | 'aoe_burst' | 'cannon_beam' | 'cannon_charge' | 'smoke' | 'sparkle' | 'crit_flash' | 'boss_roar' | 'wave_blast' | 'boss_shockwave' | 'cat_soul' | 'dust_puff' | 'freeze_fx' | 'metal_spark';
+  type:
+    | 'hit'
+    | 'aoe_burst'
+    | 'cannon_beam'
+    | 'cannon_charge'
+    | 'smoke'
+    | 'sparkle'
+    | 'crit_flash'
+    | 'boss_roar'
+    | 'wave_blast'
+    | 'boss_shockwave'
+    | 'cat_soul'
+    | 'dust_puff'
+    | 'freeze_fx'
+    | 'slow_fx'
+    | 'weaken_fx'
+    | 'zombie_burrow'
+    | 'zombie_revive'
+    | 'zombie_killer_fx'
+    | 'metal_spark';
   lifetime: number;
   maxLifetime: number;
   scale?: number;
@@ -174,12 +236,15 @@ export interface StageDefinition {
     | 'japan_grass'
     | 'japan_city'
     | 'japan_volcano'
+    | 'japan_zombie'
     | 'future_neon'
     | 'future_space'
     | 'cosmos_galaxy'
     | 'cosmos_dimension'
     | 'legend_ancient'
     | 'legend_cave'
+    | 'legend_passion'
+    | 'legend_street'
     | 'crazed_hell';
   battlefieldWidth: number;
   baseRewardXp: number;
@@ -192,6 +257,8 @@ export interface StageDefinition {
   isBossStage?: boolean;
   isFinalBossStage?: boolean;
   rewardCatUnlockId?: string; // 狂乱ステージクリア時のキャラ報酬アンロックID
+  isZombieStage?: boolean; // ゾンビ襲来モードフラグ
+  zombieRewardBonus?: boolean;
 }
 
 export interface BattleActiveItems {
@@ -215,6 +282,7 @@ export interface ChapterDefinition {
   bossSprite: string;
   unlockRequirement?: string;
   stages: StageDefinition[];
+  zombieStages?: StageDefinition[];
 }
 
 export interface PlayerUpgrades {

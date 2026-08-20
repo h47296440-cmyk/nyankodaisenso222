@@ -176,6 +176,37 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
           </div>
         );
 
+      case 'legend_passion':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-rose-950 via-red-900 to-amber-900 overflow-hidden pointer-events-none">
+            <div className="absolute top-4 left-1/3 w-80 h-80 bg-rose-500/25 rounded-full blur-3xl" />
+            <div className="absolute top-8 right-16 w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-rose-600 shadow-[0_0_25px_rgba(244,63,94,0.5)]" />
+            <svg
+              className="absolute bottom-14 left-0 w-full h-36 opacity-50 text-rose-950 fill-current"
+              viewBox="0 0 1000 100"
+              preserveAspectRatio="none"
+            >
+              <polygon points="0,100 150,30 250,70 400,20 600,60 750,15 900,55 1000,100" />
+            </svg>
+          </div>
+        );
+
+      case 'legend_street':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-stone-950 to-indigo-950 overflow-hidden pointer-events-none">
+            <div className="absolute top-6 left-1/4 w-96 h-40 bg-purple-900/30 rounded-full blur-3xl" />
+            <div className="absolute bottom-16 left-0 right-0 h-32 flex justify-around opacity-40">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="w-16 bg-stone-900 border-t-2 border-purple-500/30"
+                  style={{ height: `${60 + (i % 5) * 25}px` }}
+                />
+              ))}
+            </div>
+          </div>
+        );
+
       case 'crazed_hell':
         return (
           <div className="absolute inset-0 bg-gradient-to-b from-purple-950 via-red-950 to-stone-950 overflow-hidden pointer-events-none">
@@ -183,6 +214,24 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
             {/* Dark Storm Clouds */}
             <div className="absolute top-2 left-10 w-96 h-20 bg-purple-900/40 rounded-full blur-xl" />
             <div className="absolute top-6 right-20 w-80 h-24 bg-red-900/40 rounded-full blur-xl" />
+          </div>
+        );
+
+      case 'japan_zombie':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-950 via-slate-950 to-emerald-950 overflow-hidden pointer-events-none">
+            {/* Blood / Toxic Moon */}
+            <div className="absolute top-6 right-20 w-24 h-24 rounded-full bg-gradient-to-br from-purple-400 to-purple-800 border-2 border-purple-300/40 shadow-[0_0_35px_rgba(168,85,247,0.6)] animate-pulse" />
+            {/* Zombie Eerie Fog */}
+            <div className="absolute bottom-8 left-0 right-0 h-36 bg-gradient-to-t from-purple-900/40 via-emerald-900/20 to-transparent blur-md" />
+            {/* Distant Spooky Trees & Tombs */}
+            <svg
+              className="absolute bottom-12 left-0 w-full h-32 opacity-40 text-purple-950 fill-current"
+              viewBox="0 0 1000 100"
+              preserveAspectRatio="none"
+            >
+              <polygon points="0,100 80,45 100,50 140,30 220,75 350,20 420,60 550,25 700,80 820,35 950,55 1000,100" />
+            </svg>
           </div>
         );
 
@@ -233,6 +282,8 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
         return 'bg-gradient-to-r from-stone-950 via-stone-900 to-stone-950 border-stone-700';
       case 'crazed_hell':
         return 'bg-gradient-to-r from-purple-950 via-stone-900 to-red-950 border-rose-800';
+      case 'japan_zombie':
+        return 'bg-gradient-to-r from-purple-950 via-emerald-950 to-stone-900 border-purple-800';
       default:
         // Classic Battle Cats Japanese Grassy/Dirt Battlefield Ground
         return 'bg-[#78350f] border-[#92400e]';
@@ -326,6 +377,9 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
               animTimer={cat.animTimer}
               scale={cat.scale}
               isAttackingWindup={cat.isWindupActive}
+              isFrozen={Boolean(cat.freezeTimer && cat.freezeTimer > 0)}
+              isSlowed={Boolean(cat.slowTimer && cat.slowTimer > 0)}
+              isWeakened={Boolean(cat.weakenTimer && cat.weakenTimer > 0)}
             />
           </div>
         ))}
@@ -340,7 +394,7 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
               transform: 'translateX(-50%)',
             }}
           >
-            {enemy.hp < enemy.maxHp && (
+            {enemy.hp < enemy.maxHp && enemy.state !== 'revive' && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-black/60 rounded-full overflow-hidden border border-black/40">
                 <div
                   className="h-full bg-rose-500"
@@ -355,6 +409,11 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
               animTimer={enemy.animTimer}
               scale={enemy.scale}
               isAttackingWindup={enemy.isWindupActive}
+              isFrozen={Boolean(enemy.freezeTimer && enemy.freezeTimer > 0)}
+              isSlowed={Boolean(enemy.slowTimer && enemy.slowTimer > 0)}
+              isWeakened={Boolean(enemy.weakenTimer && enemy.weakenTimer > 0)}
+              isBurrowing={enemy.state === 'burrow'}
+              isReviving={enemy.state === 'revive'}
             />
           </div>
         ))}
@@ -368,7 +427,7 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
           </div>
         )}
 
-        {/* Visual FX (Hits, souls, shockwaves, critical flashes) */}
+        {/* Visual FX (Hits, souls, shockwaves, critical flashes, debuffs, zombie effects) */}
         {visualEffects.map((fx) => {
           const progress = fx.lifetime / fx.maxLifetime;
           return (
@@ -413,7 +472,42 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
                 </div>
               )}
               {fx.type === 'freeze_fx' && (
-                <div className="w-20 h-20 bg-sky-400/40 rounded-full border-2 border-cyan-200 blur-xs animate-pulse" />
+                <div className="relative flex items-center justify-center">
+                  <div className="w-20 h-20 bg-sky-400/40 rounded-full border-2 border-cyan-200 blur-xs animate-pulse" />
+                  <span className="absolute font-black text-xs text-sky-200 drop-shadow">❄️ 停止!</span>
+                </div>
+              )}
+              {fx.type === 'slow_fx' && (
+                <div className="relative flex items-center justify-center">
+                  <div className="w-16 h-16 bg-amber-500/30 rounded-full border border-amber-300 blur-xs animate-pulse" />
+                  <span className="absolute font-black text-xs text-amber-200 drop-shadow">🐌 鈍足!</span>
+                </div>
+              )}
+              {fx.type === 'weaken_fx' && (
+                <div className="relative flex items-center justify-center">
+                  <div className="w-16 h-16 bg-purple-600/30 rounded-full border border-purple-400 blur-xs animate-pulse" />
+                  <span className="absolute font-black text-xs text-purple-200 drop-shadow">⬇️ 攻撃力低下!</span>
+                </div>
+              )}
+              {fx.type === 'zombie_burrow' && (
+                <div className="relative flex flex-col items-center justify-center">
+                  <div className="w-16 h-8 bg-purple-900/60 rounded-full blur-sm animate-ping" />
+                  <span className="text-[10px] font-black text-purple-300 drop-shadow">地中潜伏!</span>
+                </div>
+              )}
+              {fx.type === 'zombie_revive' && (
+                <div className="relative flex flex-col items-center justify-center">
+                  <div className="w-20 h-20 bg-purple-600/40 rounded-full border border-purple-400 blur-sm animate-ping" />
+                  <span className="text-xs font-black text-purple-200 drop-shadow">☠️ 蘇生中...</span>
+                </div>
+              )}
+              {fx.type === 'zombie_killer_fx' && (
+                <div className="relative flex flex-col items-center justify-center">
+                  <div className="w-28 h-28 bg-yellow-400/50 rounded-full border-2 border-yellow-200 blur-sm animate-ping" />
+                  <span className="font-black text-xs text-yellow-300 uppercase tracking-widest drop-shadow-[0_0_10px_rgba(250,204,21,1)]">
+                    ✨ ゾンビキラー成仏!
+                  </span>
+                </div>
               )}
               {fx.type === 'cat_soul' && (
                 <div className="relative flex flex-col items-center animate-bounce">

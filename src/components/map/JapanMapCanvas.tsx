@@ -289,10 +289,14 @@ export const JapanMapCanvas: React.FC<JapanMapCanvasProps> = ({
                 <div className="absolute -inset-2 rounded-full border-2 border-amber-300 shadow-[0_0_15px_rgba(250,204,21,0.9)] pointer-events-none" />
               )}
 
-              {/* 3D Red Marker Circle */}
+              {/* 3D Marker Circle (Zombie-themed if zombie stage) */}
               <div
                 className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-white shadow-lg flex items-center justify-center transition-transform group-hover:scale-110 active:scale-95 ${
-                  isUnlocked
+                  st.isZombieStage
+                    ? isUnlocked
+                      ? 'bg-gradient-to-br from-purple-500 via-purple-700 to-emerald-900 shadow-purple-950/80 ring-2 ring-purple-400'
+                      : 'bg-stone-800 border-stone-600 opacity-60'
+                    : isUnlocked
                     ? 'bg-gradient-to-br from-red-400 via-red-600 to-rose-900 shadow-rose-950/60 ring-2 ring-black/30'
                     : 'bg-stone-600 border-stone-400 opacity-60'
                 }`}
@@ -300,6 +304,8 @@ export const JapanMapCanvas: React.FC<JapanMapCanvasProps> = ({
                 {/* Inner Icon or Number */}
                 {isCleared ? (
                   <span className="text-[11px] font-black text-yellow-300 drop-shadow">★</span>
+                ) : st.isZombieStage ? (
+                  <span className="text-[11px] font-black text-purple-200">🧟</span>
                 ) : isUnlocked ? (
                   <div className="w-2.5 h-2.5 rounded-full bg-white/90 shadow-inner" />
                 ) : (
@@ -311,7 +317,11 @@ export const JapanMapCanvas: React.FC<JapanMapCanvasProps> = ({
               <div
                 className={`mt-1 text-[11px] sm:text-xs font-black px-2 py-0.5 rounded-md whitespace-nowrap shadow-md border text-center transition-all ${
                   isSelected
-                    ? 'bg-stone-900 text-amber-300 border-amber-400 scale-105 shadow-amber-500/30'
+                    ? st.isZombieStage
+                      ? 'bg-purple-950 text-purple-200 border-purple-400 scale-105 shadow-purple-500/30'
+                      : 'bg-stone-900 text-amber-300 border-amber-400 scale-105 shadow-amber-500/30'
+                    : st.isZombieStage
+                    ? 'bg-purple-950/80 text-purple-300 border-purple-800 group-hover:bg-purple-900'
                     : 'bg-stone-900/80 text-stone-200 border-stone-700/80 group-hover:bg-stone-800'
                 }`}
               >

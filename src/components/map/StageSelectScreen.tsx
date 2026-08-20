@@ -49,10 +49,14 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<'japan' | 'future' | 'cosmos' | 'legend' | 'crazed'>('japan');
   const [selectedChapterId, setSelectedChapterId] = useState<string>('japan_1');
+  const [isZombieMode, setIsZombieMode] = useState<boolean>(false);
 
   // Filter chapters by selected category
   const categoryChapters = CHAPTERS.filter((c) => c.category === selectedCategory);
   const currentChapter = CHAPTERS.find((c) => c.id === selectedChapterId) || categoryChapters[0] || CHAPTERS[0];
+
+  const hasZombieStages = !!(selectedCategory === 'japan' && currentChapter.zombieStages && currentChapter.zombieStages.length > 0);
+  const activeStages = (isZombieMode && hasZombieStages && currentChapter.zombieStages) ? currentChapter.zombieStages : currentChapter.stages;
 
   const isInfiniteEnergy = !!profile.devMode?.infiniteEnergy;
   const isInfiniteXp = !!profile.devMode?.infiniteXp;
@@ -60,7 +64,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
 
   // Stage selection state
   const [selectedStageId, setSelectedStageId] = useState<string>(
-    currentChapter.stages[0]?.id || 'japan_1_1'
+    activeStages[0]?.id || 'japan_1_1'
   );
 
   // Active Battle Items toggles
@@ -75,14 +79,14 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
 
   const mapScrollRef = useRef<HTMLDivElement>(null);
 
-  // Sync selected stage when chapter changes
+  // Sync selected stage when chapter or mode changes
   useEffect(() => {
-    setSelectedStageId(currentChapter.stages[0]?.id || 'japan_1_1');
-  }, [selectedChapterId]);
+    setSelectedStageId(activeStages[0]?.id || 'japan_1_1');
+  }, [selectedChapterId, isZombieMode, selectedCategory]);
 
   // Current selected stage index
-  const currentIndex = currentChapter.stages.findIndex((s) => s.id === selectedStageId);
-  const currentStage = currentChapter.stages[currentIndex] || currentChapter.stages[0];
+  const currentIndex = activeStages.findIndex((s) => s.id === selectedStageId);
+  const currentStage = activeStages[currentIndex] || activeStages[0] || currentChapter.stages[0];
 
   // Helper for chapter unlocked check
   const checkChapterUnlocked = (chId: string): boolean => {
@@ -151,14 +155,14 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
   const handlePrevStage = () => {
     if (currentIndex > 0) {
       audio.playClick();
-      setSelectedStageId(currentChapter.stages[currentIndex - 1].id);
+      setSelectedStageId(activeStages[currentIndex - 1].id);
     }
   };
 
   const handleNextStage = () => {
-    if (currentIndex < currentChapter.stages.length - 1) {
+    if (currentIndex < activeStages.length - 1) {
       audio.playClick();
-      setSelectedStageId(currentChapter.stages[currentIndex + 1].id);
+      setSelectedStageId(activeStages[currentIndex + 1].id);
     }
   };
 
@@ -273,6 +277,26 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                 );
               })}
             </div>
+
+            {/* Zombie Outbreak Mode Toggle Button (Japan chapters) */}
+            {hasZombieStages && (
+              <button
+                id="btn-toggle-zombie-mode"
+                onClick={() => {
+                  audio.playClick();
+                  setIsZombieMode((prev) => !prev);
+                }}
+                className={`px-2 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-black transition-all flex items-center gap-1 shadow whitespace-nowrap border shrink-0 active:scale-95 ${
+                  isZombieMode
+                    ? 'bg-gradient-to-r from-purple-800 via-indigo-900 to-emerald-900 text-purple-200 border-purple-400 ring-2 ring-purple-400 shadow-purple-500/50 animate-pulse'
+                    : 'bg-stone-900 text-purple-300 border-purple-700/60 hover:bg-stone-800 hover:text-purple-200'
+                }`}
+                title="ゾンビ襲来ステージモード切替"
+              >
+                <span>🧟</span>
+                <span>{isZombieMode ? 'ゾンビ襲来中！' : 'ゾンビ襲来'}</span>
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
@@ -373,7 +397,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
         {/* The Japan / World / Space Map Canvas */}
         <JapanMapCanvas
           chapter={currentChapter}
-          stages={currentChapter.stages}
+          stages={activeStages}
           selectedStageId={selectedStageId}
           clearedStages={profile.clearedStages}
           onSelectStage={(st) => {
@@ -394,14 +418,14 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
               >
                 <div className="flex items-center justify-between text-[11px] font-black">
                   <span className="text-red-600">
-                    {profile.clearedStages[currentChapter.stages[currentIndex - 1].id] ? 'CLEAR!' : ''}
+                    {profile.clearedStages[activeStages[currentIndex - 1].id] ? 'CLEAR!' : ''}
                   </span>
                 </div>
                 <div className="text-sm font-black truncate">
-                  {currentChapter.stages[currentIndex - 1].name}
+                  {activeStages[currentIndex - 1].name}
                 </div>
                 <div className="text-[10px] font-bold text-stone-600">
-                  統率力 -{currentChapter.stages[currentIndex - 1].energyCost}
+                  統率力 -{activeStages[currentIndex - 1].energyCost}
                 </div>
               </div>
             )}
@@ -483,10 +507,10 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
             {/* Next Button */}
             <button
               id="btn-next-stage"
-              disabled={currentIndex >= currentChapter.stages.length - 1}
+              disabled={currentIndex >= activeStages.length - 1}
               onClick={handleNextStage}
               className={`pointer-events-auto p-1.5 sm:p-2 rounded-full border-2 border-black shadow-lg transition-transform active:scale-90 ${
-                currentIndex < currentChapter.stages.length - 1
+                currentIndex < activeStages.length - 1
                   ? 'bg-blue-600 hover:bg-blue-500 text-white'
                   : 'bg-stone-700 text-stone-500 opacity-40 cursor-not-allowed'
               }`}
@@ -495,21 +519,21 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
             </button>
 
             {/* Next Stage Preview Banner */}
-            {currentIndex < currentChapter.stages.length - 1 && (
+            {currentIndex < activeStages.length - 1 && (
               <div
                 onClick={handleNextStage}
                 className="hidden md:flex pointer-events-auto cursor-pointer flex-col bg-white/95 border-4 border-black text-black px-4 py-1.5 rounded-lg shadow-lg opacity-75 hover:opacity-100 transition-transform active:scale-95 min-w-[140px]"
               >
                 <div className="flex items-center justify-between text-[11px] font-black">
                   <span className="text-red-600">
-                    {profile.clearedStages[currentChapter.stages[currentIndex + 1].id] ? 'CLEAR!' : ''}
+                    {profile.clearedStages[activeStages[currentIndex + 1].id] ? 'CLEAR!' : ''}
                   </span>
                 </div>
                 <div className="text-sm font-black truncate">
-                  {currentChapter.stages[currentIndex + 1].name}
+                  {activeStages[currentIndex + 1].name}
                 </div>
                 <div className="text-[10px] font-bold text-stone-600">
-                  統率力 -{currentChapter.stages[currentIndex + 1].energyCost}
+                  統率力 -{activeStages[currentIndex + 1].energyCost}
                 </div>
               </div>
             )}

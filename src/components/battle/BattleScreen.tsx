@@ -369,6 +369,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       spriteType: form.spriteType,
       scale: form.scale || 1.0,
       formIndex: slot.activeFormIndex,
+      abilities: form.abilities,
       state: 'walk',
       animTimer: 0,
       knockbackVelocityX: 0,
@@ -413,6 +414,9 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       formIndex: 0,
       isBoss: isBossEntity,
       waveLevel: def.waveLevel,
+      abilities: def.abilities,
+      burrowRemaining: def.abilities?.burrow?.count,
+      reviveCountRemaining: def.abilities?.revive?.count,
       state: 'walk',
       animTimer: 0,
       knockbackVelocityX: 0,
@@ -514,6 +518,17 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       const cat = catsRef.current[i];
       cat.animTimer += dt;
 
+      // Status timers
+      if (cat.freezeTimer && cat.freezeTimer > 0) {
+        cat.freezeTimer -= dt;
+      }
+      if (cat.slowTimer && cat.slowTimer > 0) {
+        cat.slowTimer -= dt;
+      }
+      if (cat.weakenTimer && cat.weakenTimer > 0) {
+        cat.weakenTimer -= dt;
+      }
+
       // Knockback pushes cat leftwards towards player base
       if (cat.state === 'knockback') {
         cat.knockbackTimer -= dt;
@@ -524,12 +539,20 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         continue;
       }
 
+      // Frozen units cannot walk or attack
+      if (cat.freezeTimer && cat.freezeTimer > 0) {
+        cat.isWindupActive = false;
+        continue;
+      }
+
       if (cat.attackTimer > 0) {
         cat.attackTimer -= dt;
       }
 
-      // Enemies in front of cat are to the right (e.x >= cat.x - 15)
-      const enemiesInFront = enemiesRef.current.filter((e) => e.hp > 0 && e.x >= cat.x - 15);
+      // Enemies in front of cat are to the right (targetable if not burrowing and not reviving)
+      const enemiesInFront = enemiesRef.current.filter(
+        (e) => e.hp > 0 && e.state !== 'burrow' && e.state !== 'revive' && e.x >= cat.x - 15
+      );
       const closestEnemyX = enemiesInFront.length > 0 ? Math.min(...enemiesInFront.map((e) => e.x)) : enemyCastleX;
       const targetDistance = Math.max(0, closestEnemyX - cat.x);
 
@@ -557,7 +580,8 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       } else {
         cat.state = 'walk';
         cat.isWindupActive = false;
-        const nextX = cat.x + cat.speed * dt;
+        const currentSpeed = (cat.slowTimer && cat.slowTimer > 0) ? cat.speed * 0.25 : cat.speed;
+        const nextX = cat.x + currentSpeed * dt;
         cat.x = Math.min(closestEnemyX - 5, Math.min(enemyCastleX, nextX));
       }
     }
@@ -566,6 +590,32 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     for (let i = 0; i < enemiesRef.current.length; i++) {
       const enemy = enemiesRef.current[i];
       enemy.animTimer += dt;
+
+      // Status timers
+      if (enemy.freezeTimer && enemy.freezeTimer > 0) {
+        enemy.freezeTimer -= dt;
+      }
+      if (enemy.slowTimer && enemy.slowTimer > 0) {
+        enemy.slowTimer -= dt;
+      }
+      if (enemy.weakenTimer && enemy.weakenTimer > 0) {
+        enemy.weakenTimer -= dt;
+      }
+
+      // Handle Zombie Reviving Corpse State
+      if (enemy.state === 'revive') {
+        if (enemy.reviveTimer !== undefined) {
+          enemy.reviveTimer -= dt;
+          if (enemy.reviveTimer <= 0) {
+            enemy.hp = Math.round(enemy.maxHp * ((enemy.reviveHpPercent || 100) / 100));
+            enemy.state = 'walk';
+            enemy.isReviving = false;
+            spawnFx(enemy.x, 25, 'aoe_burst');
+            audio.playBossAppear();
+          }
+        }
+        continue;
+      }
 
       // Knockback pushes enemy rightwards towards enemy castle
       if (enemy.state === 'knockback') {
@@ -577,6 +627,27 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         continue;
       }
 
+      // Handle Zombie Burrow State
+      if (enemy.state === 'burrow') {
+        const undergroundSpeed = enemy.speed * 2.2;
+        enemy.x = Math.max(playerCastleX + 60, enemy.x - undergroundSpeed * dt);
+        if (enemy.burrowDistanceLeft !== undefined) {
+          enemy.burrowDistanceLeft -= undergroundSpeed * dt;
+          if (enemy.burrowDistanceLeft <= 0 || enemy.x <= playerCastleX + 70) {
+            enemy.state = 'walk';
+            enemy.isBurrowing = false;
+            spawnFx(enemy.x, 20, 'zombie_burrow');
+          }
+        }
+        continue;
+      }
+
+      // Frozen units cannot walk or attack
+      if (enemy.freezeTimer && enemy.freezeTimer > 0) {
+        enemy.isWindupActive = false;
+        continue;
+      }
+
       if (enemy.attackTimer > 0) {
         enemy.attackTimer -= dt;
       }
@@ -585,6 +656,22 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       const catsInFront = catsRef.current.filter((c) => c.hp > 0 && c.x <= enemy.x + 15);
       const closestCatX = catsInFront.length > 0 ? Math.max(...catsInFront.map((c) => c.x)) : playerCastleX;
       const targetDistance = Math.max(0, enemy.x - closestCatX);
+
+      // Check Zombie Burrow Trigger
+      if (
+        enemy.abilities?.burrow &&
+        (enemy.burrowRemaining ?? enemy.abilities.burrow.count) > 0 &&
+        enemy.state === 'walk' &&
+        targetDistance <= 120 &&
+        enemy.x > playerCastleX + 160
+      ) {
+        enemy.burrowRemaining = (enemy.burrowRemaining ?? enemy.abilities.burrow.count) - 1;
+        enemy.isBurrowing = true;
+        enemy.state = 'burrow';
+        enemy.burrowDistanceLeft = enemy.abilities.burrow.distance;
+        spawnFx(enemy.x, 20, 'zombie_burrow');
+        continue;
+      }
 
       // Clamp so enemy never passes cat frontline
       if (enemy.x < closestCatX + 5) {
@@ -610,7 +697,8 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       } else {
         enemy.state = 'walk';
         enemy.isWindupActive = false;
-        const nextX = enemy.x - enemy.speed * dt;
+        const currentSpeed = (enemy.slowTimer && enemy.slowTimer > 0) ? enemy.speed * 0.25 : enemy.speed;
+        const nextX = enemy.x - currentSpeed * dt;
         enemy.x = Math.max(closestCatX + 5, Math.max(playerCastleX, nextX));
       }
     }
@@ -623,13 +711,25 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     });
 
     enemiesRef.current.forEach((e) => {
-      if (e.hp <= 0) {
-        spawnFx(e.x, 25, 'aoe_burst');
+      if (e.hp <= 0 && e.state !== 'revive') {
+        if (e.isPermadead) {
+          spawnFx(e.x, 35, 'zombie_killer_fx');
+        } else if (e.abilities?.revive && (e.reviveCountRemaining ?? e.abilities.revive.count) > 0) {
+          // Transition into revive corpse state
+          e.isReviving = true;
+          e.state = 'revive';
+          e.reviveCountRemaining = (e.reviveCountRemaining ?? e.abilities.revive.count) - 1;
+          e.reviveTimer = e.abilities.revive.delaySeconds || 3.0;
+          e.reviveHpPercent = e.abilities.revive.hpPercent || 100;
+          spawnFx(e.x, 20, 'zombie_revive');
+        } else {
+          spawnFx(e.x, 25, 'aoe_burst');
+        }
       }
     });
 
     catsRef.current = catsRef.current.filter((c) => c.hp > 0);
-    enemiesRef.current = enemiesRef.current.filter((e) => e.hp > 0);
+    enemiesRef.current = enemiesRef.current.filter((e) => e.hp > 0 || e.state === 'revive');
   };
 
   // Cat Attacks: Single-target vs Area Attack (Attacking Rightwards)
@@ -641,10 +741,76 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     }
     const isCrit = Math.random() < critChance;
 
-    // Enemies within reach to the right of cat
+    // Damage multiplier if cat is weakened
+    const weakenMult = (cat.weakenTimer && cat.weakenTimer > 0) ? (cat.weakenMultiplier || 0.5) : 1.0;
+    const baseAtkDmg = cat.attackPower * weakenMult;
+
+    // Enemies within reach to the right of cat (excluding burrowing and dead/reviving)
     const enemiesInReach = enemiesRef.current.filter(
-      (e) => e.hp > 0 && e.x >= cat.x - 25 && e.x <= cat.x + cat.attackRange + 30
+      (e) => e.hp > 0 && e.state !== 'burrow' && e.state !== 'revive' && e.x >= cat.x - 25 && e.x <= cat.x + cat.attackRange + 30
     );
+
+    const applyAbilitiesToEnemy = (e: ActiveEntity, dmgGiven: number, willDie: boolean) => {
+      const eTraits = e.traits || [];
+
+      // Zombie Killer
+      if (cat.abilities?.zombieKiller && eTraits.includes('zombie') && willDie) {
+        e.isPermadead = true;
+      }
+
+      // Freeze ability
+      if (cat.abilities?.freeze) {
+        const { chance, duration, traits } = cat.abilities.freeze;
+        const matchesTrait = !traits || traits.length === 0 || traits.some((t) => eTraits.includes(t));
+        if (matchesTrait && Math.random() < chance) {
+          e.freezeTimer = duration;
+          spawnFx(e.x, 35, 'freeze_fx');
+        }
+      }
+
+      // Slow ability
+      if (cat.abilities?.slow) {
+        const { chance, duration, traits } = cat.abilities.slow;
+        const matchesTrait = !traits || traits.length === 0 || traits.some((t) => eTraits.includes(t));
+        if (matchesTrait && Math.random() < chance) {
+          e.slowTimer = duration;
+          spawnFx(e.x, 35, 'slow_fx');
+        }
+      }
+
+      // Weaken ability
+      if (cat.abilities?.weaken) {
+        const { chance, duration, mult, traits } = cat.abilities.weaken;
+        const matchesTrait = !traits || traits.length === 0 || traits.some((t) => eTraits.includes(t));
+        if (matchesTrait && Math.random() < chance) {
+          e.weakenTimer = duration;
+          e.weakenMultiplier = mult;
+          spawnFx(e.x, 35, 'weaken_fx');
+        }
+      }
+
+      // Knockback ability
+      if (cat.abilities?.knockback) {
+        const { chance, traits } = cat.abilities.knockback;
+        const matchesTrait = !traits || traits.length === 0 || traits.some((t) => eTraits.includes(t));
+        if (matchesTrait && Math.random() < chance) {
+          audio.playKnockback();
+          e.state = 'knockback';
+          e.knockbackVelocityX = 220;
+          e.knockbackTimer = 0.5;
+          e.x = Math.min(enemyCastleX, e.x + 80);
+          e.isWindupActive = false;
+        }
+      }
+
+      // Special Surfer freeze fallback
+      if (cat.defId === 'cat_surfer' && eTraits.includes('alien')) {
+        if (Math.random() < 0.6) {
+          e.freezeTimer = 2.5;
+          spawnFx(e.x, 35, 'freeze_fx');
+        }
+      }
+    };
 
     if (enemiesInReach.length > 0) {
       if (isArea) {
@@ -653,10 +819,21 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
         enemiesInReach.forEach((e) => {
           const isMetal = e.traits?.includes('metal');
-          let actualDmg = Math.round(cat.attackPower * (isCrit ? 2.0 : 1.0));
+          let dmgScale = isCrit ? 2.0 : 1.0;
+
+          // Massive Damage ability
+          if (cat.abilities?.massiveDamage) {
+            const { mult, traits } = cat.abilities.massiveDamage;
+            const matchesTrait = !traits || traits.length === 0 || traits.some((t) => e.traits?.includes(t));
+            if (matchesTrait) {
+              dmgScale *= mult;
+            }
+          }
+
+          let actualDmg = Math.round(baseAtkDmg * dmgScale);
           if (isMetal) {
             if (isCrit) {
-              actualDmg = Math.round(cat.attackPower * 2.0);
+              actualDmg = Math.round(baseAtkDmg * 2.0);
               spawnFx(e.x, 25, 'crit_flash');
             } else {
               actualDmg = 1;
@@ -664,14 +841,11 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
             }
           }
 
-          if (cat.defId === 'cat_surfer' && e.traits?.includes('alien')) {
-            if (Math.random() < 0.6) {
-              e.attackTimer = 2.5;
-              spawnFx(e.x, 35, 'freeze_fx');
-            }
-          }
-
           const nextHp = Math.max(0, e.hp - actualDmg);
+          const willDie = nextHp <= 0;
+
+          applyAbilitiesToEnemy(e, actualDmg, willDie);
+
           e.hp = nextHp;
           spawnDamageNum(e.x, 25, actualDmg, isCrit, true);
 
@@ -680,14 +854,14 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           const currentKBs = Math.floor((e.maxHp - nextHp) / kbThreshold);
           const shouldKb = currentKBs > (e.knockbackCount || 0);
 
-          if (nextHp <= 0) {
+          if (willDie) {
             const def = ENEMY_DEFINITIONS[e.defId];
             if (def) {
               moneyRef.current = Math.min(maxMoney, moneyRef.current + def.rewardMoney);
             }
           }
 
-          if (shouldKb) {
+          if (shouldKb && e.state !== 'knockback') {
             audio.playKnockback();
             e.knockbackCount = currentKBs;
             e.state = 'knockback';
@@ -703,10 +877,20 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         const target = [...enemiesInReach].sort((a, b) => a.x - b.x)[0];
 
         const isMetal = target.traits?.includes('metal');
-        let actualDmg = Math.round(cat.attackPower * (isCrit ? 2.0 : 1.0));
+        let dmgScale = isCrit ? 2.0 : 1.0;
+
+        if (cat.abilities?.massiveDamage) {
+          const { mult, traits } = cat.abilities.massiveDamage;
+          const matchesTrait = !traits || traits.length === 0 || traits.some((t) => target.traits?.includes(t));
+          if (matchesTrait) {
+            dmgScale *= mult;
+          }
+        }
+
+        let actualDmg = Math.round(baseAtkDmg * dmgScale);
         if (isMetal) {
           if (isCrit) {
-            actualDmg = Math.round(cat.attackPower * 2.0);
+            actualDmg = Math.round(baseAtkDmg * 2.0);
             spawnFx(target.x, 25, 'crit_flash');
           } else {
             actualDmg = 1;
@@ -716,16 +900,12 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           spawnFx(target.x, 20, isCrit ? 'crit_flash' : 'hit');
         }
 
-        if (cat.defId === 'cat_surfer' && target.traits?.includes('alien')) {
-          if (Math.random() < 0.6) {
-            target.attackTimer = 2.5;
-            spawnFx(target.x, 35, 'freeze_fx');
-          }
-        }
+        const nextHp = Math.max(0, target.hp - actualDmg);
+        const willDie = nextHp <= 0;
+
+        applyAbilitiesToEnemy(target, actualDmg, willDie);
 
         spawnDamageNum(target.x, 25, actualDmg, isCrit, true);
-
-        const nextHp = Math.max(0, target.hp - actualDmg);
         target.hp = nextHp;
 
         const maxKbs = Math.max(1, target.maxKnockbacks || 1);
@@ -733,14 +913,14 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         const currentKBs = Math.floor((target.maxHp - nextHp) / kbThreshold);
         const shouldKb = currentKBs > (target.knockbackCount || 0);
 
-        if (nextHp <= 0) {
+        if (willDie) {
           const def = ENEMY_DEFINITIONS[target.defId];
           if (def) {
             moneyRef.current = Math.min(maxMoney, moneyRef.current + def.rewardMoney);
           }
         }
 
-        if (shouldKb) {
+        if (shouldKb && target.state !== 'knockback') {
           audio.playKnockback();
           target.knockbackCount = currentKBs;
           target.state = 'knockback';
@@ -755,7 +935,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       if (enemyCastleX - cat.x <= cat.attackRange + 30) {
         audio.playHit(false, false);
         spawnFx(enemyCastleX, 40, isArea ? 'aoe_burst' : 'hit');
-        const dmg = Math.round(cat.attackPower * (isCrit ? 2.0 : 1.0));
+        const dmg = Math.round(baseAtkDmg * (isCrit ? 2.0 : 1.0));
         spawnDamageNum(enemyCastleX, 40, dmg, isCrit, true);
         enemyCastleHpRef.current = Math.max(0, enemyCastleHpRef.current - dmg);
         if (enemyCastleHpRef.current <= 0 && !battleResult.ended) {
@@ -768,12 +948,37 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   // Enemy Attacks: Single-target vs Area Attack (Attacking Leftwards)
   const executeEnemyAttack = (enemy: ActiveEntity) => {
     const isArea = enemy.attackType === 'area';
-    const dmg = enemy.attackPower;
+    const weakenMult = (enemy.weakenTimer && enemy.weakenTimer > 0) ? (enemy.weakenMultiplier || 0.5) : 1.0;
+    const dmg = Math.round(enemy.attackPower * weakenMult);
 
     // Cats within reach to the left of enemy
     const catsInReach = catsRef.current.filter(
       (c) => c.hp > 0 && c.x <= enemy.x + 25 && c.x >= enemy.x - enemy.attackRange - 30
     );
+
+    const applyEnemyAbilitiesToCat = (c: ActiveEntity) => {
+      if (enemy.abilities?.freeze && Math.random() < enemy.abilities.freeze.chance) {
+        c.freezeTimer = enemy.abilities.freeze.duration;
+        spawnFx(c.x, 30, 'freeze_fx');
+      }
+      if (enemy.abilities?.slow && Math.random() < enemy.abilities.slow.chance) {
+        c.slowTimer = enemy.abilities.slow.duration;
+        spawnFx(c.x, 30, 'slow_fx');
+      }
+      if (enemy.abilities?.weaken && Math.random() < enemy.abilities.weaken.chance) {
+        c.weakenTimer = enemy.abilities.weaken.duration;
+        c.weakenMultiplier = enemy.abilities.weaken.mult;
+        spawnFx(c.x, 30, 'weaken_fx');
+      }
+      if (enemy.abilities?.knockback && Math.random() < enemy.abilities.knockback.chance) {
+        audio.playKnockback();
+        c.state = 'knockback';
+        c.knockbackVelocityX = 200;
+        c.knockbackTimer = 0.45;
+        c.x = Math.max(playerCastleX, c.x - 70);
+        c.isWindupActive = false;
+      }
+    };
 
     if (catsInReach.length > 0) {
       if (isArea) {
@@ -781,6 +986,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         spawnFx(enemy.x - enemy.attackRange * 0.5, 20, 'aoe_burst');
 
         catsInReach.forEach((c) => {
+          applyEnemyAbilitiesToCat(c);
           const nextHp = Math.max(0, c.hp - dmg);
           c.hp = nextHp;
           spawnDamageNum(c.x, 25, dmg, false, false);
@@ -790,7 +996,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           const currentKBs = Math.floor((c.maxHp - nextHp) / kbThreshold);
           const shouldKb = currentKBs > (c.knockbackCount || 0);
 
-          if (shouldKb) {
+          if (shouldKb && c.state !== 'knockback') {
             audio.playKnockback();
             c.knockbackCount = currentKBs;
             c.state = 'knockback';
@@ -805,6 +1011,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         // Frontmost cat is closest to enemy (largest x)
         const target = [...catsInReach].sort((a, b) => b.x - a.x)[0];
         spawnFx(target.x, 20, 'hit');
+        applyEnemyAbilitiesToCat(target);
         spawnDamageNum(target.x, 25, dmg, false, false);
 
         const nextHp = Math.max(0, target.hp - dmg);
@@ -815,7 +1022,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         const currentKBs = Math.floor((target.maxHp - nextHp) / kbThreshold);
         const shouldKb = currentKBs > (target.knockbackCount || 0);
 
-        if (shouldKb) {
+        if (shouldKb && target.state !== 'knockback') {
           audio.playKnockback();
           target.knockbackCount = currentKBs;
           target.state = 'knockback';
@@ -845,6 +1052,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         );
 
         waveHitCats.forEach((c) => {
+          applyEnemyAbilitiesToCat(c);
           const waveDmg = Math.round(dmg * 0.9);
           const nextHp = Math.max(0, c.hp - waveDmg);
           c.hp = nextHp;
@@ -853,7 +1061,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           const maxKbs = Math.max(1, c.maxKnockbacks || 1);
           const kbThreshold = c.maxHp / maxKbs;
           const currentKBs = Math.floor((c.maxHp - nextHp) / kbThreshold);
-          if (currentKBs > (c.knockbackCount || 0)) {
+          if (currentKBs > (c.knockbackCount || 0) && c.state !== 'knockback') {
             audio.playKnockback();
             c.knockbackCount = currentKBs;
             c.state = 'knockback';

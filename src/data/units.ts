@@ -1117,6 +1117,506 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         waveLevel: 3,
       }
     ]
+  },
+
+  // =========================================================================
+  // DEBUFF & ZOMBIE KILLER CATS (妨害・ゾンビキラー・状態異常 特殊能力キャラクター)
+  // =========================================================================
+  {
+    id: 'cat_pirate',
+    rarity: 'rare',
+    unlockedAtStart: false,
+    unlockCostXp: 35000,
+    unlockMethod: 'xp',
+    forms: [
+      {
+        name: 'ネコ海賊',
+        jpName: 'ネコ海賊',
+        description: '【赤い敵をふっとばす】海賊帽を被った荒くれネコ。赤い敵を50%の確率で力強くふっとばし前線を押し返す！',
+        hp: 1100,
+        attackPower: 260,
+        attackRange: 160,
+        attackSpeed: 1.1,
+        attackWindup: 0.2,
+        speed: 36,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 510,
+        cooldown: 5.5,
+        scale: 1.05,
+        spriteType: 'cat_pirate',
+        abilities: {
+          knockback: { chance: 0.5, traits: ['red'] }
+        }
+      },
+      {
+        name: 'ニャック・スパロウ',
+        jpName: 'ニャック・スパロウ',
+        description: '【赤い敵をふっとばす / 強化】大海原を制覇した伝説の海賊船長。赤い敵を65%の高確率で遠くまでふっとばす！',
+        hp: 1950,
+        attackPower: 480,
+        attackRange: 175,
+        attackSpeed: 1.15,
+        attackWindup: 0.18,
+        speed: 38,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 510,
+        cooldown: 5.2,
+        scale: 1.1,
+        spriteType: 'cat_pirate_evolved',
+        abilities: {
+          knockback: { chance: 0.65, traits: ['red'] }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_witch',
+    rarity: 'rare',
+    unlockedAtStart: false,
+    unlockCostXp: 38000,
+    unlockMethod: 'xp',
+    forms: [
+      {
+        name: 'ネコ魔女',
+        jpName: 'ネコ魔女',
+        description: '【赤い敵の動きを遅くする】ほうきに乗って飛行する魔法使い。赤い敵の動きを50%の確率で3秒間遅くする呪いをかける！',
+        hp: 950,
+        attackPower: 240,
+        attackRange: 210,
+        attackSpeed: 0.95,
+        attackWindup: 0.25,
+        speed: 32,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 570,
+        cooldown: 6.0,
+        scale: 1.05,
+        spriteType: 'cat_witch',
+        abilities: {
+          slow: { chance: 0.5, duration: 3.0, traits: ['red'] }
+        }
+      },
+      {
+        name: 'ネコソーサリス',
+        jpName: 'ネコソーサリス',
+        description: '【赤い敵の動きを遅くする / 強化】上級魔法を会得した大魔道士。赤い敵の動きを65%の確率で4秒間鈍足状態に封じる！',
+        hp: 1700,
+        attackPower: 420,
+        attackRange: 230,
+        attackSpeed: 1.0,
+        attackWindup: 0.22,
+        speed: 34,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 570,
+        cooldown: 5.8,
+        scale: 1.1,
+        spriteType: 'cat_witch_evolved',
+        abilities: {
+          slow: { chance: 0.65, duration: 4.0, traits: ['red'] }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_shaman',
+    rarity: 'rare',
+    unlockedAtStart: false,
+    unlockCostXp: 40000,
+    unlockMethod: 'xp',
+    forms: [
+      {
+        name: 'ネコ占い師',
+        jpName: 'ネコ占い師',
+        description: '【浮いてる敵をふっとばす】怪しい水晶玉を抱えた占いネコ。浮いてる敵を50%の確率で豪快にふっとばす！',
+        hp: 1050,
+        attackPower: 280,
+        attackRange: 170,
+        attackSpeed: 1.05,
+        attackWindup: 0.2,
+        speed: 35,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 540,
+        cooldown: 5.8,
+        scale: 1.05,
+        spriteType: 'cat_shaman',
+        abilities: {
+          knockback: { chance: 0.5, traits: ['floating'] }
+        }
+      },
+      {
+        name: 'ネコふんど師',
+        jpName: 'ネコふんど師',
+        description: '【浮いてる敵をふっとばす / 強化】神聖なふんどしで魂を揺さぶる導師。浮いてる敵を65%の確率でふっとばす！',
+        hp: 1850,
+        attackPower: 520,
+        attackRange: 185,
+        attackSpeed: 1.1,
+        attackWindup: 0.18,
+        speed: 38,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 540,
+        cooldown: 5.5,
+        scale: 1.1,
+        spriteType: 'cat_shaman_evolved',
+        abilities: {
+          knockback: { chance: 0.65, traits: ['floating'] }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_monk',
+    rarity: 'rare',
+    unlockedAtStart: false,
+    unlockCostXp: 42000,
+    unlockMethod: 'xp',
+    forms: [
+      {
+        name: 'ネコ僧侶',
+        jpName: 'ネコ僧侶',
+        description: '【浮いてる敵の動きを遅くする】数珠を握りしめた高潔な修行僧。浮いてる敵の動きを50%の確率で3秒間遅くする！',
+        hp: 1150,
+        attackPower: 250,
+        attackRange: 190,
+        attackSpeed: 1.0,
+        attackWindup: 0.22,
+        speed: 34,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 495,
+        cooldown: 5.0,
+        scale: 1.05,
+        spriteType: 'cat_monk',
+        abilities: {
+          slow: { chance: 0.5, duration: 3.0, traits: ['floating'] }
+        }
+      },
+      {
+        name: 'ネコ法師',
+        jpName: 'ネコ法師',
+        description: '【浮いてる敵の動きを遅くする / 範囲攻撃化】悟りを開いた名僧。範囲攻撃で複数の浮いてる敵をまとめて65%の確率で鈍足化！',
+        hp: 2050,
+        attackPower: 460,
+        attackRange: 210,
+        attackSpeed: 1.05,
+        attackWindup: 0.2,
+        speed: 36,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 495,
+        cooldown: 4.8,
+        scale: 1.1,
+        spriteType: 'cat_monk_evolved',
+        abilities: {
+          slow: { chance: 0.65, duration: 3.8, traits: ['floating'] }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_onmyoji',
+    rarity: 'rare',
+    unlockedAtStart: false,
+    unlockCostXp: 45000,
+    unlockMethod: 'xp',
+    forms: [
+      {
+        name: 'ネコ陰陽師',
+        jpName: 'ネコ陰陽師',
+        description: '【敵の攻撃力を低下させる】式神を操る平安の術士。攻撃した敵の攻撃力を50%の確率で4秒間半減（50%低下）させる！',
+        hp: 1200,
+        attackPower: 220,
+        attackRange: 260,
+        attackSpeed: 0.85,
+        attackWindup: 0.3,
+        speed: 30,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 630,
+        cooldown: 6.5,
+        scale: 1.05,
+        spriteType: 'cat_onmyoji',
+        abilities: {
+          weaken: { chance: 0.5, duration: 4.0, mult: 0.5 }
+        }
+      },
+      {
+        name: 'ネコ合身・オックロック',
+        jpName: 'ネコ合身・オックロック',
+        description: '【敵の攻撃力を低下させる / 長射程】巨大な時空時計を背負った術師。遠距離から65%の確率で5秒間敵の攻撃力を半減させる！',
+        hp: 2100,
+        attackPower: 410,
+        attackRange: 290,
+        attackSpeed: 0.9,
+        attackWindup: 0.28,
+        speed: 32,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 630,
+        cooldown: 6.2,
+        scale: 1.1,
+        spriteType: 'cat_onmyoji_evolved',
+        abilities: {
+          weaken: { chance: 0.65, duration: 5.0, mult: 0.5 }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_bomber',
+    rarity: 'super_rare',
+    unlockedAtStart: false,
+    unlockCostXp: 80000,
+    unlockMethod: 'xp',
+    forms: [
+      {
+        name: 'ネコフラワー',
+        jpName: 'ネコフラワー',
+        description: '【黒い敵の動きを止める】頭にお花を生やした不思議なネコ。黒い敵の動きを30%の確率で2秒間完全に止める！',
+        hp: 1300,
+        attackPower: 200,
+        attackRange: 130,
+        attackSpeed: 1.3,
+        attackWindup: 0.15,
+        speed: 42,
+        knockbacks: 2,
+        attackType: 'single',
+        cost: 480,
+        cooldown: 3.8,
+        scale: 1.0,
+        spriteType: 'cat_flower',
+        abilities: {
+          freeze: { chance: 0.3, duration: 2.0, traits: ['black'] }
+        }
+      },
+      {
+        name: 'ネコボンバー',
+        jpName: 'ネコボンバー',
+        description: '【黒い敵の動きを100%止める / 範囲攻撃】漆黒の爆弾を抱えた最強の黒対策キャラ。範囲攻撃で黒い敵の動きを100%確実に2.5秒間完全停止！',
+        hp: 2200,
+        attackPower: 380,
+        attackRange: 140,
+        attackSpeed: 1.4,
+        attackWindup: 0.12,
+        speed: 48,
+        knockbacks: 2,
+        attackType: 'area',
+        cost: 480,
+        cooldown: 3.5,
+        scale: 1.05,
+        spriteType: 'cat_bomber',
+        abilities: {
+          freeze: { chance: 1.0, duration: 2.5, traits: ['black'] }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_chronos',
+    rarity: 'uber_rare',
+    unlockedAtStart: false,
+    unlockMethod: 'gacha',
+    unlockHint: 'レアガチャ「究極降臨ギガントゼウス」で入手！',
+    forms: [
+      {
+        name: 'クロノストリガー',
+        jpName: 'クロノストリガー',
+        description: '【全属性の動きを止める / 範囲攻撃 / 超激レア】時間を司る女神。超長射程から放つクロノス光線で、属性を持つすべての敵の動きを100%の確率で2.5秒間停止！',
+        hp: 7500,
+        attackPower: 2100,
+        attackRange: 380,
+        attackSpeed: 0.5,
+        attackWindup: 0.6,
+        speed: 30,
+        knockbacks: 4,
+        attackType: 'area',
+        cost: 3900,
+        cooldown: 28.0,
+        scale: 1.5,
+        spriteType: 'cat_chronos',
+        abilities: {
+          freeze: { chance: 1.0, duration: 2.5, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie', 'metal'] }
+        }
+      },
+      {
+        name: '時空神クロノス',
+        jpName: '時空神クロノス',
+        description: '【全属性の動きを止める / 超長射程連続撃 / 超激レア】宇宙の全時間を統べる最高神。超長射程3連撃で全属性の敵を3.5秒間完全に時空凍結させる！',
+        hp: 13500,
+        attackPower: 3800,
+        attackRange: 410,
+        attackSpeed: 0.55,
+        attackWindup: 0.5,
+        speed: 34,
+        knockbacks: 4,
+        attackType: 'area',
+        cost: 3900,
+        cooldown: 26.0,
+        scale: 1.6,
+        spriteType: 'cat_chronos_evolved',
+        abilities: {
+          freeze: { chance: 1.0, duration: 3.5, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie', 'metal'] }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_amaterasu',
+    rarity: 'uber_rare',
+    unlockedAtStart: false,
+    unlockMethod: 'gacha',
+    unlockHint: 'レアガチャ「究極降臨ギガントゼウス」で入手！',
+    forms: [
+      {
+        name: '太陽神アマテラス',
+        jpName: '太陽神アマテラス',
+        description: '【ゾンビキラー / 全属性超ダメージ / 超激レア】天地を照らす太陽の化身。全属性の敵に圧倒的な超大ダメージを与え、ゾンビを蘇生不能（成仏）にする！',
+        hp: 8200,
+        attackPower: 2600,
+        attackRange: 360,
+        attackSpeed: 0.55,
+        attackWindup: 0.55,
+        speed: 32,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 4050,
+        cooldown: 30.0,
+        scale: 1.55,
+        spriteType: 'cat_amaterasu',
+        abilities: {
+          zombieKiller: true,
+          massiveDamage: { mult: 3.0, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] }
+        }
+      },
+      {
+        name: '創生神アマテラス',
+        jpName: '創生神アマテラス',
+        description: '【ゾンビキラー / 全属性超ダメージ / 超激レア】万物を照らす創生の神。八咫鏡から放つ神光で全属性の敵を消滅させ、ゾンビの蘇生を完全に断つ！',
+        hp: 14800,
+        attackPower: 4600,
+        attackRange: 390,
+        attackSpeed: 0.6,
+        attackWindup: 0.5,
+        speed: 36,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 4050,
+        cooldown: 28.0,
+        scale: 1.65,
+        spriteType: 'cat_amaterasu_evolved',
+        abilities: {
+          zombieKiller: true,
+          massiveDamage: { mult: 3.5, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_poseidon',
+    rarity: 'uber_rare',
+    unlockedAtStart: false,
+    unlockMethod: 'gacha',
+    unlockHint: 'レアガチャ「究極降臨ギガントゼウス」で入手！',
+    forms: [
+      {
+        name: '海皇ポセイドン',
+        jpName: '海皇ポセイドン',
+        description: '【ゾンビとメタルを止める / ゾンビキラー / 超激レア】大海原を統べる海の王。三叉槍の激流でゾンビとメタルな敵の動きを100%で3.5秒間完全停止！',
+        hp: 9200,
+        attackPower: 2900,
+        attackRange: 270,
+        attackSpeed: 0.65,
+        attackWindup: 0.45,
+        speed: 55,
+        knockbacks: 2,
+        attackType: 'area',
+        cost: 3750,
+        cooldown: 27.0,
+        scale: 1.6,
+        spriteType: 'cat_poseidon',
+        abilities: {
+          zombieKiller: true,
+          freeze: { chance: 1.0, duration: 3.5, traits: ['zombie', 'metal'] }
+        }
+      },
+      {
+        name: '幻海皇ポセイドン',
+        jpName: '幻海皇ポセイドン',
+        description: '【ゾンビとメタルを止める / ゾンビキラー / 高速突撃】深海の覇者。神速の三叉槍突進でゾンビとメタルの動きを4秒間封じ、ゾンビを確実に成仏させる！',
+        hp: 16500,
+        attackPower: 5200,
+        attackRange: 290,
+        attackSpeed: 0.7,
+        attackWindup: 0.4,
+        speed: 62,
+        knockbacks: 2,
+        attackType: 'area',
+        cost: 3750,
+        cooldown: 25.0,
+        scale: 1.7,
+        spriteType: 'cat_poseidon_evolved',
+        abilities: {
+          zombieKiller: true,
+          freeze: { chance: 1.0, duration: 4.0, traits: ['zombie', 'metal'] }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_sarukani',
+    rarity: 'uber_rare',
+    unlockedAtStart: false,
+    unlockMethod: 'gacha',
+    unlockHint: 'レアガチャ「超古代勇者ウルトラソウルズ」で入手！',
+    forms: [
+      {
+        name: 'さるかに合戦',
+        jpName: 'さるかに合戦',
+        description: '【ゾンビと天使に超ダメージ / ゾンビキラー / 量産型】昔話の英雄コンビ。安価で高速量産でき、ゾンビと天使を容赦なく成仏させる対ゾンビ特効キャラ！',
+        hp: 2800,
+        attackPower: 850,
+        attackRange: 280,
+        attackSpeed: 1.1,
+        attackWindup: 0.25,
+        speed: 38,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 720,
+        cooldown: 6.0,
+        scale: 1.15,
+        spriteType: 'cat_sarukani',
+        abilities: {
+          zombieKiller: true,
+          massiveDamage: { mult: 3.5, traits: ['zombie', 'angel'] }
+        }
+      },
+      {
+        name: '超時空要塞サルカニヘブン',
+        jpName: '超時空要塞サルカニヘブン',
+        description: '【ゾンビと天使に超ダメージ / ゾンビキラー / 巨大超射程】巨大な時空要塞へと合体進化。超遠距離メガビーム砲でゾンビの大群と天使を一撃で消滅・成仏させる！',
+        hp: 17800,
+        attackPower: 5800,
+        attackRange: 430,
+        attackSpeed: 0.45,
+        attackWindup: 0.7,
+        speed: 25,
+        knockbacks: 2,
+        attackType: 'area',
+        cost: 4350,
+        cooldown: 32.0,
+        scale: 1.85,
+        spriteType: 'cat_sarukani_evolved',
+        abilities: {
+          zombieKiller: true,
+          massiveDamage: { mult: 4.0, traits: ['zombie', 'angel'] }
+        }
+      }
+    ]
   }
 ];
 
@@ -1883,6 +2383,304 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     scale: 2.6,
     waveLevel: 5,
     isBoss: true,
+  },
+
+  // =========================================================================
+  // ZOMBIE TRAIT ENEMIES (ゾンビ属性 敵キャラクター: 潜伏・蘇生)
+  // =========================================================================
+  enemy_zombie_doge: {
+    id: 'enemy_zombie_doge',
+    name: 'ゾンビわんこ（骨わんこ）',
+    description: '【ゾンビ / 潜伏1回 / 蘇生50%】白骨化したわんこ。接敵時に地中に潜って前線をすり抜け、倒されても50%のHPで蘇生する！',
+    hp: 950,
+    attackPower: 110,
+    attackRange: 60,
+    attackSpeed: 1.1,
+    attackWindup: 0.15,
+    speed: 36,
+    knockbacks: 2,
+    attackType: 'single',
+    rewardMoney: 120,
+    rewardXp: 80,
+    traits: ['zombie'],
+    spriteType: 'enemy_zombie_doge',
+    scale: 1.0,
+    abilities: {
+      burrow: { count: 1, distance: 300 },
+      revive: { count: 1, hpPercent: 50, delaySeconds: 2.5 }
+    }
+  },
+  enemy_zombie_snache: {
+    id: 'enemy_zombie_snache',
+    name: 'にょろZ',
+    description: '【ゾンビ / 潜伏1回 / 蘇生50%】腐敗したにょろ。地中を這って長距離ワープし、死んでも1回復活する厄介なヘビ！',
+    hp: 820,
+    attackPower: 130,
+    attackRange: 55,
+    attackSpeed: 1.4,
+    attackWindup: 0.12,
+    speed: 48,
+    knockbacks: 3,
+    attackType: 'single',
+    rewardMoney: 110,
+    rewardXp: 75,
+    traits: ['zombie'],
+    spriteType: 'enemy_zombie_snache',
+    scale: 0.95,
+    abilities: {
+      burrow: { count: 1, distance: 350 },
+      revive: { count: 1, hpPercent: 50, delaySeconds: 2.2 }
+    }
+  },
+  enemy_zombie_pigge: {
+    id: 'enemy_zombie_pigge',
+    name: 'ブタヤロウZ',
+    description: '【ゾンビ / 範囲攻撃 / 攻撃力低下 / 蘇生100%】紫のゾンビ豚。範囲攻撃の泥吐きで味方の攻撃力を30%低下させ、HP全快（100%）で蘇生する！',
+    hp: 4200,
+    attackPower: 360,
+    attackRange: 80,
+    attackSpeed: 0.95,
+    attackWindup: 0.25,
+    speed: 30,
+    knockbacks: 2,
+    attackType: 'area',
+    rewardMoney: 550,
+    rewardXp: 300,
+    traits: ['zombie'],
+    spriteType: 'enemy_zombie_pigge',
+    scale: 1.25,
+    abilities: {
+      burrow: { count: 1, distance: 280 },
+      revive: { count: 1, hpPercent: 100, delaySeconds: 3.0 },
+      weaken: { chance: 0.6, duration: 4.0, mult: 0.5 }
+    }
+  },
+  enemy_zombie_gorilla: {
+    id: 'enemy_zombie_gorilla',
+    name: 'ゴリ・ザ・ボン',
+    description: '【ゾンビ / 高速突進 / 蘇生100%】地獄から蘇った怪力ゾンビゴリラ。地中から城前へワープし大暴れ！ゾンビキラーで仕留めないと大惨事に！',
+    hp: 9800,
+    attackPower: 820,
+    attackRange: 70,
+    attackSpeed: 1.6,
+    attackWindup: 0.1,
+    speed: 55,
+    knockbacks: 2,
+    attackType: 'area',
+    rewardMoney: 1200,
+    rewardXp: 850,
+    traits: ['zombie'],
+    spriteType: 'enemy_zombie_gorilla',
+    scale: 1.35,
+    abilities: {
+      burrow: { count: 1, distance: 420 },
+      revive: { count: 1, hpPercent: 100, delaySeconds: 3.5 }
+    }
+  },
+  enemy_zombie_hippoe: {
+    id: 'enemy_zombie_hippoe',
+    name: 'カバちゃんZ',
+    description: '【ゾンビ / 高耐久 / 蘇生100%】巨大な白骨カバ。高耐久で壁役として立ちふさがり、倒されても再び満タンで立ち上がる！',
+    hp: 14000,
+    attackPower: 450,
+    attackRange: 75,
+    attackSpeed: 0.8,
+    attackWindup: 0.35,
+    speed: 22,
+    knockbacks: 1,
+    attackType: 'single',
+    rewardMoney: 850,
+    rewardXp: 600,
+    traits: ['zombie'],
+    spriteType: 'enemy_zombie_hippoe',
+    scale: 1.45,
+    abilities: {
+      burrow: { count: 1, distance: 220 },
+      revive: { count: 1, hpPercent: 100, delaySeconds: 3.0 }
+    }
+  },
+  enemy_zombie_coffin: {
+    id: 'enemy_zombie_coffin',
+    name: 'ヒツギイヌ（棺桶ゾンビ）',
+    description: '【ゾンビ / 潜伏2回 / 棺桶蘇生100%】棺桶を背負った不気味な犬。2回に渡って地中を潜行し、倒されると墓場となり3秒後に完全復活する！',
+    hp: 6800,
+    attackPower: 580,
+    attackRange: 85,
+    attackSpeed: 1.0,
+    attackWindup: 0.2,
+    speed: 38,
+    knockbacks: 1,
+    attackType: 'single',
+    rewardMoney: 750,
+    rewardXp: 450,
+    traits: ['zombie'],
+    spriteType: 'enemy_zombie_coffin',
+    scale: 1.15,
+    abilities: {
+      burrow: { count: 2, distance: 300 },
+      revive: { count: 1, hpPercent: 100, delaySeconds: 3.0 }
+    }
+  },
+  enemy_zombie_hanako: {
+    id: 'enemy_zombie_hanako',
+    name: '墓手花子（ゾンビボス）',
+    description: '【ゾンビBOSS / 範囲攻撃 / 動きを遅くする / 長距離潜行】ゾンビ界の女帝。地中を500px深く潜行して一気に自城へ肉薄！腐毒液で味方の動きを遅くする！',
+    hp: 95000,
+    attackPower: 1800,
+    attackRange: 130,
+    attackSpeed: 0.65,
+    attackWindup: 0.45,
+    speed: 18,
+    knockbacks: 2,
+    attackType: 'area',
+    rewardMoney: 6000,
+    rewardXp: 12000,
+    traits: ['zombie', 'boss'],
+    spriteType: 'enemy_zombie_hanako',
+    scale: 2.1,
+    isBoss: true,
+    abilities: {
+      burrow: { count: 1, distance: 500 },
+      revive: { count: 1, hpPercent: 100, delaySeconds: 4.0 },
+      slow: { chance: 0.8, duration: 4.0 }
+    }
+  },
+  enemy_zombie_bear: {
+    id: 'enemy_zombie_bear',
+    name: 'フランケンベア（ゾンビ熊）',
+    description: '【ゾンビBOSS / 範囲攻撃 / 動きを止める絶叫 / 蘇生100%】ゾンビ化した凶暴熊。怪力ツメと恐怖の咆哮で味方の動きを2秒間停止させる！',
+    hp: 82000,
+    attackPower: 2200,
+    attackRange: 140,
+    attackSpeed: 0.75,
+    attackWindup: 0.35,
+    speed: 32,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 7500,
+    rewardXp: 15000,
+    traits: ['zombie', 'boss'],
+    spriteType: 'enemy_zombie_bear',
+    scale: 2.2,
+    isBoss: true,
+    abilities: {
+      burrow: { count: 1, distance: 360 },
+      revive: { count: 1, hpPercent: 100, delaySeconds: 3.5 },
+      freeze: { chance: 0.7, duration: 2.0 }
+    }
+  },
+
+  // =========================================================================
+  // DEBUFF & LEGEND ENEMIES (妨害敵・レジェンドストーリー新強敵)
+  // =========================================================================
+  enemy_nakai: {
+    id: 'enemy_nakai',
+    name: 'ナカイくん',
+    description: '【白い敵 / 高速連打 / ふっとばし】鋭いツノを持ったトナカイ。超高回転の手数で味方を50%の確率でふっとばし前線を崩壊させる！',
+    hp: 38000,
+    attackPower: 650,
+    attackRange: 135,
+    attackSpeed: 2.4,
+    attackWindup: 0.08,
+    speed: 42,
+    knockbacks: 5,
+    attackType: 'single',
+    rewardMoney: 1800,
+    rewardXp: 2200,
+    traits: ['white'],
+    spriteType: 'enemy_nakai',
+    scale: 1.4,
+    abilities: {
+      knockback: { chance: 0.5 }
+    }
+  },
+  enemy_professor: {
+    id: 'enemy_professor',
+    name: '教授!!（メガネアリクイ）',
+    description: '【赤い敵 / 超長射程 / 動きを遅くする】赤い知性派アリクイ。超遠距離500pxから舌を伸ばし、味方の動きを50%で3.5秒間遅くする厄介な後衛！',
+    hp: 45000,
+    attackPower: 780,
+    attackRange: 500,
+    attackSpeed: 1.1,
+    attackWindup: 0.2,
+    speed: 16,
+    knockbacks: 8,
+    attackType: 'single',
+    rewardMoney: 2800,
+    rewardXp: 3500,
+    traits: ['red'],
+    spriteType: 'enemy_professor',
+    scale: 1.35,
+    abilities: {
+      slow: { chance: 0.5, duration: 3.5 }
+    }
+  },
+  enemy_kurosawa: {
+    id: 'enemy_kurosawa',
+    name: 'クロサワ監督',
+    description: '【黒い敵 / 範囲超破壊 / 攻撃力低下】黒いメガホンを握る巨匠。超高火力のメガホン爆風で味方の攻撃力を50%で5秒間半減させる！',
+    hp: 135000,
+    attackPower: 4200,
+    attackRange: 420,
+    attackSpeed: 0.35,
+    attackWindup: 0.75,
+    speed: 12,
+    knockbacks: 2,
+    attackType: 'area',
+    rewardMoney: 6500,
+    rewardXp: 8000,
+    traits: ['black', 'boss'],
+    spriteType: 'enemy_kurosawa',
+    scale: 2.0,
+    isBoss: true,
+    abilities: {
+      weaken: { chance: 0.75, duration: 5.0, mult: 0.5 }
+    }
+  },
+  enemy_legend_matador: {
+    id: 'enemy_legend_matador',
+    name: '情熱のマタドール・カオル',
+    description: '【レジェンド第2章BOSS / 赤い敵 / 範囲攻撃 / 突進ふっとばし】情熱の国を支配する闘牛士カオル。赤いマントを翻し、猛烈な突進で味方全員を豪快にふっとばす！',
+    hp: 280000,
+    attackPower: 3800,
+    attackRange: 160,
+    attackSpeed: 0.8,
+    attackWindup: 0.35,
+    speed: 38,
+    knockbacks: 4,
+    attackType: 'area',
+    rewardMoney: 12000,
+    rewardXp: 28000,
+    traits: ['red', 'boss'],
+    spriteType: 'enemy_legend_matador',
+    scale: 2.2,
+    isBoss: true,
+    abilities: {
+      knockback: { chance: 0.7 }
+    }
+  },
+  enemy_legend_yakuza_cat: {
+    id: 'enemy_legend_yakuza_cat',
+    name: '帝王・ネコ組総長',
+    description: '【レジェンド第3章 最終BOSS / 範囲攻撃 / 動き停止＋攻撃力低下】裏社会キャットストリートを牛耳る伝説の組長。白刃一閃で味方の動きを完全に止め、攻撃力を大幅ダウンさせる！',
+    hp: 420000,
+    attackPower: 5200,
+    attackRange: 210,
+    attackSpeed: 0.65,
+    attackWindup: 0.4,
+    speed: 28,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 20000,
+    rewardXp: 50000,
+    traits: ['black', 'boss'],
+    spriteType: 'enemy_legend_yakuza_cat',
+    scale: 2.5,
+    isBoss: true,
+    abilities: {
+      freeze: { chance: 0.6, duration: 3.0 },
+      weaken: { chance: 0.7, duration: 4.5, mult: 0.4 }
+    }
   }
 };
 

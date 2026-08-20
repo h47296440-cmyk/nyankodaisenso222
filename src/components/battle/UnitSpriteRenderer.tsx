@@ -3,10 +3,15 @@ import React from 'react';
 interface UnitSpriteProps {
   spriteType: string;
   isCat: boolean;
-  state: 'walk' | 'attack' | 'knockback' | 'die';
+  state: 'walk' | 'attack' | 'knockback' | 'die' | 'burrow' | 'revive';
   animTimer: number;
   scale?: number;
   isAttackingWindup?: boolean;
+  isFrozen?: boolean;
+  isSlowed?: boolean;
+  isWeakened?: boolean;
+  isBurrowing?: boolean;
+  isReviving?: boolean;
 }
 
 export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = React.memo(({
@@ -16,17 +21,22 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = React.memo(({
   animTimer,
   scale = 1.0,
   isAttackingWindup = false,
+  isFrozen = false,
+  isSlowed = false,
+  isWeakened = false,
+  isBurrowing = false,
+  isReviving = false,
 }) => {
   const safeTimer = isFinite(animTimer) ? animTimer : 0;
   const safeScale = isFinite(scale) && scale > 0 ? scale : 1.0;
 
   // Rich physics and organic squash-stretch calculations
   const walkPhase = safeTimer * 10.5;
-  const walkCycle = Math.sin(walkPhase);
-  const bounceY = state === 'walk' ? Math.abs(Math.sin(walkPhase)) * 5.5 : 0;
-  const walkSquashX = state === 'walk' ? 1 + Math.sin(walkPhase * 2) * 0.04 : 1;
-  const walkSquashY = state === 'walk' ? 1 - Math.sin(walkPhase * 2) * 0.04 : 1;
-  const walkTilt = state === 'walk' ? Math.sin(walkPhase) * 3.5 : 0;
+  const walkCycle = isFrozen ? 0 : Math.sin(walkPhase);
+  const bounceY = (state === 'walk' && !isFrozen) ? Math.abs(Math.sin(walkPhase)) * 5.5 : 0;
+  const walkSquashX = (state === 'walk' && !isFrozen) ? 1 + Math.sin(walkPhase * 2) * 0.04 : 1;
+  const walkSquashY = (state === 'walk' && !isFrozen) ? 1 - Math.sin(walkPhase * 2) * 0.04 : 1;
+  const walkTilt = (state === 'walk' && !isFrozen) ? Math.sin(walkPhase) * 3.5 : 0;
 
   // Attack windup tension vs explosive strike lunge
   let attackTilt = 0;
@@ -35,7 +45,7 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = React.memo(({
   let attackScaleX = 1;
   let attackScaleY = 1;
 
-  if (isAttackingWindup) {
+  if (isAttackingWindup && !isFrozen) {
     // Deep breath & pull-back anticipation
     const tremor = Math.sin(safeTimer * 45) * 2;
     attackTilt = isCat ? -16 : 16;
@@ -43,7 +53,7 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = React.memo(({
     attackTranslateY = -4;
     attackScaleX = 0.92;
     attackScaleY = 1.12;
-  } else if (state === 'attack') {
+  } else if (state === 'attack' && !isFrozen) {
     // Explosive forward strike snap
     attackTilt = isCat ? 22 : -22;
     attackTranslateX = isCat ? 18 : -18;
@@ -65,9 +75,9 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = React.memo(({
   const facingTransform = isCat ? 'scaleX(1)' : 'scaleX(-1)';
 
   const finalScaleX = safeScale * walkSquashX * attackScaleX;
-  const finalScaleY = safeScale * walkSquashY * attackScaleY;
+  const finalScaleY = isBurrowing ? safeScale * 0.35 : (isReviving ? safeScale * 0.6 : safeScale * walkSquashY * attackScaleY);
   const finalRot = walkTilt + attackTilt + knockbackRot;
-  const finalY = -(bounceY + attackTranslateY + knockbackElevY);
+  const finalY = isBurrowing ? 18 : -(bounceY + attackTranslateY + knockbackElevY);
 
   return (
     <div className="relative flex flex-col items-center justify-center pointer-events-none select-none will-change-transform">
@@ -86,8 +96,14 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = React.memo(({
       <div
         style={{
           transform: `${facingTransform} scale(${finalScaleX}, ${finalScaleY}) rotate(${finalRot}deg) translate(${attackTranslateX}px, ${finalY}px)`,
-          opacity: dieOpacity,
-          filter: isAttackingWindup
+          opacity: isBurrowing ? 0.65 : (isReviving ? 0.75 : dieOpacity),
+          filter: isFrozen
+            ? 'drop-shadow(0 0 10px rgba(56, 189, 248, 0.9)) brightness(1.2) hue-rotate(170deg)'
+            : isSlowed
+            ? 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.75)) sepia(0.5)'
+            : isWeakened
+            ? 'drop-shadow(0 0 8px rgba(168, 85, 247, 0.8)) opacity(0.8)'
+            : isAttackingWindup
             ? 'drop-shadow(0 0 6px rgba(250, 204, 21, 0.65))'
             : state === 'knockback'
             ? 'drop-shadow(0 0 8px rgba(239, 68, 68, 0.7))'
@@ -97,6 +113,39 @@ export const UnitSpriteRenderer: React.FC<UnitSpriteProps> = React.memo(({
       >
         {renderSpriteSvg(spriteType, walkCycle, isAttackingWindup || state === 'attack', safeTimer)}
       </div>
+
+      {/* Status Overlays */}
+      {isFrozen && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-14 h-14 border-2 border-sky-300 bg-sky-400/25 rounded-lg rotate-45 animate-pulse" />
+          <span className="absolute -top-3 text-xs">❄️</span>
+        </div>
+      )}
+
+      {isSlowed && (
+        <div className="absolute -top-4 right-0 pointer-events-none flex items-center gap-0.5 animate-bounce">
+          <span className="text-xs bg-amber-500/80 text-white rounded-full px-1 text-[9px] font-black">🐌 SLOW</span>
+        </div>
+      )}
+
+      {isWeakened && (
+        <div className="absolute -top-4 left-0 pointer-events-none flex items-center gap-0.5 animate-bounce">
+          <span className="text-xs bg-purple-600/80 text-white rounded-full px-1 text-[9px] font-black">⬇️ WEAK</span>
+        </div>
+      )}
+
+      {isBurrowing && (
+        <div className="absolute bottom-0 inset-x-0 flex flex-col items-center pointer-events-none">
+          <div className="w-12 h-3 bg-purple-950/80 rounded-full blur-xs border border-purple-500 animate-ping" />
+        </div>
+      )}
+
+      {isReviving && (
+        <div className="absolute -top-6 flex flex-col items-center pointer-events-none animate-pulse">
+          <span className="text-xs font-black text-purple-300 drop-shadow">☠️ 蘇生中...</span>
+          <div className="w-8 h-8 rounded-full border border-purple-500 bg-purple-900/40 animate-spin" />
+        </div>
+      )}
 
       {/* Attack Charge Sparks */}
       {isAttackingWindup && (
@@ -1859,6 +1908,439 @@ function renderSpriteSvg(
         </svg>
       );
 
+
+    case 'enemy_crazed_gross':
+      return (
+        <svg width="90" height="130" viewBox="0 0 90 130" className="drop-shadow-2xl">
+          <circle cx="45" cy="40" r="32" fill="none" stroke="#7e22ce" strokeWidth="4" strokeDasharray="10,6" className="animate-spin" />
+          {/* Crazed Gross Cat body */}
+          <ellipse cx="45" cy="40" rx="22" ry="20" fill="#18181b" stroke="#dc2626" strokeWidth="3" />
+          <polygon points="32,26 26,10 38,20" fill="#dc2626" stroke="#450a0a" strokeWidth="1.5" />
+          <polygon points="58,26 64,10 52,20" fill="#dc2626" stroke="#450a0a" strokeWidth="1.5" />
+          <circle cx="38" cy="38" r="3.5" fill="#ef4444" />
+          <circle cx="52" cy="38" r="3.5" fill="#ef4444" />
+          <path d="M 40 48 Q 45 54 50 48" fill="none" stroke="#dc2626" strokeWidth="2.5" />
+          {/* Long Muscular Legs with Wave Aura */}
+          <line x1="36" y1="58" x2={28 + legOffset1 * 2} y2="120" stroke="#18181b" strokeWidth="6" strokeLinecap="round" />
+          <line x1="54" y1="58" x2={50 + legOffset2 * 2} y2="120" stroke="#18181b" strokeWidth="6" strokeLinecap="round" />
+          {isAttacking && (
+            <ellipse cx="45" cy="120" rx="35" ry="8" fill="none" stroke="#7e22ce" strokeWidth="4" className="animate-ping" />
+          )}
+        </svg>
+      );
+
+    case 'enemy_crazed_bird':
+      return (
+        <svg width="105" height="105" viewBox="0 0 105 105" className="drop-shadow-2xl">
+          <circle cx="52" cy="52" r="46" fill="none" stroke="#7e22ce" strokeWidth="4" strokeDasharray="10,5" className="animate-spin" />
+          {/* Dark Demonic Bird Body & Wings */}
+          <g transform={`rotate(${Math.sin(timer * 15) * 20} 52 52)`}>
+            <polygon points="52,40 10,20 30,60" fill="#18181b" stroke="#dc2626" strokeWidth="2.5" />
+            <polygon points="52,40 94,20 74,60" fill="#18181b" stroke="#dc2626" strokeWidth="2.5" />
+          </g>
+          <ellipse cx="52" cy="52" rx="26" ry="24" fill="#18181b" stroke="#dc2626" strokeWidth="3" />
+          <polygon points="38,36 30,16 46,30" fill="#dc2626" />
+          <polygon points="66,36 74,16 58,30" fill="#dc2626" />
+          <circle cx="44" cy="48" r="4" fill="#facc15" stroke="#ef4444" strokeWidth="1" />
+          <circle cx="60" cy="48" r="4" fill="#facc15" stroke="#ef4444" strokeWidth="1" />
+          <polygon points="46,56 52,68 58,56" fill="#ef4444" stroke="#450a0a" strokeWidth="1.5" />
+          {isAttacking && (
+            <circle cx="52" cy="52" r="42" fill="none" stroke="#ef4444" strokeWidth="5" className="animate-ping" />
+          )}
+        </svg>
+      );
+
+    case 'enemy_crazed_fish':
+      return (
+        <svg width="120" height="95" viewBox="0 0 120 95" className="drop-shadow-2xl">
+          <ellipse cx="60" cy="48" rx="55" ry="38" fill="none" stroke="#7e22ce" strokeWidth="4" strokeDasharray="12,6" />
+          {/* Crazed Whale / Fish Body */}
+          <path d="M 20 48 Q 45 18 90 28 Q 115 48 90 68 Q 45 78 20 48 Z" fill="#18181b" stroke="#dc2626" strokeWidth="3.5" />
+          {/* Fin */}
+          <polygon points="60,22 75,5 80,24" fill="#dc2626" stroke="#450a0a" strokeWidth="2" />
+          <polygon points="20,48 5,30 5,66" fill="#dc2626" stroke="#450a0a" strokeWidth="2" />
+          {/* Fierce Shark Teeth */}
+          <g transform={`rotate(${isAttacking ? 20 : 0} 95 48)`}>
+            <polygon points="90,44 100,48 90,52" fill="#ffffff" />
+            <polygon points="82,42 92,48 82,54" fill="#ffffff" />
+          </g>
+          <circle cx="75" cy="38" r="4" fill="#ef4444" />
+          {isAttacking && (
+            <path d="M 90 25 Q 120 48 90 70" fill="none" stroke="#ef4444" strokeWidth="6" className="animate-ping" />
+          )}
+        </svg>
+      );
+
+    // =========================================================================
+    // ZOMBIE ENEMIES (ゾンビ軍団スプライト)
+    // =========================================================================
+    case 'enemy_zombie_doge':
+      return (
+        <svg width="68" height="54" viewBox="0 0 68 54" className="drop-shadow-md">
+          {/* Purple Necro Glow */}
+          <ellipse cx="34" cy="28" rx="24" ry="20" fill="none" stroke="#a855f7" strokeWidth="2" strokeDasharray="6,4" />
+          {/* Exposed Ribs and Bone Body */}
+          <ellipse cx="32" cy="28" rx="18" ry="15" fill="#f1f5f9" stroke="#475569" strokeWidth="2.5" />
+          {/* Rib Lines */}
+          <line x1="24" y1="22" x2="24" y2="34" stroke="#475569" strokeWidth="2" />
+          <line x1="30" y1="20" x2="30" y2="36" stroke="#475569" strokeWidth="2" />
+          <line x1="36" y1="22" x2="36" y2="34" stroke="#475569" strokeWidth="2" />
+          {/* Skull Snout */}
+          <ellipse cx="46" cy="28" rx="9" ry="8" fill="#e2e8f0" stroke="#475569" strokeWidth="2" />
+          {/* Violet Undead Eyes */}
+          <circle cx="28" cy="22" r="3" fill="#a855f7" className="animate-pulse" />
+          <circle cx="38" cy="22" r="3" fill="#a855f7" className="animate-pulse" />
+          {/* Bone Legs */}
+          <line x1="22" y1="42" x2={18 + legOffset1} y2="50" stroke="#475569" strokeWidth="3" strokeLinecap="round" />
+          <line x1="38" y1="42" x2={36 + legOffset2} y2="50" stroke="#475569" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+      );
+
+    case 'enemy_zombie_snache':
+      return (
+        <svg width="74" height="48" viewBox="0 0 74 48" className="drop-shadow-md">
+          {/* Skeletal Snake Body */}
+          <path d="M 12 36 Q 30 14 48 34 Q 60 40 68 24" fill="none" stroke="#cbd5e1" strokeWidth="8" strokeLinecap="round" />
+          <path d="M 12 36 Q 30 14 48 34 Q 60 40 68 24" fill="none" stroke="#7e22ce" strokeWidth="3" strokeDasharray="4,4" />
+          {/* Skull Head */}
+          <circle cx="68" cy="24" r="8" fill="#f1f5f9" stroke="#475569" strokeWidth="2" />
+          <circle cx="66" cy="22" r="2.5" fill="#c084fc" className="animate-pulse" />
+          <polygon points="74,24 82,21 82,27" fill="#dc2626" />
+        </svg>
+      );
+
+    case 'enemy_zombie_pigge':
+      return (
+        <svg width="78" height="65" viewBox="0 0 78 65" className="drop-shadow-lg">
+          {/* Rotting Violet Pig Body */}
+          <ellipse cx="38" cy="34" rx="24" ry="20" fill="#7e22ce" stroke="#3b0764" strokeWidth="3" />
+          {/* Stitches */}
+          <line x1="28" y1="20" x2="34" y2="30" stroke="#a855f7" strokeWidth="2.5" />
+          <line x1="26" y1="24" x2="32" y2="22" stroke="#a855f7" strokeWidth="1.5" />
+          {/* Snout with Slime */}
+          <ellipse cx="56" cy="36" rx="12" ry="10" fill="#a855f7" stroke="#3b0764" strokeWidth="2" />
+          <circle cx="52" cy="36" r="2.5" fill="#22c55e" />
+          <circle cx="60" cy="36" r="2.5" fill="#22c55e" />
+          {/* Glowing Green Zombie Eyes */}
+          <circle cx="34" cy="26" r="3.5" fill="#22c55e" className="animate-pulse" />
+          <circle cx="44" cy="26" r="3.5" fill="#22c55e" className="animate-pulse" />
+          {/* Legs */}
+          <rect x={22 + legOffset1} y="50" width="8" height="12" rx="2" fill="#581c87" stroke="#3b0764" strokeWidth="2" />
+          <rect x={42 + legOffset2} y="50" width="8" height="12" rx="2" fill="#581c87" stroke="#3b0764" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_zombie_gorilla':
+      return (
+        <svg width="90" height="85" viewBox="0 0 90 85" className="drop-shadow-xl">
+          {/* Giant Stitched Zombie Gorilla */}
+          <ellipse cx="45" cy="48" rx="30" ry="28" fill="#581c87" stroke="#2e1065" strokeWidth="3.5" />
+          <circle cx="45" cy="24" r="18" fill="#4c1d95" stroke="#2e1065" strokeWidth="3" />
+          {/* Cyber Bolts / Metal Screws */}
+          <rect x="22" y="20" width="6" height="4" fill="#94a3b8" />
+          <rect x="62" y="20" width="6" height="4" fill="#94a3b8" />
+          {/* Glowing Violet Eyes */}
+          <circle cx="38" cy="22" r="4" fill="#c084fc" className="animate-pulse" />
+          <circle cx="52" cy="22" r="4" fill="#c084fc" className="animate-pulse" />
+          {/* Zombie Gorilla Fists */}
+          <ellipse cx={20 + (isAttacking ? 16 : legOffset1)} cy="58" rx="11" ry="11" fill="#3b0764" stroke="#2e1065" strokeWidth="2.5" />
+          <ellipse cx={70 + legOffset2} cy="58" rx="11" ry="11" fill="#3b0764" stroke="#2e1065" strokeWidth="2.5" />
+        </svg>
+      );
+
+    case 'enemy_zombie_hippoe':
+      return (
+        <svg width="98" height="75" viewBox="0 0 98 75" className="drop-shadow-xl">
+          {/* Bone Skull Hippo */}
+          <ellipse cx="40" cy="40" rx="30" ry="24" fill="#6b21a8" stroke="#3b0764" strokeWidth="3.5" />
+          <ellipse cx="68" cy="44" rx="22" ry="18" fill="#581c87" stroke="#3b0764" strokeWidth="3" />
+          {/* Bone Snout & Exposed Teeth */}
+          <polygon points="76,58 80,48 84,58" fill="#f8fafc" stroke="#3b0764" strokeWidth="1.5" />
+          <polygon points="86,58 90,48 94,58" fill="#f8fafc" stroke="#3b0764" strokeWidth="1.5" />
+          <circle cx="44" cy="30" r="4" fill="#22c55e" className="animate-pulse" />
+          <rect x={24 + legOffset1} y="58" width="14" height="14" rx="3" fill="#3b0764" stroke="#2e1065" strokeWidth="2.5" />
+          <rect x={52 + legOffset2} y="58" width="14" height="14" rx="3" fill="#3b0764" stroke="#2e1065" strokeWidth="2.5" />
+        </svg>
+      );
+
+    case 'enemy_zombie_coffin':
+      return (
+        <svg width="84" height="74" viewBox="0 0 84 74" className="drop-shadow-2xl">
+          {/* Coffin on Back */}
+          <polygon points="26,8 54,8 60,45 40,60 20,45" fill="#3f3f46" stroke="#71717a" strokeWidth="2.5" />
+          <line x1="38" y1="18" x2="38" y2="40" stroke="#dc2626" strokeWidth="3" />
+          <line x1="28" y1="26" x2="48" y2="26" stroke="#dc2626" strokeWidth="3" />
+          {/* Dog emerging */}
+          <ellipse cx="50" cy="44" rx="18" ry="14" fill="#581c87" stroke="#2e1065" strokeWidth="2.5" />
+          <circle cx="56" cy="40" r="3" fill="#22c55e" className="animate-pulse" />
+          <ellipse cx={40 + legOffset1} cy="64" rx="5" ry="5" fill="#3b0764" stroke="#2e1065" strokeWidth="2" />
+          <ellipse cx={60 + legOffset2} cy="64" rx="5" ry="5" fill="#3b0764" stroke="#2e1065" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_zombie_hanako':
+      return (
+        <svg width="130" height="130" viewBox="0 0 130 130" className="drop-shadow-2xl">
+          <circle cx="65" cy="65" r="58" fill="none" stroke="#a855f7" strokeWidth="5" strokeDasharray="14,7" className="animate-spin" />
+          {/* Demonic Cemetery Lady Ghost */}
+          <path d="M 35 110 Q 65 30 95 110 Z" fill="#3b0764" stroke="#a855f7" strokeWidth="4" />
+          <circle cx="65" cy="42" r="22" fill="#e9d5ff" stroke="#581c87" strokeWidth="3" />
+          {/* Bleeding Violet Eyes */}
+          <ellipse cx="56" cy="40" rx="4" ry="6" fill="#7e22ce" />
+          <ellipse cx="74" cy="40" rx="4" ry="6" fill="#7e22ce" />
+          <circle cx="56" cy="40" r="1.5" fill="#22c55e" />
+          <circle cx="74" cy="40" r="1.5" fill="#22c55e" />
+          {/* Long Ghost Hair */}
+          <path d="M 42 38 Q 30 70 38 100" fill="none" stroke="#1e1b4b" strokeWidth="5" strokeLinecap="round" />
+          <path d="M 88 38 Q 100 70 92 100" fill="none" stroke="#1e1b4b" strokeWidth="5" strokeLinecap="round" />
+          {isAttacking && (
+            <ellipse cx="65" cy="115" rx="50" ry="12" fill="none" stroke="#22c55e" strokeWidth="4" className="animate-ping" />
+          )}
+        </svg>
+      );
+
+    case 'enemy_zombie_bear':
+      return (
+        <svg width="135" height="120" viewBox="0 0 135 120" className="drop-shadow-2xl">
+          <circle cx="67" cy="60" r="54" fill="none" stroke="#22c55e" strokeWidth="4" strokeDasharray="12,6" className="animate-spin" />
+          {/* Frankenbear Monster */}
+          <ellipse cx="67" cy="64" rx="42" ry="34" fill="#3b0764" stroke="#1e1b4b" strokeWidth="4" />
+          <circle cx="36" cy="46" r="24" fill="#4c1d95" stroke="#1e1b4b" strokeWidth="3.5" />
+          {/* Bolts in Neck */}
+          <rect x="15" y="44" width="8" height="6" fill="#94a3b8" />
+          <rect x="57" y="44" width="8" height="6" fill="#94a3b8" />
+          {/* Fierce Glowing Eyes */}
+          <circle cx="30" cy="42" r="5" fill="#22c55e" className="animate-pulse" />
+          <circle cx="44" cy="42" r="5" fill="#22c55e" className="animate-pulse" />
+          {/* Claws & Smash */}
+          <polygon points="12,68 0,76 10,82" fill="#f8fafc" />
+          <polygon points="12,78 0,86 10,92" fill="#f8fafc" />
+          {isAttacking && (
+            <circle cx="20" cy="70" r="30" fill="none" stroke="#22c55e" strokeWidth="6" className="animate-ping" />
+          )}
+          <line x1="45" y1="95" x2={38 + legOffset1 * 2} y2="114" stroke="#1e1b4b" strokeWidth="8" strokeLinecap="round" />
+          <line x1="88" y1="95" x2={82 + legOffset2 * 2} y2="114" stroke="#1e1b4b" strokeWidth="8" strokeLinecap="round" />
+        </svg>
+      );
+
+    // =========================================================================
+    // LEGEND / DEBUFF ENEMIES (妨害・レジェンド強敵スプライト)
+    // =========================================================================
+    case 'enemy_nakai':
+      return (
+        <svg width="86" height="86" viewBox="0 0 86 86" className="drop-shadow-xl">
+          {/* Reindeer Antlers */}
+          <path d="M 30 20 L 15 5 M 24 14 L 16 18 M 38 20 L 52 5 M 44 14 L 52 18" stroke="#78350f" strokeWidth="3.5" strokeLinecap="round" />
+          {/* Reindeer Head and Body */}
+          <ellipse cx="38" cy="44" rx="20" ry="18" fill="#f8fafc" stroke="#0f172a" strokeWidth="3" />
+          <circle cx="30" cy="38" r="3" fill="#0f172a" />
+          <circle cx="44" cy="38" r="3" fill="#0f172a" />
+          <circle cx="37" cy="46" r="3.5" fill="#ef4444" />
+          {/* Speed Kicking Legs */}
+          <line x1="28" y1="60" x2={18 + legOffset1 * 2.5} y2="80" stroke="#0f172a" strokeWidth="4.5" strokeLinecap="round" />
+          <line x1="48" y1="60" x2={42 + legOffset2 * 2.5} y2="80" stroke="#0f172a" strokeWidth="4.5" strokeLinecap="round" />
+        </svg>
+      );
+
+    case 'enemy_professor':
+      return (
+        <svg width="105" height="80" viewBox="0 0 105 80" className="drop-shadow-xl">
+          {/* Red Anteater Body with Glasses and Cap */}
+          <ellipse cx="65" cy="48" rx="28" ry="18" fill="#dc2626" stroke="#450a0a" strokeWidth="3" />
+          {/* Academic Graduation Cap */}
+          <polygon points="35,16 55,22 35,28 15,22" fill="#18181b" stroke="#facc15" strokeWidth="1.5" />
+          {/* Glasses */}
+          <circle cx="36" cy="38" r="5" fill="none" stroke="#facc15" strokeWidth="2" />
+          <line x1="30" y1="38" x2="42" y2="38" stroke="#facc15" strokeWidth="2" />
+          {/* Long Super Whip Tongue */}
+          <path d="M 40 44 L 14 42 L 36 54 Z" fill="#dc2626" stroke="#450a0a" strokeWidth="2.5" />
+          {isAttacking ? (
+            <path d="M 14 42 Q -30 35 -60 50" fill="none" stroke="#ef4444" strokeWidth="5" strokeLinecap="round" />
+          ) : (
+            <circle cx="14" cy="42" r="2.5" fill="#ef4444" />
+          )}
+          <ellipse cx={52 + legOffset1} cy="66" rx="6" ry="6" fill="#b91c1c" stroke="#450a0a" strokeWidth="2" />
+          <ellipse cx={78 + legOffset2} cy="66" rx="6" ry="6" fill="#b91c1c" stroke="#450a0a" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_kurosawa':
+      return (
+        <svg width="125" height="115" viewBox="0 0 125 115" className="drop-shadow-2xl">
+          {/* Director Kurosawa in Black Trenchcoat */}
+          <ellipse cx="62" cy="62" rx="36" ry="32" fill="#09090b" stroke="#3f3f46" strokeWidth="4" />
+          {/* Director Sunglasses */}
+          <rect x="42" y="44" width="16" height="10" rx="2" fill="#18181b" stroke="#71717a" strokeWidth="2" />
+          <rect x="66" y="44" width="16" height="10" rx="2" fill="#18181b" stroke="#71717a" strokeWidth="2" />
+          <line x1="58" y1="48" x2="66" y2="48" stroke="#71717a" strokeWidth="2" />
+          {/* Giant Film Megaphone */}
+          <polygon points="34,56 6,40 6,76" fill="#dc2626" stroke="#18181b" strokeWidth="3" />
+          {/* Shockwave Blast on Attack */}
+          {isAttacking && (
+            <g className="animate-ping">
+              <circle cx="6" cy="58" r="28" fill="none" stroke="#ef4444" strokeWidth="5" />
+            </g>
+          )}
+          <ellipse cx={48 + legOffset1} cy="96" rx="8" ry="8" fill="#18181b" stroke="#3f3f46" strokeWidth="3" />
+          <ellipse cx={76 + legOffset2} cy="96" rx="8" ry="8" fill="#18181b" stroke="#3f3f46" strokeWidth="3" />
+        </svg>
+      );
+
+    case 'enemy_legend_matador':
+      return (
+        <svg width="135" height="125" viewBox="0 0 135 125" className="drop-shadow-2xl">
+          <ellipse cx="68" cy="60" rx="42" ry="44" fill="#dc2626" stroke="#450a0a" strokeWidth="4" />
+          {/* Matador Hat (Montera) */}
+          <path d="M 40 24 Q 68 10 96 24 Q 68 28 40 24 Z" fill="#09090b" stroke="#facc15" strokeWidth="2" />
+          {/* Bullfighter Eyes */}
+          <ellipse cx="52" cy="46" rx="6" ry="7" fill="#fef08a" />
+          <ellipse cx="84" cy="46" rx="6" ry="7" fill="#fef08a" />
+          {/* Red Muleta Cape Swirling */}
+          <g transform={`rotate(${isAttacking ? -35 : 10} 30 70)`}>
+            <path d="M 30 50 Q -10 60 5 95 Q 40 90 30 50 Z" fill="#ef4444" stroke="#991b1b" strokeWidth="3" />
+            <polygon points="10,48 4,38 12,42" fill="#facc15" />
+          </g>
+          {isAttacking && (
+            <circle cx="20" cy="70" r="30" fill="none" stroke="#ef4444" strokeWidth="6" className="animate-ping" />
+          )}
+        </svg>
+      );
+
+    case 'enemy_legend_yakuza_cat':
+      return (
+        <svg width="145" height="135" viewBox="0 0 145 135" className="drop-shadow-2xl">
+          <circle cx="72" cy="70" r="62" fill="none" stroke="#dc2626" strokeWidth="5" strokeDasharray="16,8" className="animate-spin" />
+          {/* Yakuza Cat Boss with Kimono & Katana */}
+          <ellipse cx="72" cy="68" rx="36" ry="34" fill="#09090b" stroke="#dc2626" strokeWidth="4" />
+          {/* Dragon Tattoo over Shoulder */}
+          <path d="M 50 50 Q 60 65 72 54 Q 85 68 95 50" fill="none" stroke="#f59e0b" strokeWidth="4" strokeLinecap="round" />
+          {/* Slit Boss Eyes */}
+          <line x1="56" y1="52" x2="66" y2="54" stroke="#ef4444" strokeWidth="3.5" strokeLinecap="round" />
+          <line x1="88" y1="54" x2="78" y2="52" stroke="#ef4444" strokeWidth="3.5" strokeLinecap="round" />
+          {/* Katana Slash */}
+          <g transform={`rotate(${isAttacking ? -65 : 25} 35 55)`}>
+            <rect x="25" y="10" width="6" height="70" fill="#e2e8f0" stroke="#0f172a" strokeWidth="2" />
+            <rect x="22" y="70" width="12" height="16" fill="#dc2626" />
+          </g>
+          {isAttacking && (
+            <path d="M 10 20 Q -25 70 20 120" fill="none" stroke="#ef4444" strokeWidth="8" strokeLinecap="round" className="animate-ping" />
+          )}
+          <ellipse cx={56 + legOffset1} cy="104" rx="9" ry="8" fill="#18181b" stroke="#dc2626" strokeWidth="3" />
+          <ellipse cx={88 + legOffset2} cy="104" rx="9" ry="8" fill="#18181b" stroke="#dc2626" strokeWidth="3" />
+        </svg>
+      );
+
+    // =========================================================================
+    // DEBUFF ALLY CATS (妨害・状態異常 味方ネコスプライト)
+    // =========================================================================
+    case 'cat_shikigami':
+    case 'cat_shikigami_evolved':
+      return (
+        <svg width="65" height="65" viewBox="0 0 65 65" className="drop-shadow-md">
+          {/* Onmyoji Robe & Hat */}
+          <polygon points="32,2 24,18 40,18" fill="#1e1b4b" stroke="#4338ca" strokeWidth="2" />
+          <ellipse cx="32" cy="32" rx="18" ry="17" fill="#ffffff" stroke="#0f172a" strokeWidth="2.5" />
+          {/* Yin Yang / Talisman Seal */}
+          <rect x={isAttacking ? 10 : 20} y="34" width="8" height="14" fill="#fef08a" stroke="#dc2626" strokeWidth="1.5" />
+          <line x1={isAttacking ? 12 : 22} y1="38" x2={isAttacking ? 16 : 26} y2="38" stroke="#dc2626" strokeWidth="2" />
+          {/* Eyes */}
+          <circle cx="26" cy="28" r="2.5" fill="#0f172a" />
+          <circle cx="38" cy="28" r="2.5" fill="#0f172a" />
+          <ellipse cx={24 + legOffset1} cy="50" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={40 + legOffset2} cy="50" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_pirate':
+    case 'cat_pirate_captain':
+      return (
+        <svg width="65" height="65" viewBox="0 0 65 65" className="drop-shadow-md">
+          {/* Pirate Tricorne Hat */}
+          <polygon points="12,18 32,4 52,18 32,14" fill="#0f172a" stroke="#dc2626" strokeWidth="2" />
+          <ellipse cx="32" cy="34" rx="18" ry="17" fill="#ffffff" stroke="#0f172a" strokeWidth="2.5" />
+          {/* Eye Patch */}
+          <circle cx="26" cy="30" r="3" fill="#0f172a" />
+          <line x1="20" y1="26" x2="32" y2="34" stroke="#0f172a" strokeWidth="2" />
+          <circle cx="38" cy="30" r="2.5" fill="#0f172a" />
+          {/* Flintlock Pistol / Cutlass */}
+          <rect x={isAttacking ? 44 : 38} y="32" width="16" height="6" rx="2" fill="#78350f" stroke="#0f172a" strokeWidth="1.5" />
+          <ellipse cx={24 + legOffset1} cy="52" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={40 + legOffset2} cy="52" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_shaman':
+    case 'cat_necromancer':
+      return (
+        <svg width="65" height="65" viewBox="0 0 65 65" className="drop-shadow-md">
+          {/* Feathered Headdress */}
+          <polygon points="26,14 32,2 38,14" fill="#a855f7" />
+          <polygon points="18,18 24,6 28,18" fill="#3b82f6" />
+          <polygon points="36,18 40,6 46,18" fill="#ef4444" />
+          <ellipse cx="32" cy="34" rx="18" ry="17" fill="#ffffff" stroke="#0f172a" strokeWidth="2.5" />
+          <circle cx="26" cy="30" r="2.5" fill="#0f172a" />
+          <circle cx="38" cy="30" r="2.5" fill="#0f172a" />
+          {/* Shaman Skull Rattle */}
+          <g transform={`rotate(${Math.sin(timer * 20) * 25} 44 34)`}>
+            <line x1="44" y1="20" x2="44" y2="44" stroke="#78350f" strokeWidth="3" />
+            <circle cx="44" cy="20" r="6" fill="#f8fafc" stroke="#0f172a" strokeWidth="1.5" />
+          </g>
+          <ellipse cx={24 + legOffset1} cy="52" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={40 + legOffset2} cy="52" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_witch':
+    case 'cat_sorceress':
+      return (
+        <svg width="65" height="65" viewBox="0 0 65 65" className="drop-shadow-md">
+          {/* Pointy Witch Hat */}
+          <polygon points="32,2 20,18 44,18" fill="#581c87" stroke="#3b0764" strokeWidth="2" />
+          <ellipse cx="32" cy="18" rx="16" ry="4" fill="#7e22ce" />
+          <ellipse cx="32" cy="34" rx="18" ry="17" fill="#ffffff" stroke="#0f172a" strokeWidth="2.5" />
+          <circle cx="26" cy="30" r="2.5" fill="#a855f7" />
+          <circle cx="38" cy="30" r="2.5" fill="#a855f7" />
+          {/* Magic Wand with Star */}
+          <line x1="44" y1="42" x2={isAttacking ? 56 : 48} y2={isAttacking ? 22 : 28} stroke="#f59e0b" strokeWidth="3" />
+          <polygon points="56,22 52,26 56,30 60,26" fill="#facc15" />
+          <ellipse cx={24 + legOffset1} cy="52" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={40 + legOffset2} cy="52" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_lumberjack':
+    case 'cat_chainsaw':
+      return (
+        <svg width="68" height="65" viewBox="0 0 68 65" className="drop-shadow-md">
+          {/* Plaid Lumberjack Cap */}
+          <path d="M 18 20 Q 34 10 50 20 Z" fill="#dc2626" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx="34" cy="34" rx="18" ry="17" fill="#ffffff" stroke="#0f172a" strokeWidth="2.5" />
+          <circle cx="28" cy="30" r="2.5" fill="#0f172a" />
+          <circle cx="40" cy="30" r="2.5" fill="#0f172a" />
+          {/* Roaring Chainsaw */}
+          <rect x={isAttacking ? 38 : 34} y="32" width="22" height="10" rx="2" fill="#f59e0b" stroke="#0f172a" strokeWidth="2" />
+          <polygon points="60,32 66,37 60,42" fill="#94a3b8" />
+          <ellipse cx={26 + legOffset1} cy="52" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={42 + legOffset2} cy="52" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_boxer':
+    case 'cat_champion':
+      return (
+        <svg width="68" height="65" viewBox="0 0 68 65" className="drop-shadow-md">
+          <ellipse cx="34" cy="32" rx="18" ry="17" fill="#ffffff" stroke="#0f172a" strokeWidth="2.5" />
+          {/* Headband & Bruise */}
+          <rect x="18" y="20" width="32" height="5" fill="#dc2626" />
+          <circle cx="28" cy="28" r="2.5" fill="#0f172a" />
+          <circle cx="40" cy="28" r="2.5" fill="#0f172a" />
+          {/* Red Boxing Gloves */}
+          <circle cx={isAttacking ? 52 : 44} cy="36" r="7" fill="#dc2626" stroke="#991b1b" strokeWidth="2" />
+          <circle cx="24" cy="38" r="6" fill="#dc2626" stroke="#991b1b" strokeWidth="2" />
+          <ellipse cx={26 + legOffset1} cy="50" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={42 + legOffset2} cy="50" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
 
     default:
       return (
