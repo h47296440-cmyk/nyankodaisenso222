@@ -1,6 +1,6 @@
 {
   "name": "にゃんこ大戦争 v1.0 (Battle Cats Web Edition)",
-  "description": "スマホ対応の横スクロールタワーディフェンスゲーム。レジェンドストーリー（伝説のはじまり）や狂乱降臨ステージ、日本編・未来編・宇宙編のステージを攻略！狂乱キャラや多彩な強敵、BGM・ガチャ・お宝・パワーアップ機能を完全搭載。",
+  "description": "日本編・未来編・宇宙編（各1〜3章）、ゾンビ襲来、レジェンドストーリー（全8章）、狂乱降臨ステージ（狂乱のネコ〜巨神、極ムズ狂乱オールスターズ）を完全収録したにゃんこ大戦争。進行度に応じた段階的解放UI、BGM・ガチャ・お宝・編成・図鑑機能を搭載。",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

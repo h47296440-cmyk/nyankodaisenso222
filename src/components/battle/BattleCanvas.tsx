@@ -207,6 +207,47 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
           </div>
         );
 
+      case 'legend_volcano':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-orange-950 to-red-950 overflow-hidden pointer-events-none">
+            <div className="absolute top-2 left-1/3 w-96 h-60 bg-red-600/30 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-16 left-0 right-0 h-24 bg-gradient-to-t from-orange-600/30 to-transparent blur-sm" />
+            <svg className="absolute bottom-14 left-0 w-full h-44 opacity-60 text-stone-950 fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+              <polygon points="0,100 180,30 350,75 550,15 720,65 900,25 1000,100" />
+            </svg>
+          </div>
+        );
+
+      case 'legend_ice':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-cyan-950 to-blue-950 overflow-hidden pointer-events-none">
+            <div className="absolute top-4 right-1/4 w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-cyan-900/30 to-transparent" />
+            <svg className="absolute bottom-12 left-0 w-full h-36 opacity-50 text-cyan-950 fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+              <polygon points="0,100 120,40 220,70 380,20 540,65 700,25 840,75 1000,100" />
+            </svg>
+          </div>
+        );
+
+      case 'legend_sky':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-sky-900 via-indigo-900 to-amber-950 overflow-hidden pointer-events-none">
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 w-96 h-40 bg-amber-400/25 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute top-16 left-12 w-48 h-16 bg-white/20 rounded-full blur-lg" />
+            <div className="absolute top-24 right-20 w-64 h-20 bg-white/20 rounded-full blur-xl" />
+          </div>
+        );
+
+      case 'legend_ruins':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-purple-950 to-stone-900 overflow-hidden pointer-events-none">
+            <div className="absolute top-4 left-1/4 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl" />
+            <svg className="absolute bottom-14 left-0 w-full h-40 opacity-50 text-stone-950 fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+              <polygon points="0,100 100,40 140,40 160,80 280,25 340,25 360,80 520,35 600,35 620,85 780,20 860,20 880,75 1000,100" />
+            </svg>
+          </div>
+        );
+
       case 'crazed_hell':
         return (
           <div className="absolute inset-0 bg-gradient-to-b from-purple-950 via-red-950 to-stone-950 overflow-hidden pointer-events-none">

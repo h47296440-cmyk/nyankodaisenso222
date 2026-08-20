@@ -216,12 +216,19 @@ export type ChapterId =
   | 'legend_1'
   | 'legend_2'
   | 'legend_3'
+  | 'legend_4'
+  | 'legend_5'
+  | 'legend_6'
+  | 'legend_7'
+  | 'legend_8'
   | 'crazed_event'
+  | 'special_event'
   | 'japan'
   | 'future'
   | 'cosmos'
   | 'legend'
-  | 'crazed';
+  | 'crazed'
+  | 'special';
 
 export interface StageDefinition {
   id: string;
@@ -245,6 +252,10 @@ export interface StageDefinition {
     | 'legend_cave'
     | 'legend_passion'
     | 'legend_street'
+    | 'legend_volcano'
+    | 'legend_ice'
+    | 'legend_sky'
+    | 'legend_ruins'
     | 'crazed_hell';
   battlefieldWidth: number;
   baseRewardXp: number;
@@ -259,6 +270,9 @@ export interface StageDefinition {
   rewardCatUnlockId?: string; // 狂乱ステージクリア時のキャラ報酬アンロックID
   isZombieStage?: boolean; // ゾンビ襲来モードフラグ
   zombieRewardBonus?: boolean;
+  difficultyLabel?: string; // e.g. "初級", "上級", "超激ムズ", "極ムズ"
+  timeRemaining?: string; // e.g. "のこり 01時間09分"
+  stageLoreTip?: string; // 特殊アドバイス・セリフ
 }
 
 export interface BattleActiveItems {
@@ -272,7 +286,7 @@ export interface BattleActiveItems {
 
 export interface ChapterDefinition {
   id: ChapterId;
-  category: 'japan' | 'future' | 'cosmos' | 'legend' | 'crazed';
+  category: 'japan' | 'future' | 'cosmos' | 'legend' | 'crazed' | 'special';
   chapterNumber: number;
   name: string;
   jpName: string;

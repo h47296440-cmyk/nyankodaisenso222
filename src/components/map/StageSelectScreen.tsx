@@ -1,23 +1,26 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   ChapterDefinition,
   StageDefinition,
   PlayerProfile,
   TreasureQuality,
   BattleActiveItems,
+  ChapterId,
 } from '../../types';
-import { CHAPTERS, TREASURES } from '../../data/stages';
+import { CHAPTERS } from '../../data/stages';
 import {
-  Award,
-  ChevronLeft,
-  ChevronRight,
-  Zap,
   ArrowLeft,
-  Settings,
-  Layers,
   Sparkles,
   Lock,
   Wrench,
+  HelpCircle,
+  Zap,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Info,
+  Shield,
+  Flame,
 } from 'lucide-react';
 import { audio } from '../../utils/audio';
 import { JapanMapCanvas } from './JapanMapCanvas';
@@ -47,25 +50,23 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
   onOpenStorySelect,
   onBackToTitle,
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<'japan' | 'future' | 'cosmos' | 'legend' | 'crazed'>('japan');
-  const [selectedChapterId, setSelectedChapterId] = useState<string>('japan_1');
+  // Screen View: 'chapter_select' (ふすまの章選択画面) or 'stage_map' (地図でのステージ選択画面)
+  const [screenView, setScreenView] = useState<'chapter_select' | 'stage_map'>('chapter_select');
+
+  // Selected Chapter ID
+  const [selectedChapterId, setSelectedChapterId] = useState<ChapterId>('japan_1');
   const [isZombieMode, setIsZombieMode] = useState<boolean>(false);
+  const [catSpeech, setCatSpeech] = useState<string>(
+    'にゃんコンボ図鑑に表示されたにゃんコンボの名前部分をダブルタップすると自動でセット出来て便利にゃ'
+  );
+  const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
 
-  // Filter chapters by selected category
-  const categoryChapters = CHAPTERS.filter((c) => c.category === selectedCategory);
-  const currentChapter = CHAPTERS.find((c) => c.id === selectedChapterId) || categoryChapters[0] || CHAPTERS[0];
-
-  const hasZombieStages = !!(selectedCategory === 'japan' && currentChapter.zombieStages && currentChapter.zombieStages.length > 0);
-  const activeStages = (isZombieMode && hasZombieStages && currentChapter.zombieStages) ? currentChapter.zombieStages : currentChapter.stages;
+  // Category filter for the chapter select menu
+  const [activeCategoryTab, setActiveCategoryTab] = useState<'all' | 'japan' | 'future' | 'cosmos' | 'legend' | 'crazed'>('all');
 
   const isInfiniteEnergy = !!profile.devMode?.infiniteEnergy;
   const isInfiniteXp = !!profile.devMode?.infiniteXp;
   const isInfiniteCatFood = !!profile.devMode?.infiniteCatFood;
-
-  // Stage selection state
-  const [selectedStageId, setSelectedStageId] = useState<string>(
-    activeStages[0]?.id || 'japan_1_1'
-  );
 
   // Active Battle Items toggles
   const [activeItems, setActiveItems] = useState<BattleActiveItems>({
@@ -78,57 +79,220 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
   });
 
   const mapScrollRef = useRef<HTMLDivElement>(null);
+  const chapterListRef = useRef<HTMLDivElement>(null);
 
-  // Sync selected stage when chapter or mode changes
-  useEffect(() => {
-    setSelectedStageId(activeStages[0]?.id || 'japan_1_1');
-  }, [selectedChapterId, isZombieMode, selectedCategory]);
+  // =========================================================================
+  // CHAPTER UNLOCK & PROGRESSION LOGIC
+  // =========================================================================
+  const checkChapterCleared = (chId: ChapterId): boolean => {
+    const ch = CHAPTERS.find((c) => c.id === chId);
+    if (!ch || ch.stages.length === 0) return false;
+    const lastStage = ch.stages[ch.stages.length - 1];
+    return !!profile.clearedStages[lastStage.id];
+  };
 
-  // Current selected stage index
-  const currentIndex = activeStages.findIndex((s) => s.id === selectedStageId);
-  const currentStage = activeStages[currentIndex] || activeStages[0] || currentChapter.stages[0];
-
-  // Helper for chapter unlocked check
-  const checkChapterUnlocked = (chId: string): boolean => {
+  const checkChapterUnlocked = (chId: ChapterId): boolean => {
     switch (chId) {
       case 'japan_1':
       case 'japan':
         return true;
       case 'japan_2':
-        return !!profile.clearedStages['japan_1_5'] || !!profile.clearedStages['japan_12'] || !!profile.clearedStages['japan_6'];
+        return checkChapterCleared('japan_1');
       case 'japan_3':
-        return !!profile.clearedStages['japan_2_4'] || !!profile.clearedStages['japan_12'];
+        return checkChapterCleared('japan_2');
       case 'future_1':
       case 'future':
-        return !!profile.clearedStages['japan_3_3'] || !!profile.clearedStages['japan_1_5'] || !!profile.clearedStages['japan_12'];
+        return checkChapterCleared('japan_3') || checkChapterCleared('japan_1');
       case 'future_2':
-        return !!profile.clearedStages['future_1_3'] || !!profile.clearedStages['future_1_6'];
+        return checkChapterCleared('future_1');
       case 'future_3':
-        return !!profile.clearedStages['future_2_4'] || !!profile.clearedStages['future_1_6'];
+        return checkChapterCleared('future_2');
       case 'cosmos_1':
       case 'cosmos':
-        return !!profile.clearedStages['future_3_6'] || !!profile.clearedStages['future_1_6'];
+        return checkChapterCleared('future_3') || checkChapterCleared('future_1');
       case 'cosmos_2':
-        return !!profile.clearedStages['cosmos_1_6'];
+        return checkChapterCleared('cosmos_1');
       case 'cosmos_3':
-        return !!profile.clearedStages['cosmos_2_6'];
+        return checkChapterCleared('cosmos_2');
       case 'legend_1':
       case 'legend':
-        return !!profile.clearedStages['japan_1_5'] || !!profile.clearedStages['japan_1_8'] || !!profile.clearedStages['japan_12'] || !!profile.clearedStages['japan_3_3'];
+        return checkChapterCleared('japan_1');
+      case 'legend_2':
+        return checkChapterCleared('legend_1');
+      case 'legend_3':
+        return checkChapterCleared('legend_2');
+      case 'legend_4':
+        return checkChapterCleared('legend_3');
+      case 'legend_5':
+        return checkChapterCleared('legend_4');
+      case 'legend_6':
+        return checkChapterCleared('legend_5');
+      case 'legend_7':
+        return checkChapterCleared('legend_6');
+      case 'legend_8':
+        return checkChapterCleared('legend_7');
       case 'crazed_event':
       case 'crazed':
-        return !!profile.clearedStages['japan_1_5'] || !!profile.clearedStages['japan_1_8'] || !!profile.clearedStages['japan_12'] || !!profile.clearedStages['japan_3_3'];
+        return checkChapterCleared('japan_1');
       default:
         return true;
     }
   };
 
-  const isFutureCategoryUnlocked = checkChapterUnlocked('future_1');
-  const isCosmosCategoryUnlocked = checkChapterUnlocked('cosmos_1');
-  const isLegendCategoryUnlocked = checkChapterUnlocked('legend_1');
-  const isCrazedCategoryUnlocked = checkChapterUnlocked('crazed_event');
+  // List of all Chapters with progressive visibility
+  // "解放されてるところとそれをクリアすると解放されるところ(暗くして)以外は見えないように"
+  const visibleChaptersWithStatus = useMemo(() => {
+    const chaptersToFilter = activeCategoryTab === 'all' 
+      ? CHAPTERS 
+      : CHAPTERS.filter((c) => c.category === activeCategoryTab);
 
-  // Toggle item selection
+    const result: {
+      chapter: ChapterDefinition;
+      status: 'cleared' | 'unlocked' | 'next_locked';
+      timeRemaining?: string;
+      isEvent?: boolean;
+    }[] = [];
+
+    let hasFoundNextLocked = false;
+
+    for (let i = 0; i < chaptersToFilter.length; i++) {
+      const ch = chaptersToFilter[i];
+      const isCleared = checkChapterCleared(ch.id);
+      const isUnlocked = checkChapterUnlocked(ch.id);
+
+      if (isCleared) {
+        result.push({
+          chapter: ch,
+          status: 'cleared',
+          timeRemaining: ch.category === 'crazed' ? 'のこり 01時間09分' : undefined,
+          isEvent: ch.category === 'crazed',
+        });
+      } else if (isUnlocked) {
+        result.push({
+          chapter: ch,
+          status: 'unlocked',
+          timeRemaining: ch.category === 'crazed' ? 'のこり 01時間09分' : undefined,
+          isEvent: ch.category === 'crazed',
+        });
+      } else if (!hasFoundNextLocked) {
+        result.push({
+          chapter: ch,
+          status: 'next_locked',
+          isEvent: ch.category === 'crazed',
+        });
+        hasFoundNextLocked = true;
+      }
+      // Subsequent locked chapters are hidden
+    }
+
+    return result;
+  }, [activeCategoryTab, profile.clearedStages]);
+
+  const currentChapter = useMemo(() => {
+    return (
+      CHAPTERS.find((c) => c.id === selectedChapterId) ||
+      visibleChaptersWithStatus[0]?.chapter ||
+      CHAPTERS[0]
+    );
+  }, [selectedChapterId, visibleChaptersWithStatus]);
+
+  const hasZombieStages = !!(
+    (currentChapter.category === 'japan' || currentChapter.category === 'future') &&
+    currentChapter.zombieStages &&
+    currentChapter.zombieStages.length > 0
+  );
+
+  const rawActiveStages =
+    isZombieMode && hasZombieStages && currentChapter.zombieStages
+      ? currentChapter.zombieStages
+      : currentChapter.stages;
+
+  // Progressive visibility for stages in map
+  const visibleStagesWithStatus = useMemo(() => {
+    const result: { stage: StageDefinition; status: 'cleared' | 'unlocked' | 'next_locked' }[] = [];
+    let hasFoundNextLocked = false;
+
+    for (let i = 0; i < rawActiveStages.length; i++) {
+      const st = rawActiveStages[i];
+      const isCleared = !!profile.clearedStages[st.id];
+      const isUnlocked = i === 0 || !!profile.clearedStages[rawActiveStages[i - 1].id];
+
+      if (isCleared) {
+        result.push({ stage: st, status: 'cleared' });
+      } else if (isUnlocked) {
+        result.push({ stage: st, status: 'unlocked' });
+      } else if (!hasFoundNextLocked) {
+        result.push({ stage: st, status: 'next_locked' });
+        hasFoundNextLocked = true;
+      }
+    }
+
+    return result;
+  }, [rawActiveStages, profile.clearedStages]);
+
+  const playableStages = useMemo(() => {
+    return visibleStagesWithStatus.filter((s) => s.status !== 'next_locked').map((s) => s.stage);
+  }, [visibleStagesWithStatus]);
+
+  // Stage selection state
+  const [selectedStageId, setSelectedStageId] = useState<string>(
+    playableStages[0]?.id || rawActiveStages[0]?.id || 'japan_1_1'
+  );
+
+  // Sync selected stage when chapter or mode changes
+  useEffect(() => {
+    if (playableStages.length > 0) {
+      const stageToSelect = playableStages[playableStages.length - 1] || playableStages[0];
+      setSelectedStageId(stageToSelect.id);
+    } else if (rawActiveStages.length > 0) {
+      setSelectedStageId(rawActiveStages[0].id);
+    }
+  }, [selectedChapterId, isZombieMode]);
+
+  const currentStage = useMemo(() => {
+    return (
+      rawActiveStages.find((s) => s.id === selectedStageId) ||
+      playableStages[0] ||
+      rawActiveStages[0]
+    );
+  }, [selectedStageId, rawActiveStages, playableStages]);
+
+  const currentIndex = rawActiveStages.findIndex((s) => s.id === currentStage?.id);
+
+  // Update Cat's speech on stage selection
+  useEffect(() => {
+    if (screenView === 'stage_map' && currentStage) {
+      if (currentStage.id === 'crazed_allstars') {
+        setCatSpeech(
+          '極ムズ警告だにゃ！狂乱キャラ全員が一斉に押し寄せてくるにゃ！安価壁を5枚以上連打して前線を死守し、高火力アタッカーで総力戦だにゃ！'
+        );
+      } else if (currentStage.id.startsWith('crazed')) {
+        setCatSpeech(
+          `超激ムズ降臨だにゃ！${currentStage.name}の猛攻を耐え抜いて討伐すると狂乱キャラが仲間になるにゃ！`
+        );
+      } else if (currentStage.isZombieStage) {
+        setCatSpeech(
+          'ゾンビ敵は地中を潜って拠点を急襲し、倒されても蘇生するにゃ！ゾンビキラー特性持ちの味方が大活躍するにゃ！'
+        );
+      } else if (currentStage.isFinalBossStage) {
+        setCatSpeech(
+          `この章の最終決戦だにゃ！BOSS【${currentChapter.bossName}】を討伐して完全制覇を目指すにゃ！`
+        );
+      } else if (currentStage.treasureFestival) {
+        setCatSpeech('お宝出現率が超UPしているにゃ！最高のお宝（金）を狙う絶好のチャンスだにゃ！');
+      } else {
+        const tips = [
+          '壁キャラを絶え間なく生産して後ろの長射程アタッカーを守るのが勝利の秘訣だにゃ！',
+          '働きネコのレベルを上げるとお金の上限と生産速度がアップするにゃ！',
+          'お宝を金で揃えると統率力や攻撃力が劇的にパワーアップするにゃ！',
+          '赤い敵には勇者ネコや暗黒ネコ、浮いてる敵にはネコ番長が頼もしいにゃ！',
+        ];
+        setCatSpeech(tips[Math.floor(Math.random() * tips.length)]);
+      }
+    }
+  }, [currentStage?.id, screenView]);
+
+  // Toggle battle item selection
   const handleToggleItem = (key: keyof BattleActiveItems, count: number) => {
     audio.playClick();
     if (count <= 0 && !activeItems[key]) {
@@ -143,6 +307,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
 
   // Launch Battle
   const handleDeploy = () => {
+    if (!currentStage) return;
     audio.playClick();
     if (!isInfiniteEnergy && profile.energy < currentStage.energyCost) {
       alert('統率力（エナジー）が足りないにゃ！時間が経つと回復するにゃ。');
@@ -155,602 +320,734 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
   const handlePrevStage = () => {
     if (currentIndex > 0) {
       audio.playClick();
-      setSelectedStageId(activeStages[currentIndex - 1].id);
+      setSelectedStageId(rawActiveStages[currentIndex - 1].id);
     }
   };
 
   const handleNextStage = () => {
-    if (currentIndex < activeStages.length - 1) {
+    if (currentIndex < rawActiveStages.length - 1) {
       audio.playClick();
-      setSelectedStageId(activeStages[currentIndex + 1].id);
+      setSelectedStageId(rawActiveStages[currentIndex + 1].id);
     }
   };
 
   // Treasure status helper
-  const getTreasureStatus = (stageId: string) => {
+  const getTreasureStatus = (stageId: string): TreasureQuality => {
     return profile.treasures[stageId] || 'none';
   };
 
-  const currentTreasureStatus = getTreasureStatus(currentStage.id);
-  const isCurrentCleared = !!profile.clearedStages[currentStage.id];
-  const clearCount = isCurrentCleared ? 2 : 0; // standard display count
+  const currentTreasureStatus = currentStage ? getTreasureStatus(currentStage.id) : 'none';
 
   return (
-    <div className="relative w-full h-full flex flex-col bg-stone-950 text-white select-none font-['M_PLUS_Rounded_1c'] overflow-hidden">
-      {/* 1. TOP BAR: TITLE, CHAPTER TABS & RESOURCES (iPhone PWA Safe Area Aware) */}
-      <div className="z-30 bg-stone-900/95 border-b border-stone-800 px-2 sm:px-5 pt-[max(0.35rem,env(safe-area-inset-top,0px))] pb-1.5 shadow-md flex flex-col gap-1 sm:gap-0 sm:flex-row sm:items-center sm:justify-between">
-        {/* Row 1 (or Left side on desktop): Back, Chapters, Story, History, Dev */}
-        <div className="flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2.5 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-1.5 sm:gap-2">
+    <div
+      id="screen-stage-select"
+      className="relative w-full h-full flex flex-col bg-stone-950 text-white select-none font-['M_PLUS_Rounded_1c'] overflow-hidden"
+    >
+      {/* ========================================================================= */}
+      {/* 1. TOP HEADER BAR (Iconic Battle Cats Top Bar with Wood & Gold accents)  */}
+      {/* ========================================================================= */}
+      <div className="z-30 bg-[#2b1e16] border-b-4 border-[#17100b] px-2 sm:px-4 pt-[max(0.35rem,env(safe-area-inset-top,0px))] pb-2 shadow-xl flex items-center justify-between gap-2">
+        {/* Left: Back to Base Button (or Back to Chapter Select) */}
+        <div className="flex items-center gap-2 shrink-0">
+          {screenView === 'stage_map' ? (
             <button
-              id="btn-back-to-title"
+              id="btn-back-to-chapter-select"
+              onClick={() => {
+                audio.playClick();
+                setScreenView('chapter_select');
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-b from-amber-500 via-amber-600 to-amber-800 hover:from-amber-400 hover:to-amber-700 text-stone-950 font-black text-xs sm:text-sm border-2 border-[#17100b] shadow-[0_2px_0_#17100b] active:translate-y-0.5 transition-all"
+              title="章選択へ戻る"
+            >
+              <ArrowLeft size={16} strokeWidth={3} className="text-stone-950" />
+              <span>章選択へ</span>
+            </button>
+          ) : (
+            <button
+              id="btn-back-to-base"
               onClick={() => {
                 audio.playClick();
                 onBackToTitle();
               }}
-              className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 active:scale-95 shrink-0"
-              title="タイトルへ戻る"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-b from-amber-500 via-amber-600 to-amber-800 hover:from-amber-400 hover:to-amber-700 text-stone-950 font-black text-xs sm:text-sm border-2 border-[#17100b] shadow-[0_2px_0_#17100b] active:translate-y-0.5 transition-all"
+              title="ネコ基地へ戻る"
             >
-              <ArrowLeft size={16} />
+              <ArrowLeft size={16} strokeWidth={3} className="text-stone-950" />
+              <span>ネコ基地</span>
             </button>
+          )}
 
-            {/* Category Selector Tabs (日本 / 未来 / 宇宙 / レジェンド / 狂乱降臨) */}
-            <div className="flex items-center bg-stone-950 p-0.5 sm:p-1 rounded-xl border border-stone-800 shrink-0 max-w-[50vw] sm:max-w-none overflow-x-auto no-scrollbar">
-              {[
-                { id: 'japan' as const, name: '日本編', short: '日本', locked: false, badge: '' },
-                { id: 'future' as const, name: '未来編', short: '未来', locked: !isFutureCategoryUnlocked, badge: '' },
-                { id: 'cosmos' as const, name: '宇宙編', short: '宇宙', locked: !isCosmosCategoryUnlocked, badge: '' },
-                { id: 'legend' as const, name: 'レジェンド', short: '伝説', locked: !isLegendCategoryUnlocked, badge: 'NEW' },
-                { id: 'crazed' as const, name: '狂乱降臨', short: '狂乱', locked: !isCrazedCategoryUnlocked, badge: '降臨' },
-              ].map((cat) => {
-                const isSelected = selectedCategory === cat.id;
-
-                return (
-                  <button
-                    key={cat.id}
-                    id={`tab-category-${cat.id}`}
-                    disabled={cat.locked}
-                    onClick={() => {
-                      audio.playClick();
-                      setSelectedCategory(cat.id);
-                      const firstCatCh = CHAPTERS.find((c) => c.category === cat.id);
-                      if (firstCatCh) {
-                        setSelectedChapterId(firstCatCh.id);
-                      }
-                    }}
-                    className={`relative px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-black transition-all flex items-center gap-1 whitespace-nowrap ${
-                      isSelected
-                        ? cat.id === 'crazed'
-                          ? 'bg-gradient-to-r from-purple-700 to-rose-700 text-white shadow-md ring-1 ring-purple-400'
-                          : cat.id === 'legend'
-                          ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-white shadow-md ring-1 ring-amber-300'
-                          : 'bg-amber-600 text-white shadow-md'
-                        : cat.locked
-                        ? 'text-stone-600 opacity-50 cursor-not-allowed'
-                        : 'text-stone-400 hover:text-white'
-                    }`}
-                  >
-                    {cat.locked && <Lock size={10} />}
-                    <span className="sm:inline hidden">{cat.name}</span>
-                    <span className="sm:hidden inline">{cat.short}</span>
-                    {cat.badge && !cat.locked && (
-                      <span className="text-[8px] bg-red-600 text-white px-1 py-0.2 rounded font-black leading-none">
-                        {cat.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Sub-Chapter Pills (第1章 / 第2章 / 第3章) */}
-            <div className="flex items-center bg-stone-950/80 p-0.5 rounded-lg border border-stone-800/80 shrink-0">
-              {categoryChapters.map((ch) => {
-                const isLocked = !checkChapterUnlocked(ch.id);
-                const isSelected = currentChapter.id === ch.id;
-
-                return (
-                  <button
-                    key={ch.id}
-                    id={`tab-chapter-${ch.id}`}
-                    disabled={isLocked}
-                    onClick={() => {
-                      audio.playClick();
-                      setSelectedChapterId(ch.id);
-                    }}
-                    className={`px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-black transition-all flex items-center gap-0.5 whitespace-nowrap ${
-                      isSelected
-                        ? 'bg-red-600 text-white shadow ring-1 ring-amber-300'
-                        : isLocked
-                        ? 'text-stone-600 opacity-40 cursor-not-allowed'
-                        : 'text-stone-400 hover:text-amber-300'
-                    }`}
-                    title={ch.jpName}
-                  >
-                    {isLocked ? (
-                      <Lock size={9} />
-                    ) : (
-                      <span className="text-amber-400">👑</span>
-                    )}
-                    <span>第{ch.chapterNumber}章</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Zombie Outbreak Mode Toggle Button (Japan chapters) */}
-            {hasZombieStages && (
-              <button
-                id="btn-toggle-zombie-mode"
-                onClick={() => {
-                  audio.playClick();
-                  setIsZombieMode((prev) => !prev);
-                }}
-                className={`px-2 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-black transition-all flex items-center gap-1 shadow whitespace-nowrap border shrink-0 active:scale-95 ${
-                  isZombieMode
-                    ? 'bg-gradient-to-r from-purple-800 via-indigo-900 to-emerald-900 text-purple-200 border-purple-400 ring-2 ring-purple-400 shadow-purple-500/50 animate-pulse'
-                    : 'bg-stone-900 text-purple-300 border-purple-700/60 hover:bg-stone-800 hover:text-purple-200'
-                }`}
-                title="ゾンビ襲来ステージモード切替"
-              >
-                <span>🧟</span>
-                <span>{isZombieMode ? 'ゾンビ襲来中！' : 'ゾンビ襲来'}</span>
-              </button>
-            )}
+          {/* Limited Sale / Event Banner (Authentic to Battle Cats UI) */}
+          <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 border border-yellow-300 shadow text-[11px] font-black text-white animate-pulse">
+            <Sparkles size={13} className="text-yellow-200" />
+            <span>いまだけ!! のこり1日 超お得★限定パック発売中！</span>
           </div>
+        </div>
 
-          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-            {/* Story Theater Button */}
+        {/* Center: Title / Story Theater Badge */}
+        <div className="flex items-center gap-1.5">
+          {screenView === 'stage_map' ? (
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-stone-900/90 border border-amber-600/60 text-amber-300 font-black text-xs sm:text-sm shadow">
+              <span>🗺️</span>
+              <span>{currentChapter.jpName}</span>
+            </div>
+          ) : (
             <button
               id="btn-map-story-theater"
               onClick={() => {
                 audio.playClick();
                 onOpenStorySelect();
               }}
-              className="text-[10px] sm:text-xs font-black text-white bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-600 hover:to-indigo-600 px-2 py-0.5 sm:py-1 rounded-lg shadow border border-purple-400 flex items-center gap-0.5 active:scale-95 transition-all whitespace-nowrap"
+              className="text-[10px] sm:text-xs font-black text-white bg-gradient-to-r from-purple-800 to-indigo-800 hover:from-purple-700 hover:to-indigo-700 px-2.5 py-1 rounded-lg shadow border border-purple-400 flex items-center gap-1 active:scale-95 transition-all whitespace-nowrap"
               title="各章のオープニング・エンディング"
             >
               <span>📜</span>
-              <span>物語</span>
+              <span>物語シアター</span>
             </button>
+          )}
 
-            <button
-              id="btn-map-update-history"
-              onClick={() => {
-                audio.playClick();
-                onOpenUpdateHistory();
-              }}
-              className="text-[10px] font-black text-amber-950 bg-amber-300 hover:bg-amber-200 px-1.5 sm:px-2 py-0.5 rounded-full shadow border border-amber-400 active:scale-95 whitespace-nowrap animate-pulse"
-            >
-              v2.0 NEW!
-            </button>
+          <button
+            id="btn-map-dev-mode"
+            onClick={() => {
+              audio.playClick();
+              onOpenDevMode();
+            }}
+            className="text-[10px] sm:text-xs font-black text-stone-900 bg-amber-400 hover:bg-amber-300 px-2 py-1 rounded-lg shadow border border-amber-600 flex items-center gap-1 active:scale-95 transition-all whitespace-nowrap"
+            title="開発者モード"
+          >
+            <Wrench size={12} className="text-stone-900" />
+            <span className="hidden sm:inline">開発</span>
+          </button>
 
-            {/* Dev Mode Button in Map Header */}
-            <button
-              id="btn-map-dev-mode"
-              onClick={() => {
-                audio.playClick();
-                onOpenDevMode();
-              }}
-              className="text-[10px] font-black text-stone-900 bg-amber-400 hover:bg-amber-300 px-2 py-0.5 rounded-full shadow border border-amber-600 flex items-center gap-0.5 active:scale-95 transition-all whitespace-nowrap"
-              title="開発者モード"
-            >
-              <Wrench size={11} className="text-stone-900" />
-              <span>開発</span>
-            </button>
-          </div>
+          <button
+            id="btn-help-modal"
+            onClick={() => {
+              audio.playClick();
+              setShowHelpModal(true);
+            }}
+            className="p-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-600 active:scale-95"
+            title="ヘルプ"
+          >
+            <HelpCircle size={16} />
+          </button>
         </div>
 
-        {/* Row 2 (or Right side on desktop): Resources: Energy, XP, Cat Food */}
-        <div className="flex items-center justify-end gap-1.5 sm:gap-2.5 text-[11px] sm:text-xs font-black shrink-0">
-          {/* Energy */}
-          <div
-            className={`flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-full border whitespace-nowrap ${
-              isInfiniteEnergy
-                ? 'bg-cyan-950/90 border-cyan-400 text-cyan-300 shadow-[0_0_8px_rgba(6,182,212,0.4)] animate-pulse'
-                : 'bg-stone-800/90 border-cyan-500/50 text-cyan-300'
-            }`}
-          >
-            <Zap size={13} className="text-cyan-400" />
-            <span>
-              {isInfiniteEnergy ? (
-                <span>∞ (MAX)</span>
-              ) : (
-                <>
-                  {profile.energy}{' '}
-                  <span className="text-[9px] sm:text-[10px] text-stone-400">
-                    /{profile.maxEnergy}
-                  </span>
-                </>
-              )}
-            </span>
-          </div>
-
+        {/* Right: Currency & Energy Resources */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 text-xs font-black shrink-0">
           {/* XP */}
           <div
-            className={`flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-full border whitespace-nowrap ${
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-full border-2 whitespace-nowrap ${
               isInfiniteXp
                 ? 'bg-emerald-950/90 border-emerald-400 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.4)] animate-pulse'
-                : 'bg-stone-800/90 border-emerald-500/50 text-emerald-300'
+                : 'bg-stone-900 border-[#4a3525] text-emerald-300'
             }`}
           >
-            <span className="text-[9px] sm:text-[10px] text-emerald-400">XP</span>
-            <span>{isInfiniteXp ? '∞ (MAX)' : profile.xp.toLocaleString()}</span>
+            <span className="text-[10px] font-black text-emerald-400">経験値 XP</span>
+            <span className="text-xs font-black">
+              {isInfiniteXp ? '∞' : profile.xp.toLocaleString()}
+            </span>
           </div>
 
           {/* Cat Food */}
           <div
-            className={`flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-full border whitespace-nowrap ${
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-full border-2 whitespace-nowrap ${
               isInfiniteCatFood
                 ? 'bg-amber-950/90 border-amber-400 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.4)] animate-pulse'
-                : 'bg-stone-800/90 border-amber-500/50 text-amber-300'
+                : 'bg-stone-900 border-[#4a3525] text-amber-300'
             }`}
           >
-            <span className="text-[9px] sm:text-[10px] text-amber-400">缶</span>
-            <span>{isInfiniteCatFood ? '∞ (MAX)' : profile.catFood}</span>
+            <span className="text-[10px] font-black text-amber-400">缶</span>
+            <span className="text-xs font-black">
+              {isInfiniteCatFood ? '∞' : profile.catFood.toLocaleString()}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* 2. MAIN MAP VIEWPORT (Full Screen Map with Stage Overlay) */}
-      <div className="relative flex-1 min-h-0 w-full overflow-hidden">
-        {/* The Japan / World / Space Map Canvas */}
-        <JapanMapCanvas
-          chapter={currentChapter}
-          stages={activeStages}
-          selectedStageId={selectedStageId}
-          clearedStages={profile.clearedStages}
-          onSelectStage={(st) => {
-            audio.playClick();
-            setSelectedStageId(st.id);
+      {/* ========================================================================= */}
+      {/* 2. MAIN VIEW SWITCHER: CHAPTER SELECT (FUSUMA MENU) VS MAP VIEW           */}
+      {/* ========================================================================= */}
+      {screenView === 'chapter_select' ? (
+        // =========================================================================
+        // SCREEN 1: CHAPTER & EVENT SELECT MENU (ATTACHED SCREENSHOT AUTHENTIC UI!)
+        // =========================================================================
+        <div
+          id="fusuma-chapter-select-menu"
+          className="relative flex-1 w-full h-full flex flex-col md:flex-row overflow-hidden"
+          style={{
+            // Green Japanese Karakusa / Fusuma pattern matching the screenshot!
+            backgroundColor: '#3b5c46',
+            backgroundImage: `
+              radial-gradient(circle at 50% 50%, #466e54 10%, transparent 10.5%),
+              radial-gradient(circle at 0% 50%, #466e54 10%, transparent 10.5%),
+              radial-gradient(circle at 100% 50%, #466e54 10%, transparent 10.5%),
+              radial-gradient(circle at 50% 0%, #466e54 10%, transparent 10.5%),
+              radial-gradient(circle at 50% 100%, #466e54 10%, transparent 10.5%)
+            `,
+            backgroundSize: '48px 48px',
           }}
-          containerRef={mapScrollRef}
-        />
-
-        {/* 3. TOP STAGE BANNER CAROUSEL (Replica of Battle Cats UI Banner) */}
-        <div className="absolute top-2 left-0 right-0 z-20 flex items-center justify-center pointer-events-none px-2">
-          <div className="flex items-center gap-2 max-w-4xl w-full justify-center">
-            {/* Prev Stage Preview Banner */}
-            {currentIndex > 0 && (
-              <div
-                onClick={handlePrevStage}
-                className="hidden md:flex pointer-events-auto cursor-pointer flex-col bg-white/95 border-4 border-black text-black px-4 py-1.5 rounded-lg shadow-lg opacity-75 hover:opacity-100 transition-transform active:scale-95 min-w-[140px]"
-              >
-                <div className="flex items-center justify-between text-[11px] font-black">
-                  <span className="text-red-600">
-                    {profile.clearedStages[activeStages[currentIndex - 1].id] ? 'CLEAR!' : ''}
-                  </span>
-                </div>
-                <div className="text-sm font-black truncate">
-                  {activeStages[currentIndex - 1].name}
-                </div>
-                <div className="text-[10px] font-bold text-stone-600">
-                  統率力 -{activeStages[currentIndex - 1].energyCost}
-                </div>
+        >
+          {/* Fusuma Center Divider & Traditional Metal Pull (襖の引き手) */}
+          <div className="hidden md:flex absolute inset-y-0 left-1/2 -translate-x-1/2 w-10 flex-col items-center justify-center pointer-events-none z-10">
+            {/* Center Vertical Fusuma Seam */}
+            <div className="absolute inset-y-0 w-1.5 bg-[#17100b] shadow-[0_0_8px_rgba(0,0,0,0.8)]" />
+            {/* Round Metal Fusuma Pull with Cat Paw Motif */}
+            <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-stone-500 via-stone-700 to-stone-900 border-4 border-[#17100b] shadow-[0_4px_10px_rgba(0,0,0,0.9)] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-stone-800 to-stone-950 border-2 border-stone-600 flex items-center justify-center text-stone-400 font-black text-lg">
+                🐾
               </div>
-            )}
+            </div>
+          </div>
 
-            {/* Prev Button */}
-            <button
-              id="btn-prev-stage"
-              disabled={currentIndex <= 0}
-              onClick={handlePrevStage}
-              className={`pointer-events-auto p-1.5 sm:p-2 rounded-full border-2 border-black shadow-lg transition-transform active:scale-90 ${
-                currentIndex > 0
-                  ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                  : 'bg-stone-700 text-stone-500 opacity-40 cursor-not-allowed'
-              }`}
-            >
-              <ChevronLeft size={20} strokeWidth={3} />
-            </button>
-
-            {/* CURRENT SELECTED STAGE BANNER (Prominent Large White Board) */}
-            <div className="pointer-events-auto relative bg-white border-[3px] sm:border-[5px] border-black text-black px-3 sm:px-8 py-1 sm:py-2.5 rounded-xl shadow-2xl flex flex-col items-center min-w-[190px] sm:min-w-[320px] max-w-[70vw] sm:max-w-md">
-              {/* CLEAR! Stamp on Top Left */}
-              {isCurrentCleared && (
-                <div className="absolute -top-2.5 -left-2 sm:-top-3.5 sm:-left-3 bg-red-600 text-white font-black text-[9px] sm:text-xs px-1.5 sm:px-2.5 py-0.5 rounded border-2 border-black shadow rotate-[-8deg] tracking-wider animate-pulse">
-                  CLEAR!
-                </div>
-              )}
-
-              {/* Treasure Stamp on Top Right */}
-              <div className="absolute -top-2.5 -right-2 sm:-top-3.5 sm:-right-3">
-                {currentTreasureStatus === 'gold' ? (
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-600 border-2 border-black shadow-md flex items-center justify-center font-black text-stone-950 text-[10px] sm:text-xs ring-2 ring-yellow-300 animate-bounce">
-                    宝
-                  </div>
-                ) : currentTreasureStatus === 'silver' ? (
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-slate-200 via-stone-300 to-slate-400 border-2 border-black shadow-md flex items-center justify-center font-black text-stone-900 text-[10px] sm:text-xs">
-                    宝
-                  </div>
-                ) : currentTreasureStatus === 'bronze' ? (
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-600 via-amber-700 to-amber-900 border-2 border-black shadow-md flex items-center justify-center font-black text-amber-100 text-[10px] sm:text-xs">
-                    宝
-                  </div>
-                ) : (
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-stone-300 border-2 border-stone-600 shadow flex items-center justify-center font-bold text-stone-500 text-[10px] sm:text-xs">
-                    宝
-                  </div>
-                )}
-              </div>
-
-              {/* Main Stage Name (Extremely Bold) */}
-              <h2 className="text-base sm:text-2xl font-black text-black tracking-wide drop-shadow-sm truncate max-w-full">
-                {currentStage.name}
-              </h2>
-
-              {/* Bottom Info: Energy Cost & Clear Count */}
-              <div className="flex items-center justify-between w-full mt-0.5 pt-0.5 border-t-2 border-stone-300 text-[10px] sm:text-xs font-black">
-                <div className="flex items-center gap-1 text-stone-800">
-                  <span>統率力</span>
-                  <span className="text-red-600 font-extrabold text-xs sm:text-sm">
-                    -{currentStage.energyCost}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1 text-stone-800">
-                  <span>クリア</span>
-                  <span className="font-extrabold text-xs sm:text-sm">
-                    {clearCount}回
-                  </span>
-                </div>
-              </div>
-
-              {/* Treasure Festival Bubble Speech Tag */}
-              {currentStage.treasureFestival && (
-                <div className="absolute -bottom-3 sm:-bottom-4 right-1 sm:right-2 bg-emerald-600 text-yellow-200 text-[8px] sm:text-xs font-black px-1.5 sm:px-2.5 py-0.5 rounded-full border-2 border-black shadow flex items-center gap-1">
-                  <span>お宝出現率</span>
-                  <span className="text-white font-extrabold underline">超UP!!</span>
-                </div>
-              )}
+          {/* ------------------------------------------------------------------- */}
+          {/* LEFT PANEL: Scrollable Orange/Amber Chapter & Event Buttons          */}
+          {/* ------------------------------------------------------------------- */}
+          <div className="flex-1 md:w-1/2 md:max-w-xl lg:max-w-2xl h-full flex flex-col z-20 overflow-hidden bg-black/10 backdrop-blur-[1px]">
+            {/* Filter Tabs Header */}
+            <div className="p-2 sm:px-4 bg-[#1e150f]/90 border-b-2 border-[#3d2a1c] flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow">
+              {[
+                { id: 'all' as const, label: 'すべて' },
+                { id: 'japan' as const, label: '日本編' },
+                { id: 'future' as const, label: '未来編' },
+                { id: 'cosmos' as const, label: '宇宙編' },
+                { id: 'legend' as const, label: 'レジェンド' },
+                { id: 'crazed' as const, label: '狂乱降臨' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  id={`tab-filter-${tab.id}`}
+                  onClick={() => {
+                    audio.playClick();
+                    setActiveCategoryTab(tab.id);
+                  }}
+                  className={`px-3 py-1 rounded-lg text-xs font-black whitespace-nowrap transition-all border ${
+                    activeCategoryTab === tab.id
+                      ? 'bg-amber-500 text-stone-950 border-yellow-300 shadow font-black'
+                      : 'bg-stone-900/80 text-stone-300 border-stone-700 hover:bg-stone-800'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
 
-            {/* Next Button */}
-            <button
-              id="btn-next-stage"
-              disabled={currentIndex >= activeStages.length - 1}
-              onClick={handleNextStage}
-              className={`pointer-events-auto p-1.5 sm:p-2 rounded-full border-2 border-black shadow-lg transition-transform active:scale-90 ${
-                currentIndex < activeStages.length - 1
-                  ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                  : 'bg-stone-700 text-stone-500 opacity-40 cursor-not-allowed'
-              }`}
+            {/* Scrollable Chapter Buttons List */}
+            <div
+              ref={chapterListRef}
+              className="flex-1 overflow-y-auto p-3 sm:p-5 flex flex-col gap-3.5 no-scrollbar"
             >
-              <ChevronRight size={20} strokeWidth={3} />
-            </button>
+              {visibleChaptersWithStatus.map(({ chapter: ch, status, timeRemaining, isEvent }) => {
+                const isCleared = status === 'cleared';
+                const isNextLocked = status === 'next_locked';
 
-            {/* Next Stage Preview Banner */}
-            {currentIndex < activeStages.length - 1 && (
-              <div
-                onClick={handleNextStage}
-                className="hidden md:flex pointer-events-auto cursor-pointer flex-col bg-white/95 border-4 border-black text-black px-4 py-1.5 rounded-lg shadow-lg opacity-75 hover:opacity-100 transition-transform active:scale-95 min-w-[140px]"
-              >
-                <div className="flex items-center justify-between text-[11px] font-black">
-                  <span className="text-red-600">
-                    {profile.clearedStages[activeStages[currentIndex + 1].id] ? 'CLEAR!' : ''}
-                  </span>
+                return (
+                  <div
+                    key={ch.id}
+                    id={`chapter-card-${ch.id}`}
+                    onClick={() => {
+                      if (!isNextLocked) {
+                        audio.playClick();
+                        setSelectedChapterId(ch.id);
+                        setScreenView('stage_map'); // Transition to JapanMapCanvas!
+                      }
+                    }}
+                    className={`group relative w-full rounded-2xl border-[3.5px] p-3 sm:p-4 flex items-center justify-between gap-3 shadow-[0_6px_0_rgba(0,0,0,0.6)] active:translate-y-1 active:shadow-[0_2px_0_rgba(0,0,0,0.6)] transition-all ${
+                      isNextLocked
+                        ? 'bg-gradient-to-r from-stone-800 to-stone-900 border-stone-700 opacity-60 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-[#ff6e00] via-[#fa5a00] to-[#e64a00] hover:from-[#ff7a14] hover:to-[#f05000] border-black text-white cursor-pointer'
+                    }`}
+                  >
+                    {/* Time Limit / Event Tag Banner on Top-Right of Button */}
+                    {timeRemaining && (
+                      <div className="absolute -top-3 right-6 bg-[#1a1410] border-2 border-[#543b27] px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-black text-white shadow flex items-center gap-1 z-10">
+                        <span className="text-yellow-400">⏱️</span>
+                        <span>{timeRemaining}</span>
+                      </div>
+                    )}
+
+                    {/* Left: Stamp (CLEAR!) & Title Details */}
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {/* Red Stamp Badge (CLEAR!) as in user screenshot */}
+                      {isCleared ? (
+                        <div className="bg-red-600 text-white font-black text-[10px] sm:text-xs px-2.5 py-0.5 rounded border-2 border-black shadow rotate-[-10deg] tracking-wider shrink-0 animate-pulse">
+                          CLEAR!
+                        </div>
+                      ) : isNextLocked ? (
+                        <div className="w-8 h-8 rounded-full bg-stone-900 border-2 border-stone-600 flex items-center justify-center text-stone-400 shrink-0">
+                          <Lock size={16} />
+                        </div>
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-b from-yellow-300 to-amber-500 border-2 border-black text-stone-950 font-black text-xs sm:text-sm flex items-center justify-center shadow shrink-0">
+                          {ch.category === 'crazed' ? '👹' : '★'}
+                        </div>
+                      )}
+
+                      {/* Chapter Names & Difficulty */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className="text-[10px] sm:text-xs font-black text-amber-200 drop-shadow">
+                            {ch.category === 'japan'
+                              ? '日本編'
+                              : ch.category === 'future'
+                              ? '未来編'
+                              : ch.category === 'cosmos'
+                              ? '宇宙編'
+                              : ch.category === 'legend'
+                              ? 'レジェンドストーリー'
+                              : '降臨イベント'}
+                          </span>
+                          {ch.category === 'crazed' && (
+                            <span className="text-[9px] bg-red-700 text-white px-1.5 py-0.2 rounded font-black border border-red-400">
+                              極ムズ
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Big Bold Chapter / Stage Name */}
+                        <div className="text-base sm:text-xl font-black text-white tracking-wide drop-shadow-[0_2px_2px_rgba(0,0,0,0.9)] truncate">
+                          {ch.jpName}
+                        </div>
+
+                        <div className="text-[11px] sm:text-xs font-bold text-amber-100/90 truncate mt-0.5">
+                          {isNextLocked ? '🔒 前の章をクリアで解放！' : ch.subtitle}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right: Authentic Speech Lore Button (...) */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      {!isNextLocked && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            audio.playClick();
+                            if (ch.category === 'crazed') {
+                              setCatSpeech(
+                                `【${ch.jpName}】だにゃ！狂乱キャラの強力な一撃に耐え抜いて仲間を手に入れるにゃ！`
+                              );
+                            } else {
+                              setCatSpeech(
+                                `【${ch.jpName}】へ進軍するにゃ！${ch.subtitle} 準備はいいかにゃ？`
+                              );
+                            }
+                          }}
+                          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white hover:bg-stone-100 text-stone-950 font-black text-sm border-2 border-black shadow flex items-center justify-center active:scale-95"
+                          title="章の解説を聞く"
+                        >
+                          ...
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ------------------------------------------------------------------- */}
+          {/* RIGHT PANEL: Authentic Battle Cats Mascot & Speech Bubble           */}
+          {/* ------------------------------------------------------------------- */}
+          <div className="flex-1 md:w-1/2 h-full flex flex-col justify-end p-4 sm:p-8 z-20 pointer-events-none">
+            <div className="flex flex-col items-end gap-3 pointer-events-auto max-w-lg ml-auto w-full">
+              {/* Authentic Dark Speech Bubble with White Outline matching screenshot! */}
+              <div className="relative w-full bg-[#1b262c]/95 border-4 border-white text-white p-4 sm:p-5 rounded-3xl shadow-[0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-sm">
+                <div className="text-sm sm:text-base font-black leading-relaxed tracking-wide">
+                  {catSpeech}
                 </div>
-                <div className="text-sm font-black truncate">
-                  {activeStages[currentIndex + 1].name}
-                </div>
-                <div className="text-[10px] font-bold text-stone-600">
-                  統率力 -{activeStages[currentIndex + 1].energyCost}
-                </div>
+                {/* Speech Bubble Tail pointing to Cat */}
+                <div className="absolute -bottom-4 right-20 w-0 h-0 border-x-[12px] border-x-transparent border-t-[16px] border-t-white" />
+                <div className="absolute -bottom-2.5 right-20 w-0 h-0 border-x-[9px] border-x-transparent border-t-[12px] border-t-[#1b262c]" />
               </div>
-            )}
+
+              {/* Big Iconic Battle Cat Face Illustration */}
+              <div className="relative -mr-2 sm:mr-4 w-44 h-36 sm:w-56 sm:h-44 shrink-0 flex items-end justify-center">
+                <svg viewBox="0 0 200 160" className="w-full h-full drop-shadow-[0_8px_16px_rgba(0,0,0,0.8)]">
+                  {/* Cat Head / Body (White with thick black outline) */}
+                  <path
+                    d="M 30 160 C 20 80, 50 40, 100 40 C 150 40, 180 80, 170 160 Z"
+                    fill="#ffffff"
+                    stroke="#000000"
+                    strokeWidth="7"
+                    strokeLinejoin="round"
+                  />
+                  {/* Left Ear */}
+                  <polygon
+                    points="45,65 30,10 75,45"
+                    fill="#ffffff"
+                    stroke="#000000"
+                    strokeWidth="7"
+                    strokeLinejoin="round"
+                  />
+                  {/* Right Ear */}
+                  <polygon
+                    points="155,65 170,10 125,45"
+                    fill="#ffffff"
+                    stroke="#000000"
+                    strokeWidth="7"
+                    strokeLinejoin="round"
+                  />
+                  {/* Eyes (Round black dots) */}
+                  <circle cx="75" cy="85" r="7" fill="#000000" />
+                  <circle cx="125" cy="85" r="7" fill="#000000" />
+                  {/* Mouth (Iconic :3 curve) */}
+                  <path
+                    d="M 90 102 Q 100 112 100 102 Q 100 112 110 102"
+                    stroke="#000000"
+                    strokeWidth="5"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                  {/* Whiskers */}
+                  <line x1="30" y1="88" x2="55" y2="92" stroke="#000000" strokeWidth="5" strokeLinecap="round" />
+                  <line x1="28" y1="104" x2="54" y2="102" stroke="#000000" strokeWidth="5" strokeLinecap="round" />
+                  <line x1="170" y1="88" x2="145" y2="92" stroke="#000000" strokeWidth="5" strokeLinecap="round" />
+                  <line x1="172" y1="104" x2="146" y2="102" stroke="#000000" strokeWidth="5" strokeLinecap="round" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
+      ) : (
+        // =========================================================================
+        // SCREEN 2: INTERACTIVE MAP & STAGE DEPLOYMENT (JapanMapCanvas View)
+        // =========================================================================
+        <div className="relative flex-1 w-full h-full flex flex-col md:flex-row overflow-hidden bg-stone-950">
+          {/* Main Map Viewport */}
+          <div className="relative flex-1 h-full overflow-hidden">
+            <JapanMapCanvas
+              chapter={currentChapter}
+              stages={rawActiveStages}
+              selectedStageId={selectedStageId}
+              clearedStages={profile.clearedStages}
+              onSelectStage={(st) => {
+                audio.playClick();
+                setSelectedStageId(st.id);
+              }}
+              containerRef={mapScrollRef}
+            />
 
-        {/* 4. RIGHT-BOTTOM DEPLOY & ENERGY PANEL */}
-        <div className="absolute right-2 sm:right-6 bottom-2 sm:bottom-3 z-30 flex flex-col items-end gap-1 sm:gap-1.5 pointer-events-auto shrink-0">
-          {/* Energy Display Box (Official Battle Cats Style) */}
-          <div className="relative bg-gradient-to-b from-amber-400 to-amber-500 border-2 sm:border-4 border-black px-2 sm:px-4 py-0.5 sm:py-1 rounded-xl shadow-xl flex items-center gap-1.5 sm:gap-3">
-            <span className="text-[11px] sm:text-base font-black text-black tracking-wider">
-              統率力
-            </span>
-            <div className="bg-black text-lime-400 font-mono font-black text-xs sm:text-xl px-1.5 sm:px-3 py-0.5 rounded border sm:border-2 border-stone-800 min-w-[50px] sm:min-w-[80px] text-right">
-              {isInfiniteEnergy ? '9999' : profile.energy}
-            </div>
-            {/* Small timer tag */}
-            <div className="absolute -top-2 -right-1.5 bg-orange-600 text-white font-mono text-[8px] sm:text-[10px] font-black px-1 sm:px-1.5 rounded border border-black shadow">
-              {isInfiniteEnergy ? 'MAX' : '03'}
-            </div>
+            {/* Zombie Mode Switcher Button (Overlay on Map for Japan/Future) */}
+            {hasZombieStages && (
+              <div className="absolute top-3 left-3 z-30">
+                <button
+                  id="btn-toggle-zombie-mode-map"
+                  onClick={() => {
+                    audio.playClick();
+                    setIsZombieMode((prev) => !prev);
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shadow-lg border-2 active:scale-95 ${
+                    isZombieMode
+                      ? 'bg-gradient-to-r from-purple-800 via-indigo-900 to-emerald-900 text-purple-200 border-purple-400 ring-2 ring-purple-400 shadow-purple-500/50 animate-pulse'
+                      : 'bg-[#2b1e16]/90 text-purple-300 border-purple-700/80 hover:bg-[#3d2a1c]'
+                  }`}
+                  title="ゾンビ襲来モード切替"
+                >
+                  <span>🧟</span>
+                  <span>{isZombieMode ? 'ゾンビ襲来中！' : 'ゾンビ襲来切替'}</span>
+                </button>
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Quick Deck / Slot Button */}
+          {/* Right/Bottom Stage Deployment Control Panel */}
+          <div className="w-full md:w-84 lg:w-96 bg-[#180f0a] border-t-4 md:border-t-0 md:border-l-4 border-[#2d1b11] p-3 sm:p-4 flex flex-col justify-between shadow-2xl overflow-y-auto no-scrollbar z-20 shrink-0">
+            {/* Top: Stage Title & Navigation */}
+            <div className="flex flex-col gap-2.5">
+              {/* Chapter & Stage Switcher Header */}
+              <div className="flex items-center justify-between bg-stone-900/90 p-2 rounded-xl border border-stone-800">
+                <button
+                  onClick={handlePrevStage}
+                  disabled={currentIndex <= 0}
+                  className={`p-1 rounded-lg border text-xs font-black ${
+                    currentIndex > 0
+                      ? 'bg-amber-600 text-white border-amber-400 hover:bg-amber-500'
+                      : 'bg-stone-800 text-stone-600 border-stone-700 cursor-not-allowed'
+                  }`}
+                  title="前のステージ"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                <div className="text-center px-2">
+                  <div className="text-[10px] text-amber-400 font-bold">
+                    {currentChapter.jpName} (第{currentIndex + 1}ステージ)
+                  </div>
+                  <div className="text-sm sm:text-base font-black text-white truncate max-w-[180px]">
+                    {currentStage?.name}
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleNextStage}
+                  disabled={currentIndex >= rawActiveStages.length - 1}
+                  className={`p-1 rounded-lg border text-xs font-black ${
+                    currentIndex < rawActiveStages.length - 1
+                      ? 'bg-amber-600 text-white border-amber-400 hover:bg-amber-500'
+                      : 'bg-stone-800 text-stone-600 border-stone-700 cursor-not-allowed'
+                  }`}
+                  title="次のステージ"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+
+              {/* Stage Rewards & Treasure Details */}
+              {currentStage && (
+                <div className="bg-[#241710] border-2 border-[#4d3221] p-3 rounded-2xl shadow flex flex-col gap-2">
+                  <div className="grid grid-cols-2 gap-2 text-xs font-bold">
+                    <div className="bg-stone-900/80 p-2 rounded-xl border border-stone-800">
+                      <div className="text-[10px] text-stone-400">獲得可能 XP</div>
+                      <div className="text-emerald-400 font-black text-sm">
+                        +{currentStage.baseRewardXp.toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="bg-stone-900/80 p-2 rounded-xl border border-stone-800">
+                      <div className="text-[10px] text-stone-400">初回ネコカン</div>
+                      <div className="text-amber-400 font-black text-sm">
+                        +{currentStage.baseRewardCatFood}缶
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Treasure Quality Status */}
+                  <div className="flex items-center justify-between bg-stone-900/80 px-3 py-1.5 rounded-xl border border-stone-800">
+                    <span className="text-xs font-bold text-stone-300">獲得お宝状況:</span>
+                    <div className="flex items-center gap-1.5">
+                      {currentTreasureStatus === 'gold' ? (
+                        <span className="text-xs font-black text-yellow-300 flex items-center gap-1">
+                          👑 最高のお宝 (金)
+                        </span>
+                      ) : currentTreasureStatus === 'silver' ? (
+                        <span className="text-xs font-black text-slate-300 flex items-center gap-1">
+                          🥈 普通のお宝 (銀)
+                        </span>
+                      ) : currentTreasureStatus === 'bronze' ? (
+                        <span className="text-xs font-black text-amber-500 flex items-center gap-1">
+                          🥉 粗悪なお宝 (銅)
+                        </span>
+                      ) : (
+                        <span className="text-xs text-stone-500 font-bold">未獲得</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {currentStage.rewardCatUnlockId && (
+                    <div className="bg-gradient-to-r from-purple-950 to-red-950 border border-purple-400 p-2 rounded-xl flex items-center gap-2">
+                      <Sparkles size={16} className="text-yellow-300 shrink-0" />
+                      <span className="text-[11px] font-black text-yellow-200">
+                        クリアで狂乱キャラクターを必ず獲得！
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Cat Advice Bubble */}
+              <div className="bg-stone-900/90 border border-stone-800 p-2.5 rounded-xl flex items-start gap-2">
+                <span className="text-lg">🐱</span>
+                <span className="text-[11px] text-stone-300 font-bold leading-tight">
+                  {catSpeech}
+                </span>
+              </div>
+            </div>
+
+            {/* Bottom: Battle Items & Deploy Button */}
+            <div className="flex flex-col gap-2.5 mt-3 pt-2 border-t-2 border-[#3d2415]">
+              {/* Battle Items Quick Toggles */}
+              <div>
+                <div className="text-[10px] font-black text-amber-400 mb-1 flex items-center justify-between">
+                  <span>出撃アイテム使用:</span>
+                  <span className="text-stone-400">タップでON/OFF</span>
+                </div>
+                <div className="grid grid-cols-6 gap-1 bg-stone-900/90 p-1.5 rounded-xl border border-stone-800">
+                  {/* Speed Up */}
+                  <button
+                    id="item-toggle-speedup"
+                    onClick={() => handleToggleItem('speedUp', profile.items?.speedUp || 0)}
+                    className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
+                      activeItems.speedUp
+                        ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                        : 'bg-stone-800 border-stone-700'
+                    }`}
+                  >
+                    <span className="text-[10px] font-black text-amber-300">⚡</span>
+                    <span className="text-[8px] text-stone-300">SPEED</span>
+                    <span className="text-[9px] font-black text-amber-400">
+                      x{profile.items?.speedUp || 0}
+                    </span>
+                  </button>
+
+                  {/* Radar */}
+                  <button
+                    id="item-toggle-radar"
+                    onClick={() => handleToggleItem('treasureRadar', profile.items?.treasureRadar || 0)}
+                    className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
+                      activeItems.treasureRadar
+                        ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                        : 'bg-stone-800 border-stone-700'
+                    }`}
+                  >
+                    <span className="text-[10px] font-black text-yellow-400">GET</span>
+                    <span className="text-[8px] text-stone-300">レーダー</span>
+                    <span className="text-[9px] font-black text-yellow-400">
+                      x{profile.items?.treasureRadar || 0}
+                    </span>
+                  </button>
+
+                  {/* Rich Cat */}
+                  <button
+                    id="item-toggle-richcat"
+                    onClick={() => handleToggleItem('richCat', profile.items?.richCat || 0)}
+                    className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
+                      activeItems.richCat
+                        ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                        : 'bg-stone-800 border-stone-700'
+                    }`}
+                  >
+                    <span className="text-[10px] font-black text-emerald-400">MAX</span>
+                    <span className="text-[8px] text-stone-300">ネコボン</span>
+                    <span className="text-[9px] font-black text-emerald-400">
+                      x{profile.items?.richCat || 0}
+                    </span>
+                  </button>
+
+                  {/* CPU */}
+                  <button
+                    id="item-toggle-catcpu"
+                    onClick={() => handleToggleItem('catCpu', profile.items?.catCpu || 0)}
+                    className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
+                      activeItems.catCpu
+                        ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                        : 'bg-stone-800 border-stone-700'
+                    }`}
+                  >
+                    <span className="text-[10px] font-black text-cyan-400">CPU</span>
+                    <span className="text-[8px] text-stone-300">ニャンピ</span>
+                    <span className="text-[9px] font-black text-cyan-400">
+                      x{profile.items?.catCpu || 0}
+                    </span>
+                  </button>
+
+                  {/* Jobs */}
+                  <button
+                    id="item-toggle-catjobs"
+                    onClick={() => handleToggleItem('catJobs', profile.items?.catJobs || 0)}
+                    className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
+                      activeItems.catJobs
+                        ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                        : 'bg-stone-800 border-stone-700'
+                    }`}
+                  >
+                    <span className="text-[10px] font-black text-purple-400">XP</span>
+                    <span className="text-[8px] text-stone-300">おかめ</span>
+                    <span className="text-[9px] font-black text-purple-400">
+                      x{profile.items?.catJobs || 0}
+                    </span>
+                  </button>
+
+                  {/* Sniper */}
+                  <button
+                    id="item-toggle-sniper"
+                    onClick={() => handleToggleItem('sniper', profile.items?.sniper || 0)}
+                    className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
+                      activeItems.sniper
+                        ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                        : 'bg-stone-800 border-stone-700'
+                    }`}
+                  >
+                    <span className="text-[10px] font-black text-red-400">🎯</span>
+                    <span className="text-[8px] text-stone-300">スニャ</span>
+                    <span className="text-[9px] font-black text-red-400">
+                      x{profile.items?.sniper || 0}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Energy Cost & Golden Deploy Button */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between bg-black/60 px-3 py-1.5 rounded-xl border border-stone-800">
+                  <span className="text-xs font-black text-stone-300">必要統率力</span>
+                  <div className="flex items-center gap-1.5">
+                    <Zap size={14} className="text-cyan-400" />
+                    <span className="text-sm font-black text-cyan-300">
+                      {currentStage?.energyCost}
+                    </span>
+                    <span className="text-[11px] text-stone-400">
+                      (所持: {isInfiniteEnergy ? '∞' : profile.energy})
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  id="btn-deploy-battle"
+                  onClick={handleDeploy}
+                  className="w-full py-3 rounded-2xl bg-gradient-to-b from-yellow-400 via-amber-500 to-amber-700 hover:from-yellow-300 hover:to-amber-600 text-stone-950 font-black text-base sm:text-lg border-4 border-yellow-200 shadow-[0_6px_0_#451a03] active:translate-y-1 active:shadow-[0_2px_0_#451a03] flex items-center justify-center gap-2 tracking-wider transition-all"
+                >
+                  <span className="text-xl">⚔️</span>
+                  <span>戦闘開始!! (いざ出陣)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 3. HELP MODAL                                                             */}
+      {/* ========================================================================= */}
+      {showHelpModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#241710] border-4 border-amber-500 rounded-3xl max-w-md w-full p-5 text-white shadow-2xl flex flex-col gap-4">
+            <div className="flex items-center justify-between border-b-2 border-stone-700 pb-2">
+              <div className="text-base font-black text-amber-300 flex items-center gap-2">
+                <HelpCircle size={20} className="text-yellow-400" />
+                <span>ステージ選択・出撃の遊び方</span>
+              </div>
+              <button
+                onClick={() => {
+                  audio.playClick();
+                  setShowHelpModal(false);
+                }}
+                className="text-stone-400 hover:text-white font-black text-lg p-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="text-xs sm:text-sm space-y-2.5 text-stone-200 leading-relaxed max-h-[60vh] overflow-y-auto no-scrollbar">
+              <div className="bg-stone-900/80 p-2.5 rounded-xl border border-stone-800">
+                <span className="text-amber-300 font-black">1. 章・エリアの選択</span>
+                <p className="text-[12px] text-stone-300 mt-0.5">
+                  ふすま画面の大きなオレンジ色のボタンをタップすると、その章のマップ画面に移動します。
+                </p>
+              </div>
+              <div className="bg-stone-900/80 p-2.5 rounded-xl border border-stone-800">
+                <span className="text-amber-300 font-black">2. 地図上でステージ選択</span>
+                <p className="text-[12px] text-stone-300 mt-0.5">
+                  日本地図や世界地図上の赤いピンをタップして攻略したい都道府県やステージを選択します。
+                </p>
+              </div>
+              <div className="bg-stone-900/80 p-2.5 rounded-xl border border-stone-800">
+                <span className="text-amber-300 font-black">3. 出撃アイテムと戦闘開始</span>
+                <p className="text-[12px] text-stone-300 mt-0.5">
+                  右側パネルでアイテム使用を設定し、「戦闘開始!!」を押すとバトルが開始されます！
+                </p>
+              </div>
+            </div>
+
             <button
-              id="btn-quick-deck"
               onClick={() => {
                 audio.playClick();
-                onOpenUpgrade();
+                setShowHelpModal(false);
               }}
-              className="hidden md:flex bg-stone-900 hover:bg-stone-800 text-white border-3 border-black px-2.5 py-1.5 rounded-xl shadow-xl flex-col items-center justify-center font-black active:scale-95 transition-transform"
+              className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-sm border-2 border-amber-300 shadow active:scale-95"
             >
-              <span className="text-[9px] text-amber-400">スロット 1</span>
-              <span className="text-xs">編成</span>
-            </button>
-
-            {/* GIANT GOLDEN "いざ出陣!!" BUTTON */}
-            <button
-              id="btn-deploy-main"
-              onClick={handleDeploy}
-              className="relative px-4 sm:px-10 py-1.5 sm:py-3 rounded-xl sm:rounded-2xl bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-500 hover:from-yellow-200 hover:to-amber-400 text-black font-black text-sm sm:text-3xl border-3 sm:border-4 border-black shadow-[0_3px_0_#92400e,0_6px_12px_rgba(0,0,0,0.6)] sm:shadow-[0_8px_0_#92400e,0_12px_20px_rgba(0,0,0,0.6)] active:translate-y-0.5 active:shadow-[0_1px_0_#92400e] transition-all flex items-center justify-center gap-1.5 group min-h-[40px] sm:min-h-[56px]"
-            >
-              <span className="tracking-wider drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
-                いざ出陣!!
-              </span>
+              わかったにゃ！
             </button>
           </div>
         </div>
-
-        {/* 5. BOTTOM BATTLE ITEMS TOGGLE BAR (6 Major Battle Items) */}
-        <div className="absolute left-2 sm:left-6 bottom-2 sm:bottom-3 z-30 flex items-center gap-1 sm:gap-2 bg-stone-900/90 backdrop-blur-md p-1 sm:p-2 rounded-xl sm:rounded-2xl border-2 border-stone-700 shadow-2xl pointer-events-auto overflow-x-auto max-w-[calc(100vw-175px)] sm:max-w-[420px] md:max-w-none no-scrollbar">
-          {/* 1. SPEED UP */}
-          <button
-            id="item-toggle-speedup"
-            onClick={() => handleToggleItem('speedUp', profile.items?.speedUp || 0)}
-            className={`flex flex-col items-center justify-center p-1 sm:p-2 rounded-lg sm:rounded-xl border-2 transition-all min-w-[44px] sm:min-w-[62px] active:scale-95 shrink-0 ${
-              activeItems.speedUp
-                ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]'
-                : 'bg-stone-800 border-stone-700 hover:bg-stone-700'
-            }`}
-          >
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-stone-900 border border-stone-600 flex items-center justify-center text-[9px] sm:text-[10px] font-black text-amber-300">
-              ⚡2x
-            </div>
-            <span className="text-[8px] sm:text-[9px] font-bold text-stone-300 mt-0.5">SPEED</span>
-            <span className="text-[9px] sm:text-[10px] font-black text-amber-400">
-              x{profile.items?.speedUp || 0}
-            </span>
-          </button>
-
-          {/* 2. TREASURE RADAR */}
-          <button
-            id="item-toggle-radar"
-            onClick={() => handleToggleItem('treasureRadar', profile.items?.treasureRadar || 0)}
-            className={`flex flex-col items-center justify-center p-1 sm:p-2 rounded-lg sm:rounded-xl border-2 transition-all min-w-[44px] sm:min-w-[62px] active:scale-95 shrink-0 ${
-              activeItems.treasureRadar
-                ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]'
-                : 'bg-stone-800 border-stone-700 hover:bg-stone-700'
-            }`}
-          >
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-stone-900 border border-stone-600 flex items-center justify-center text-[9px] sm:text-[10px] font-black text-yellow-400">
-              GET
-            </div>
-            <span className="text-[8px] sm:text-[9px] font-bold text-stone-300 mt-0.5">レーダー</span>
-            <span className="text-[9px] sm:text-[10px] font-black text-yellow-400">
-              x{profile.items?.treasureRadar || 0}
-            </span>
-          </button>
-
-          {/* 3. RICH CAT (ネコボン) */}
-          <button
-            id="item-toggle-richcat"
-            onClick={() => handleToggleItem('richCat', profile.items?.richCat || 0)}
-            className={`flex flex-col items-center justify-center p-1 sm:p-2 rounded-lg sm:rounded-xl border-2 transition-all min-w-[44px] sm:min-w-[62px] active:scale-95 shrink-0 ${
-              activeItems.richCat
-                ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]'
-                : 'bg-stone-800 border-stone-700 hover:bg-stone-700'
-            }`}
-          >
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-stone-900 border border-stone-600 flex items-center justify-center text-[9px] sm:text-[10px] font-black text-emerald-400">
-              MAX
-            </div>
-            <span className="text-[8px] sm:text-[9px] font-bold text-stone-300 mt-0.5">ネコボン</span>
-            <span className="text-[9px] sm:text-[10px] font-black text-emerald-400">
-              x{profile.items?.richCat || 0}
-            </span>
-          </button>
-
-          {/* 4. CAT CPU (ニャンピューター) */}
-          <button
-            id="item-toggle-catcpu"
-            onClick={() => handleToggleItem('catCpu', profile.items?.catCpu || 0)}
-            className={`flex flex-col items-center justify-center p-1 sm:p-2 rounded-lg sm:rounded-xl border-2 transition-all min-w-[44px] sm:min-w-[62px] active:scale-95 shrink-0 ${
-              activeItems.catCpu
-                ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]'
-                : 'bg-stone-800 border-stone-700 hover:bg-stone-700'
-            }`}
-          >
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-stone-900 border border-stone-600 flex items-center justify-center text-[9px] sm:text-[10px] font-black text-cyan-400">
-              CPU
-            </div>
-            <span className="text-[8px] sm:text-[9px] font-bold text-stone-300 mt-0.5">ニャンピ</span>
-            <span className="text-[9px] sm:text-[10px] font-black text-cyan-400">
-              x{profile.items?.catCpu || 0}
-            </span>
-          </button>
-
-          {/* 5. CAT JOBS (おかめはちもく: XP 1.5x) */}
-          <button
-            id="item-toggle-catjobs"
-            onClick={() => handleToggleItem('catJobs', profile.items?.catJobs || 0)}
-            className={`flex flex-col items-center justify-center p-1 sm:p-2 rounded-lg sm:rounded-xl border-2 transition-all min-w-[44px] sm:min-w-[62px] active:scale-95 shrink-0 ${
-              activeItems.catJobs
-                ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]'
-                : 'bg-stone-800 border-stone-700 hover:bg-stone-700'
-            }`}
-          >
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-stone-900 border border-stone-600 flex items-center justify-center text-[9px] sm:text-[10px] font-black text-purple-400">
-              XP UP
-            </div>
-            <span className="text-[8px] sm:text-[9px] font-bold text-stone-300 mt-0.5">おかめ</span>
-            <span className="text-[9px] sm:text-[10px] font-black text-purple-400">
-              x{profile.items?.catJobs || 0}
-            </span>
-          </button>
-
-          {/* 6. SNIPER (スニャイパー) */}
-          <button
-            id="item-toggle-sniper"
-            onClick={() => handleToggleItem('sniper', profile.items?.sniper || 0)}
-            className={`flex flex-col items-center justify-center p-1 sm:p-2 rounded-lg sm:rounded-xl border-2 transition-all min-w-[44px] sm:min-w-[62px] active:scale-95 shrink-0 ${
-              activeItems.sniper
-                ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]'
-                : 'bg-stone-800 border-stone-700 hover:bg-stone-700'
-            }`}
-          >
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-stone-900 border border-stone-600 flex items-center justify-center text-[9px] sm:text-[10px] font-black text-red-400">
-              🎯
-            </div>
-            <span className="text-[8px] sm:text-[9px] font-bold text-stone-300 mt-0.5">スニャ</span>
-            <span className="text-[9px] sm:text-[10px] font-black text-red-400">
-              x{profile.items?.sniper || 0}
-            </span>
-          </button>
-        </div>
-      </div>
-
-      {/* 6. BOTTOM NAVIGATION BAR (Hub Navigation - Fixed Safe Area Bottom) */}
-      <div className="z-30 bg-stone-900/95 border-t-2 border-stone-800 px-1.5 sm:px-3 pt-1.5 pb-[calc(max(0.5rem,env(safe-area-inset-bottom,0px))+6px)] flex justify-between items-center gap-1 sm:gap-2 shadow-2xl">
-        <button
-          id="btn-nav-upgrade"
-          onClick={() => {
-            audio.playClick();
-            onOpenUpgrade();
-          }}
-          className="flex-1 py-1 sm:py-2 px-1 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-200 text-[10px] sm:text-xs font-black flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1 shadow active:scale-95 whitespace-nowrap min-h-[44px]"
-        >
-          <span className="text-amber-400 text-xs sm:text-sm">⚡</span>
-          <span>パワーアップ / 編成</span>
-        </button>
-
-        <button
-          id="btn-nav-gacha"
-          onClick={() => {
-            audio.playClick();
-            onOpenGacha();
-          }}
-          className="flex-1 py-1 sm:py-2 px-1 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 border border-yellow-400 text-white text-[10px] sm:text-xs font-black flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1 shadow active:scale-95 whitespace-nowrap min-h-[44px]"
-        >
-          <Sparkles size={14} className="text-yellow-300" />
-          <span>にゃんこガチャ</span>
-        </button>
-
-        <button
-          id="btn-nav-treasures"
-          onClick={() => {
-            audio.playClick();
-            onOpenTreasures();
-          }}
-          className="flex-1 py-1 sm:py-2 px-1 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-200 text-[10px] sm:text-xs font-black flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1 shadow active:scale-95 whitespace-nowrap min-h-[44px]"
-        >
-          <Award size={14} className="text-yellow-400" />
-          <span>お宝一覧</span>
-        </button>
-
-        <button
-          id="btn-nav-encyclopedia"
-          onClick={() => {
-            audio.playClick();
-            onOpenEncyclopedia();
-          }}
-          className="flex-1 py-1 sm:py-2 px-1 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-200 text-[10px] sm:text-xs font-black flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1 shadow active:scale-95 whitespace-nowrap min-h-[44px]"
-        >
-          <span className="text-xs sm:text-sm">📖</span>
-          <span>にゃんこ図鑑</span>
-        </button>
-      </div>
+      )}
     </div>
   );
 };
