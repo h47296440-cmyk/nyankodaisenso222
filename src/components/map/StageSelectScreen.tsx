@@ -50,6 +50,8 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
   onOpenStorySelect,
   onBackToTitle,
 }) => {
+  const [showMobileDetails, setShowMobileDetails] = useState<boolean>(false);
+
   // Screen View: 'chapter_select' (ふすまの章選択画面) or 'stage_map' (地図でのステージ選択画面)
   const [screenView, setScreenView] = useState<'chapter_select' | 'stage_map'>('chapter_select');
 
@@ -131,6 +133,14 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
         return checkChapterCleared('legend_6');
       case 'legend_8':
         return checkChapterCleared('legend_7');
+      case 'legend_9':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_8');
+      case 'legend_10':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_9');
+      case 'legend_11':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_10');
+      case 'legend_12':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_11');
       case 'crazed_event':
       case 'crazed':
         return checkChapterCleared('japan_1');
@@ -202,10 +212,20 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
     currentChapter.zombieStages.length > 0
   );
 
-  const rawActiveStages =
-    isZombieMode && hasZombieStages && currentChapter.zombieStages
-      ? currentChapter.zombieStages
-      : currentChapter.stages;
+  const rawActiveStages = useMemo(() => {
+    const baseList =
+      isZombieMode && hasZombieStages && currentChapter.zombieStages
+        ? currentChapter.zombieStages
+        : currentChapter.stages;
+
+    // Gate cosmos_3_filibuster behind Legend Chapter 8 clear
+    return baseList.filter((st) => {
+      if (st.id === 'cosmos_3_filibuster') {
+        return checkChapterCleared('legend_8');
+      }
+      return true;
+    });
+  }, [isZombieMode, hasZombieStages, currentChapter, profile.clearedStages]);
 
   // Progressive visibility for stages in map
   const visibleStagesWithStatus = useMemo(() => {
@@ -647,20 +667,20 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
           {/* ------------------------------------------------------------------- */}
           {/* RIGHT PANEL: Authentic Battle Cats Mascot & Speech Bubble           */}
           {/* ------------------------------------------------------------------- */}
-          <div className="flex-1 md:w-1/2 h-full flex flex-col justify-end p-4 sm:p-8 z-20 pointer-events-none">
-            <div className="flex flex-col items-end gap-3 pointer-events-auto max-w-lg ml-auto w-full">
+          <div className="md:flex-1 md:w-1/2 h-auto md:h-full flex flex-col justify-end p-2 sm:p-4 md:p-8 z-20 pointer-events-none shrink-0">
+            <div className="flex flex-col items-end gap-2 md:gap-3 pointer-events-auto max-w-lg ml-auto w-full">
               {/* Authentic Dark Speech Bubble with White Outline matching screenshot! */}
-              <div className="relative w-full bg-[#1b262c]/95 border-4 border-white text-white p-4 sm:p-5 rounded-3xl shadow-[0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-sm">
-                <div className="text-sm sm:text-base font-black leading-relaxed tracking-wide">
+              <div className="relative w-full bg-[#1b262c]/95 border-2 sm:border-4 border-white text-white p-3 sm:p-5 rounded-2xl sm:rounded-3xl shadow-[0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-sm">
+                <div className="text-xs sm:text-base font-black leading-relaxed tracking-wide">
                   {catSpeech}
                 </div>
                 {/* Speech Bubble Tail pointing to Cat */}
-                <div className="absolute -bottom-4 right-20 w-0 h-0 border-x-[12px] border-x-transparent border-t-[16px] border-t-white" />
-                <div className="absolute -bottom-2.5 right-20 w-0 h-0 border-x-[9px] border-x-transparent border-t-[12px] border-t-[#1b262c]" />
+                <div className="absolute -bottom-3 sm:-bottom-4 right-16 sm:right-20 w-0 h-0 border-x-[8px] sm:border-x-[12px] border-x-transparent border-t-[12px] sm:border-t-[16px] border-t-white" />
+                <div className="absolute -bottom-2 sm:-bottom-2.5 right-16 sm:right-20 w-0 h-0 border-x-[6px] sm:border-x-[9px] border-x-transparent border-t-[9px] sm:border-t-[12px] border-t-[#1b262c]" />
               </div>
 
               {/* Big Iconic Battle Cat Face Illustration */}
-              <div className="relative -mr-2 sm:mr-4 w-44 h-36 sm:w-56 sm:h-44 shrink-0 flex items-end justify-center">
+              <div className="relative -mr-2 sm:mr-4 w-28 h-24 sm:w-44 sm:h-36 md:w-56 md:h-44 shrink-0 flex items-end justify-center">
                 <svg viewBox="0 0 200 160" className="w-full h-full drop-shadow-[0_8px_16px_rgba(0,0,0,0.8)]">
                   {/* Cat Head / Body (White with thick black outline) */}
                   <path
@@ -712,8 +732,8 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
         // SCREEN 2: INTERACTIVE MAP & STAGE DEPLOYMENT (JapanMapCanvas View)
         // =========================================================================
         <div className="relative flex-1 w-full h-full flex flex-col md:flex-row overflow-hidden bg-stone-950">
-          {/* Main Map Viewport */}
-          <div className="relative flex-1 h-full overflow-hidden">
+          {/* Main Map Viewport (Takes full available height in portrait mode!) */}
+          <div className="relative flex-1 w-full h-[55vh] md:h-full min-h-[260px] overflow-hidden">
             <JapanMapCanvas
               chapter={currentChapter}
               stages={rawActiveStages}
@@ -749,12 +769,12 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
             )}
           </div>
 
-          {/* Right/Bottom Stage Deployment Control Panel */}
-          <div className="w-full md:w-84 lg:w-96 bg-[#180f0a] border-t-4 md:border-t-0 md:border-l-4 border-[#2d1b11] p-3 sm:p-4 flex flex-col justify-between shadow-2xl overflow-y-auto no-scrollbar z-20 shrink-0">
+          {/* Right/Bottom Stage Deployment Control Panel (Responsive for Portrait & Landscape) */}
+          <div className="w-full md:w-84 lg:w-96 bg-[#180f0a] border-t-4 md:border-t-0 md:border-l-4 border-[#2d1b11] p-2.5 sm:p-4 flex flex-col justify-between shadow-2xl overflow-y-auto no-scrollbar z-20 shrink-0 max-h-[45vh] md:max-h-full">
             {/* Top: Stage Title & Navigation */}
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-2">
               {/* Chapter & Stage Switcher Header */}
-              <div className="flex items-center justify-between bg-stone-900/90 p-2 rounded-xl border border-stone-800">
+              <div className="flex items-center justify-between bg-stone-900/90 p-1.5 sm:p-2 rounded-xl border border-stone-800">
                 <button
                   onClick={handlePrevStage}
                   disabled={currentIndex <= 0}
@@ -768,11 +788,11 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                   <ChevronLeft size={16} />
                 </button>
 
-                <div className="text-center px-2">
-                  <div className="text-[10px] text-amber-400 font-bold">
+                <div className="text-center px-2 flex-1 min-w-0">
+                  <div className="text-[10px] text-amber-400 font-bold truncate">
                     {currentChapter.jpName} (第{currentIndex + 1}ステージ)
                   </div>
-                  <div className="text-sm sm:text-base font-black text-white truncate max-w-[180px]">
+                  <div className="text-sm sm:text-base font-black text-white truncate">
                     {currentStage?.name}
                   </div>
                 </div>
@@ -789,205 +809,216 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                 >
                   <ChevronRight size={16} />
                 </button>
+
+                {/* Mobile Toggle Details Button */}
+                <button
+                  onClick={() => {
+                    audio.playClick();
+                    setShowMobileDetails((prev) => !prev);
+                  }}
+                  className="md:hidden ml-1 px-2 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-amber-300 border border-stone-700 text-[10px] font-black shrink-0"
+                >
+                  {showMobileDetails ? '詳細閉じる ▲' : 'アイテム/詳細 ▼'}
+                </button>
               </div>
 
-              {/* Stage Rewards & Treasure Details */}
-              {currentStage && (
-                <div className="bg-[#241710] border-2 border-[#4d3221] p-3 rounded-2xl shadow flex flex-col gap-2">
-                  <div className="grid grid-cols-2 gap-2 text-xs font-bold">
-                    <div className="bg-stone-900/80 p-2 rounded-xl border border-stone-800">
-                      <div className="text-[10px] text-stone-400">獲得可能 XP</div>
-                      <div className="text-emerald-400 font-black text-sm">
-                        +{currentStage.baseRewardXp.toLocaleString()}
+              {/* Collapsible details on mobile, always visible on desktop */}
+              <div className={`${showMobileDetails ? 'flex' : 'hidden md:flex'} flex-col gap-2`}>
+                {/* Stage Rewards & Treasure Details */}
+                {currentStage && (
+                  <div className="bg-[#241710] border-2 border-[#4d3221] p-2.5 rounded-2xl shadow flex flex-col gap-2">
+                    <div className="grid grid-cols-2 gap-2 text-xs font-bold">
+                      <div className="bg-stone-900/80 p-1.5 rounded-xl border border-stone-800">
+                        <div className="text-[9px] text-stone-400">獲得可能 XP</div>
+                        <div className="text-emerald-400 font-black text-xs sm:text-sm">
+                          +{currentStage.baseRewardXp.toLocaleString()}
+                        </div>
+                      </div>
+                      <div className="bg-stone-900/80 p-1.5 rounded-xl border border-stone-800">
+                        <div className="text-[9px] text-stone-400">初回ネコカン</div>
+                        <div className="text-amber-400 font-black text-xs sm:text-sm">
+                          +{currentStage.baseRewardCatFood}缶
+                        </div>
                       </div>
                     </div>
-                    <div className="bg-stone-900/80 p-2 rounded-xl border border-stone-800">
-                      <div className="text-[10px] text-stone-400">初回ネコカン</div>
-                      <div className="text-amber-400 font-black text-sm">
-                        +{currentStage.baseRewardCatFood}缶
+
+                    {/* Treasure Quality Status */}
+                    <div className="flex items-center justify-between bg-stone-900/80 px-2.5 py-1 rounded-xl border border-stone-800">
+                      <span className="text-[11px] font-bold text-stone-300">お宝状況:</span>
+                      <div className="flex items-center gap-1">
+                        {currentTreasureStatus === 'gold' ? (
+                          <span className="text-[11px] font-black text-yellow-300 flex items-center gap-1">
+                            👑 最高 (金)
+                          </span>
+                        ) : currentTreasureStatus === 'silver' ? (
+                          <span className="text-[11px] font-black text-slate-300 flex items-center gap-1">
+                            🥈 普通 (銀)
+                          </span>
+                        ) : currentTreasureStatus === 'bronze' ? (
+                          <span className="text-[11px] font-black text-amber-500 flex items-center gap-1">
+                            🥉 粗悪 (銅)
+                          </span>
+                        ) : (
+                          <span className="text-[11px] text-stone-500 font-bold">未獲得</span>
+                        )}
                       </div>
                     </div>
-                  </div>
 
-                  {/* Treasure Quality Status */}
-                  <div className="flex items-center justify-between bg-stone-900/80 px-3 py-1.5 rounded-xl border border-stone-800">
-                    <span className="text-xs font-bold text-stone-300">獲得お宝状況:</span>
-                    <div className="flex items-center gap-1.5">
-                      {currentTreasureStatus === 'gold' ? (
-                        <span className="text-xs font-black text-yellow-300 flex items-center gap-1">
-                          👑 最高のお宝 (金)
+                    {currentStage.rewardCatUnlockId && (
+                      <div className="bg-gradient-to-r from-purple-950 to-red-950 border border-purple-400 p-1.5 rounded-xl flex items-center gap-1.5">
+                        <Sparkles size={14} className="text-yellow-300 shrink-0" />
+                        <span className="text-[10px] font-black text-yellow-200">
+                          クリアで狂乱キャラを必ず獲得！
                         </span>
-                      ) : currentTreasureStatus === 'silver' ? (
-                        <span className="text-xs font-black text-slate-300 flex items-center gap-1">
-                          🥈 普通のお宝 (銀)
-                        </span>
-                      ) : currentTreasureStatus === 'bronze' ? (
-                        <span className="text-xs font-black text-amber-500 flex items-center gap-1">
-                          🥉 粗悪なお宝 (銅)
-                        </span>
-                      ) : (
-                        <span className="text-xs text-stone-500 font-bold">未獲得</span>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
+                )}
 
-                  {currentStage.rewardCatUnlockId && (
-                    <div className="bg-gradient-to-r from-purple-950 to-red-950 border border-purple-400 p-2 rounded-xl flex items-center gap-2">
-                      <Sparkles size={16} className="text-yellow-300 shrink-0" />
-                      <span className="text-[11px] font-black text-yellow-200">
-                        クリアで狂乱キャラクターを必ず獲得！
-                      </span>
-                    </div>
-                  )}
+                {/* Cat Advice Bubble */}
+                <div className="bg-stone-900/90 border border-stone-800 p-2 rounded-xl flex items-start gap-1.5">
+                  <span className="text-base">🐱</span>
+                  <span className="text-[10px] sm:text-[11px] text-stone-300 font-bold leading-tight">
+                    {catSpeech}
+                  </span>
                 </div>
-              )}
 
-              {/* Cat Advice Bubble */}
-              <div className="bg-stone-900/90 border border-stone-800 p-2.5 rounded-xl flex items-start gap-2">
-                <span className="text-lg">🐱</span>
-                <span className="text-[11px] text-stone-300 font-bold leading-tight">
-                  {catSpeech}
-                </span>
+                {/* Battle Items Quick Toggles */}
+                <div>
+                  <div className="text-[9px] sm:text-[10px] font-black text-amber-400 mb-1 flex items-center justify-between">
+                    <span>出撃アイテム使用:</span>
+                    <span className="text-stone-400 text-[8px]">タップでON/OFF</span>
+                  </div>
+                  <div className="grid grid-cols-6 gap-1 bg-stone-900/90 p-1.5 rounded-xl border border-stone-800">
+                    {/* Speed Up */}
+                    <button
+                      id="item-toggle-speedup"
+                      onClick={() => handleToggleItem('speedUp', profile.items?.speedUp || 0)}
+                      className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
+                        activeItems.speedUp
+                          ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                          : 'bg-stone-800 border-stone-700'
+                      }`}
+                    >
+                      <span className="text-[10px] font-black text-amber-300">⚡</span>
+                      <span className="text-[7px] sm:text-[8px] text-stone-300">SPEED</span>
+                      <span className="text-[8px] sm:text-[9px] font-black text-amber-400">
+                        x{profile.items?.speedUp || 0}
+                      </span>
+                    </button>
+
+                    {/* Radar */}
+                    <button
+                      id="item-toggle-radar"
+                      onClick={() => handleToggleItem('treasureRadar', profile.items?.treasureRadar || 0)}
+                      className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
+                        activeItems.treasureRadar
+                          ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                          : 'bg-stone-800 border-stone-700'
+                      }`}
+                    >
+                      <span className="text-[10px] font-black text-yellow-400">GET</span>
+                      <span className="text-[7px] sm:text-[8px] text-stone-300">レーダー</span>
+                      <span className="text-[8px] sm:text-[9px] font-black text-yellow-400">
+                        x{profile.items?.treasureRadar || 0}
+                      </span>
+                    </button>
+
+                    {/* Rich Cat */}
+                    <button
+                      id="item-toggle-richcat"
+                      onClick={() => handleToggleItem('richCat', profile.items?.richCat || 0)}
+                      className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
+                        activeItems.richCat
+                          ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                          : 'bg-stone-800 border-stone-700'
+                      }`}
+                    >
+                      <span className="text-[10px] font-black text-emerald-400">MAX</span>
+                      <span className="text-[7px] sm:text-[8px] text-stone-300">ネコボン</span>
+                      <span className="text-[8px] sm:text-[9px] font-black text-emerald-400">
+                        x{profile.items?.richCat || 0}
+                      </span>
+                    </button>
+
+                    {/* CPU */}
+                    <button
+                      id="item-toggle-catcpu"
+                      onClick={() => handleToggleItem('catCpu', profile.items?.catCpu || 0)}
+                      className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
+                        activeItems.catCpu
+                          ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                          : 'bg-stone-800 border-stone-700'
+                      }`}
+                    >
+                      <span className="text-[10px] font-black text-cyan-400">CPU</span>
+                      <span className="text-[7px] sm:text-[8px] text-stone-300">ニャンピ</span>
+                      <span className="text-[8px] sm:text-[9px] font-black text-cyan-400">
+                        x{profile.items?.catCpu || 0}
+                      </span>
+                    </button>
+
+                    {/* Jobs */}
+                    <button
+                      id="item-toggle-catjobs"
+                      onClick={() => handleToggleItem('catJobs', profile.items?.catJobs || 0)}
+                      className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
+                        activeItems.catJobs
+                          ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                          : 'bg-stone-800 border-stone-700'
+                      }`}
+                    >
+                      <span className="text-[10px] font-black text-purple-400">XP</span>
+                      <span className="text-[7px] sm:text-[8px] text-stone-300">おかめ</span>
+                      <span className="text-[8px] sm:text-[9px] font-black text-purple-400">
+                        x{profile.items?.catJobs || 0}
+                      </span>
+                    </button>
+
+                    {/* Sniper */}
+                    <button
+                      id="item-toggle-sniper"
+                      onClick={() => handleToggleItem('sniper', profile.items?.sniper || 0)}
+                      className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
+                        activeItems.sniper
+                          ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                          : 'bg-stone-800 border-stone-700'
+                      }`}
+                    >
+                      <span className="text-[10px] font-black text-red-400">🎯</span>
+                      <span className="text-[7px] sm:text-[8px] text-stone-300">スニャ</span>
+                      <span className="text-[8px] sm:text-[9px] font-black text-red-400">
+                        x{profile.items?.sniper || 0}
+                      </span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Bottom: Battle Items & Deploy Button */}
-            <div className="flex flex-col gap-2.5 mt-3 pt-2 border-t-2 border-[#3d2415]">
-              {/* Battle Items Quick Toggles */}
-              <div>
-                <div className="text-[10px] font-black text-amber-400 mb-1 flex items-center justify-between">
-                  <span>出撃アイテム使用:</span>
-                  <span className="text-stone-400">タップでON/OFF</span>
-                </div>
-                <div className="grid grid-cols-6 gap-1 bg-stone-900/90 p-1.5 rounded-xl border border-stone-800">
-                  {/* Speed Up */}
-                  <button
-                    id="item-toggle-speedup"
-                    onClick={() => handleToggleItem('speedUp', profile.items?.speedUp || 0)}
-                    className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
-                      activeItems.speedUp
-                        ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
-                        : 'bg-stone-800 border-stone-700'
-                    }`}
-                  >
-                    <span className="text-[10px] font-black text-amber-300">⚡</span>
-                    <span className="text-[8px] text-stone-300">SPEED</span>
-                    <span className="text-[9px] font-black text-amber-400">
-                      x{profile.items?.speedUp || 0}
-                    </span>
-                  </button>
-
-                  {/* Radar */}
-                  <button
-                    id="item-toggle-radar"
-                    onClick={() => handleToggleItem('treasureRadar', profile.items?.treasureRadar || 0)}
-                    className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
-                      activeItems.treasureRadar
-                        ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
-                        : 'bg-stone-800 border-stone-700'
-                    }`}
-                  >
-                    <span className="text-[10px] font-black text-yellow-400">GET</span>
-                    <span className="text-[8px] text-stone-300">レーダー</span>
-                    <span className="text-[9px] font-black text-yellow-400">
-                      x{profile.items?.treasureRadar || 0}
-                    </span>
-                  </button>
-
-                  {/* Rich Cat */}
-                  <button
-                    id="item-toggle-richcat"
-                    onClick={() => handleToggleItem('richCat', profile.items?.richCat || 0)}
-                    className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
-                      activeItems.richCat
-                        ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
-                        : 'bg-stone-800 border-stone-700'
-                    }`}
-                  >
-                    <span className="text-[10px] font-black text-emerald-400">MAX</span>
-                    <span className="text-[8px] text-stone-300">ネコボン</span>
-                    <span className="text-[9px] font-black text-emerald-400">
-                      x{profile.items?.richCat || 0}
-                    </span>
-                  </button>
-
-                  {/* CPU */}
-                  <button
-                    id="item-toggle-catcpu"
-                    onClick={() => handleToggleItem('catCpu', profile.items?.catCpu || 0)}
-                    className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
-                      activeItems.catCpu
-                        ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
-                        : 'bg-stone-800 border-stone-700'
-                    }`}
-                  >
-                    <span className="text-[10px] font-black text-cyan-400">CPU</span>
-                    <span className="text-[8px] text-stone-300">ニャンピ</span>
-                    <span className="text-[9px] font-black text-cyan-400">
-                      x{profile.items?.catCpu || 0}
-                    </span>
-                  </button>
-
-                  {/* Jobs */}
-                  <button
-                    id="item-toggle-catjobs"
-                    onClick={() => handleToggleItem('catJobs', profile.items?.catJobs || 0)}
-                    className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
-                      activeItems.catJobs
-                        ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
-                        : 'bg-stone-800 border-stone-700'
-                    }`}
-                  >
-                    <span className="text-[10px] font-black text-purple-400">XP</span>
-                    <span className="text-[8px] text-stone-300">おかめ</span>
-                    <span className="text-[9px] font-black text-purple-400">
-                      x{profile.items?.catJobs || 0}
-                    </span>
-                  </button>
-
-                  {/* Sniper */}
-                  <button
-                    id="item-toggle-sniper"
-                    onClick={() => handleToggleItem('sniper', profile.items?.sniper || 0)}
-                    className={`flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all ${
-                      activeItems.sniper
-                        ? 'bg-amber-500/30 border-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]'
-                        : 'bg-stone-800 border-stone-700'
-                    }`}
-                  >
-                    <span className="text-[10px] font-black text-red-400">🎯</span>
-                    <span className="text-[8px] text-stone-300">スニャ</span>
-                    <span className="text-[9px] font-black text-red-400">
-                      x{profile.items?.sniper || 0}
-                    </span>
-                  </button>
+            {/* Bottom: Energy Cost & Golden Deploy Button */}
+            <div className="flex flex-col gap-2 mt-2 pt-1.5 border-t-2 border-[#3d2415]">
+              <div className="flex items-center justify-between bg-black/60 px-3 py-1 rounded-xl border border-stone-800">
+                <span className="text-xs font-black text-stone-300">必要統率力</span>
+                <div className="flex items-center gap-1.5">
+                  <Zap size={14} className="text-cyan-400" />
+                  <span className="text-sm font-black text-cyan-300">
+                    {currentStage?.energyCost}
+                  </span>
+                  <span className="text-[10px] sm:text-[11px] text-stone-400">
+                    (所持: {isInfiniteEnergy ? '∞' : profile.energy})
+                  </span>
                 </div>
               </div>
 
-              {/* Energy Cost & Golden Deploy Button */}
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between bg-black/60 px-3 py-1.5 rounded-xl border border-stone-800">
-                  <span className="text-xs font-black text-stone-300">必要統率力</span>
-                  <div className="flex items-center gap-1.5">
-                    <Zap size={14} className="text-cyan-400" />
-                    <span className="text-sm font-black text-cyan-300">
-                      {currentStage?.energyCost}
-                    </span>
-                    <span className="text-[11px] text-stone-400">
-                      (所持: {isInfiniteEnergy ? '∞' : profile.energy})
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  id="btn-deploy-battle"
-                  onClick={handleDeploy}
-                  className="w-full py-3 rounded-2xl bg-gradient-to-b from-yellow-400 via-amber-500 to-amber-700 hover:from-yellow-300 hover:to-amber-600 text-stone-950 font-black text-base sm:text-lg border-4 border-yellow-200 shadow-[0_6px_0_#451a03] active:translate-y-1 active:shadow-[0_2px_0_#451a03] flex items-center justify-center gap-2 tracking-wider transition-all"
-                >
-                  <span className="text-xl">⚔️</span>
-                  <span>戦闘開始!! (いざ出陣)</span>
-                </button>
-              </div>
+              <button
+                id="btn-deploy-battle"
+                onClick={handleDeploy}
+                className="w-full py-2.5 sm:py-3 rounded-2xl bg-gradient-to-b from-yellow-400 via-amber-500 to-amber-700 hover:from-yellow-300 hover:to-amber-600 text-stone-950 font-black text-sm sm:text-lg border-2 sm:border-4 border-yellow-200 shadow-[0_4px_0_#451a03] sm:shadow-[0_6px_0_#451a03] active:translate-y-1 active:shadow-[0_1px_0_#451a03] flex items-center justify-center gap-2 tracking-wider transition-all"
+              >
+                <span className="text-base sm:text-xl">⚔️</span>
+                <span>戦闘開始!! (いざ出陣)</span>
+              </button>
             </div>
           </div>
         </div>

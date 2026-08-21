@@ -58,6 +58,7 @@ export function getDefaultPlayerProfile(): PlayerProfile {
       sniper: 2,
     },
     gachaPityCounter: 0,
+    hasClearedFilibuster: false,
     devMode: {
       unlocked: false,
       infiniteEnergy: false,

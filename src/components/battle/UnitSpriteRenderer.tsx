@@ -2342,6 +2342,187 @@ function renderSpriteSvg(
         </svg>
       );
 
+    case 'cat_fencer':
+    case 'cat_swordmaster':
+      return (
+        <svg width="76" height="70" viewBox="0 0 76 70" className="drop-shadow-md">
+          {/* Fencing Helmet / Rapier */}
+          <ellipse cx="38" cy="34" rx="20" ry="18" fill="#ffffff" stroke="#0f172a" strokeWidth="2.5" />
+          {/* Fencing Mesh Mask */}
+          <ellipse cx="34" cy="32" rx="12" ry="10" fill="#334155" stroke="#0f172a" strokeWidth="1.5" />
+          <circle cx="30" cy="30" r="1.5" fill="#f8fafc" />
+          {/* Glowing Barrier-Breaker Rapier Blade */}
+          <g transform={`rotate(${isAttacking ? 45 : -15} 48 38)`}>
+            <line x1="48" y1="38" x2="80" y2="28" stroke="#38bdf8" strokeWidth="3.5" strokeLinecap="round" />
+            <circle cx="48" cy="38" r="5" fill="#f59e0b" stroke="#0f172a" strokeWidth="1.5" />
+            {isAttacking && (
+              <polygon points="78,24 86,28 78,32" fill="#38bdf8" className="animate-ping" />
+            )}
+          </g>
+          <ellipse cx={30 + legOffset1} cy="54" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={46 + legOffset2} cy="54" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
+
+    // =========================================================================
+    // STAR ALIEN ENEMIES (スターエイリアン敵スプライト: 星リング＋バリア・ワープ意匠)
+    // =========================================================================
+    case 'enemy_star_doge':
+      return (
+        <svg width="68" height="60" viewBox="0 0 68 60" className="drop-shadow-lg">
+          {/* Cosmic Star Halo */}
+          <circle cx="34" cy="28" r="26" fill="none" stroke="#38bdf8" strokeWidth="2" strokeDasharray="6,4" className="animate-spin" />
+          {/* Star Alien Doge Body */}
+          <ellipse cx="34" cy="30" rx="20" ry="16" fill="#06b6d4" stroke="#082f49" strokeWidth="2.5" />
+          {/* Glowing Alien Star Antenna */}
+          <line x1="34" y1="14" x2="34" y2="4" stroke="#facc15" strokeWidth="2.5" />
+          <polygon points="34,1 36,5 40,5 37,8 38,12 34,9 30,12 31,8 28,5 32,5" fill="#facc15" />
+          {/* Alien Eyes */}
+          <ellipse cx="26" cy="28" rx="3.5" ry="5" fill="#f43f5e" />
+          <ellipse cx="42" cy="28" rx="3.5" ry="5" fill="#f43f5e" />
+          <circle cx="27" cy="26" r="1.5" fill="#ffffff" />
+          <circle cx="43" cy="26" r="1.5" fill="#ffffff" />
+          {/* Star Alien Feet */}
+          <ellipse cx={24 + legOffset1} cy="48" rx="4.5" ry="5" fill="#0891b2" stroke="#082f49" strokeWidth="2" />
+          <ellipse cx={44 + legOffset2} cy="48" rx="4.5" ry="5" fill="#0891b2" stroke="#082f49" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_star_croc':
+      return (
+        <svg width="78" height="55" viewBox="0 0 78 55" className="drop-shadow-lg">
+          <ellipse cx="38" cy="28" rx="30" ry="12" fill="none" stroke="#c084fc" strokeWidth="2" strokeDasharray="8,4" className="animate-spin" />
+          <ellipse cx="40" cy="30" rx="26" ry="13" fill="#0284c7" stroke="#0c4a6e" strokeWidth="2.5" />
+          {/* Croc Jaw with Sharp Star Teeth */}
+          <polygon points="12,28 2,24 16,36" fill="#0284c7" stroke="#0c4a6e" strokeWidth="2" />
+          <polygon points="4,24 8,28 12,25 16,29" fill="#facc15" />
+          {/* Triple Cosmic Eyes */}
+          <circle cx="22" cy="24" r="3" fill="#f43f5e" />
+          <circle cx="30" cy="22" r="3" fill="#f43f5e" />
+          <circle cx="38" cy="24" r="3" fill="#f43f5e" />
+          <ellipse cx={26 + legOffset1} cy="45" rx="5" ry="4" fill="#0369a1" stroke="#0c4a6e" strokeWidth="2" />
+          <ellipse cx={52 + legOffset2} cy="45" rx="5" ry="4" fill="#0369a1" stroke="#0c4a6e" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_star_pigeon':
+      return (
+        <svg width="70" height="65" viewBox="0 0 70 65" className="drop-shadow-lg">
+          {/* Star Pigeon */}
+          <polygon points="35,4 38,12 46,12 40,17 42,25 35,20 28,25 30,17 24,12 32,12" fill="#facc15" />
+          <ellipse cx="36" cy="35" rx="18" ry="16" fill="#0ea5e9" stroke="#075985" strokeWidth="2.5" />
+          <polygon points="16,35 6,38 16,42" fill="#f43f5e" stroke="#075985" strokeWidth="1.5" />
+          <circle cx="24" cy="32" r="3.5" fill="#facc15" />
+          <circle cx="23" cy="31" r="1.5" fill="#000000" />
+          {/* Cosmic Wing */}
+          <g transform={`rotate(${Math.sin(timer * 25) * 30} 42 34)`}>
+            <ellipse cx="46" cy="32" rx="14" ry="7" fill="#38bdf8" stroke="#075985" strokeWidth="2" />
+          </g>
+          <line x1={30 + legOffset1} y1="50" x2="30" y2="58" stroke="#f43f5e" strokeWidth="2.5" />
+          <line x1={42 + legOffset2} y1="50" x2="42" y2="58" stroke="#f43f5e" strokeWidth="2.5" />
+        </svg>
+      );
+
+    case 'enemy_star_hippo':
+      return (
+        <svg width="95" height="75" viewBox="0 0 95 75" className="drop-shadow-xl">
+          <circle cx="48" cy="38" r="34" fill="none" stroke="#38bdf8" strokeWidth="2.5" strokeDasharray="10,6" className="animate-spin" />
+          {/* Bulky Hippo Snout */}
+          <ellipse cx="32" cy="40" rx="22" ry="18" fill="#0284c7" stroke="#082f49" strokeWidth="3" />
+          <ellipse cx="60" cy="36" rx="24" ry="20" fill="#0ea5e9" stroke="#082f49" strokeWidth="3" />
+          <circle cx="20" cy="36" r="3" fill="#082f49" />
+          <circle cx="26" cy="36" r="3" fill="#082f49" />
+          {/* Alien Eyes */}
+          <ellipse cx="44" cy="26" rx="4" ry="5" fill="#f43f5e" />
+          <ellipse cx="54" cy="26" rx="4" ry="5" fill="#f43f5e" />
+          <ellipse cx={40 + legOffset1} cy="58" rx="8" ry="7" fill="#0369a1" stroke="#082f49" strokeWidth="2.5" />
+          <ellipse cx={68 + legOffset2} cy="58" rx="8" ry="7" fill="#0369a1" stroke="#082f49" strokeWidth="2.5" />
+        </svg>
+      );
+
+    case 'enemy_star_pig':
+      return (
+        <svg width="80" height="65" viewBox="0 0 80 65" className="drop-shadow-lg">
+          <ellipse cx="40" cy="34" rx="22" ry="18" fill="#ec4899" stroke="#831843" strokeWidth="2.5" />
+          {/* Star Alien Snout */}
+          <ellipse cx="22" cy="36" rx="10" ry="7" fill="#f472b6" stroke="#831843" strokeWidth="2" />
+          <circle cx="19" cy="36" r="2" fill="#831843" />
+          <circle cx="25" cy="36" r="2" fill="#831843" />
+          {/* Starlight Crest */}
+          <polygon points="40,6 42,12 48,12 43,16 45,22 40,18 35,22 37,16 32,12 38,12" fill="#38bdf8" />
+          <circle cx="34" cy="28" r="3.5" fill="#38bdf8" />
+          <circle cx="46" cy="28" r="3.5" fill="#38bdf8" />
+          <ellipse cx={30 + legOffset1} cy="54" rx="5" ry="5" fill="#be185d" stroke="#831843" strokeWidth="2" />
+          <ellipse cx={50 + legOffset2} cy="54" rx="5" ry="5" fill="#be185d" stroke="#831843" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_star_le_boin':
+      return (
+        <svg width="125" height="100" viewBox="0 0 125 100" className="drop-shadow-2xl">
+          <ellipse cx="65" cy="50" rx="52" ry="42" fill="none" stroke="#38bdf8" strokeWidth="3" strokeDasharray="16,8" className="animate-spin" />
+          {/* Big Alien Elephant Body */}
+          <ellipse cx="75" cy="52" rx="34" ry="28" fill="#0284c7" stroke="#082f49" strokeWidth="3.5" />
+          <ellipse cx="40" cy="46" rx="22" ry="20" fill="#0ea5e9" stroke="#082f49" strokeWidth="3.5" />
+          {/* Glowing Cosmic Trunk */}
+          <g transform={`rotate(${Math.sin(timer * 12) * 20} 25 50)`}>
+            <path d="M 30 50 Q 15 70 8 55 Q 0 45 10 40" fill="none" stroke="#38bdf8" strokeWidth="8" strokeLinecap="round" />
+          </g>
+          {/* Big Star Alien Ear */}
+          <ellipse cx="56" cy="40" rx="14" ry="18" fill="#38bdf8" stroke="#082f49" strokeWidth="2.5" />
+          <ellipse cx="32" cy="38" rx="4.5" ry="6" fill="#f43f5e" />
+          <ellipse cx={52 + legOffset1} cy="82" rx="10" ry="8" fill="#0369a1" stroke="#082f49" strokeWidth="3" />
+          <ellipse cx={88 + legOffset2} cy="82" rx="10" ry="8" fill="#0369a1" stroke="#082f49" strokeWidth="3" />
+        </svg>
+      );
+
+    case 'enemy_star_moth':
+      return (
+        <svg width="105" height="85" viewBox="0 0 105 85" className="drop-shadow-xl">
+          {/* Flapping Star Wings */}
+          <g transform={`scale(1, ${Math.sin(timer * 22)})`}>
+            <ellipse cx="32" cy="30" rx="26" ry="18" fill="#06b6d4" stroke="#083344" strokeWidth="2.5" />
+            <ellipse cx="74" cy="30" rx="26" ry="18" fill="#06b6d4" stroke="#083344" strokeWidth="2.5" />
+            <polygon points="32,24 35,32 44,32 37,38 40,46 32,40 24,46 27,38 20,32 29,32" fill="#facc15" />
+            <polygon points="74,24 77,32 86,32 79,38 82,46 74,40 66,46 69,38 62,32 71,32" fill="#facc15" />
+          </g>
+          {/* Moth Body */}
+          <ellipse cx="53" cy="38" rx="10" ry="24" fill="#0891b2" stroke="#083344" strokeWidth="2.5" />
+          <circle cx="53" cy="20" r="5" fill="#f43f5e" />
+          <line x1="50" y1="16" x2="40" y2="4" stroke="#38bdf8" strokeWidth="2" />
+          <line x1="56" y1="16" x2="66" y2="4" stroke="#38bdf8" strokeWidth="2" />
+        </svg>
+      );
+
+    // =========================================================================
+    // BOSS: FILIBUSTER (フィリバスター・超神撃チャージボス)
+    // =========================================================================
+    case 'boss_filibuster':
+      return (
+        <svg width="165" height="155" viewBox="0 0 165 155" className="drop-shadow-[0_0_25px_rgba(168,85,247,0.9)]">
+          {/* Huge Mystical Halo Rings */}
+          <circle cx="82" cy="75" r="70" fill="none" stroke="#c084fc" strokeWidth="4" strokeDasharray="20,10" className="animate-spin" />
+          <circle cx="82" cy="75" r="54" fill="none" stroke="#38bdf8" strokeWidth="3" strokeDasharray="12,6" className="animate-spin" />
+          {/* Godly Floating Relic Armor */}
+          <polygon points="82,8 96,38 136,44 104,70 114,110 82,88 50,110 60,70 28,44 68,38" fill="#4c1d95" stroke="#a855f7" strokeWidth="4" />
+          {/* Core Eye / Nucleus */}
+          <ellipse cx="82" cy="68" rx="20" ry="24" fill="#09090b" stroke="#f43f5e" strokeWidth="4" />
+          <circle cx="82" cy="68" r="10" fill="#f43f5e" className="animate-pulse" />
+          <circle cx="82" cy="68" r="4" fill="#ffffff" />
+          {/* Energy Tendrils / Floating Hands */}
+          <g transform={`rotate(${Math.sin(timer * 8) * 15} 35 80)`}>
+            <polygon points="20,70 36,60 30,90" fill="#7c3aed" stroke="#c084fc" strokeWidth="2" />
+          </g>
+          <g transform={`rotate(${-Math.sin(timer * 8) * 15} 130 80)`}>
+            <polygon points="144,70 128,60 134,90" fill="#7c3aed" stroke="#c084fc" strokeWidth="2" />
+          </g>
+          {/* Attack Charge Pulsing Nova */}
+          {isAttacking && (
+            <circle cx="82" cy="68" r="45" fill="none" stroke="#f43f5e" strokeWidth="8" className="animate-ping" />
+          )}
+        </svg>
+      );
+
     default:
       return (
         <svg width="50" height="50" viewBox="0 0 50 50">

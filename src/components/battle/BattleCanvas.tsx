@@ -443,6 +443,39 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
                 />
               </div>
             )}
+
+            {/* Star Alien Barrier Aura */}
+            {enemy.barrierHp && enemy.barrierHp > 0 ? (
+              <div className="absolute inset-0 -m-3 pointer-events-none flex items-center justify-center">
+                <div className="w-20 sm:w-24 h-20 sm:h-24 rounded-full border-2 border-cyan-300 bg-cyan-400/20 shadow-[0_0_15px_rgba(6,182,212,0.8)] animate-pulse" />
+                <div className="absolute -top-6 bg-cyan-900/90 text-cyan-200 border border-cyan-400 rounded px-1.5 py-0.5 text-[9px] font-black tracking-tighter flex items-center gap-1 shadow">
+                  <span>🛡️ バリア</span>
+                  <span className="font-mono">{enemy.barrierHp.toLocaleString()}</span>
+                </div>
+              </div>
+            ) : null}
+
+            {/* Boss Filibuster Mega Attack Charge Bar */}
+            {enemy.isCharging && enemy.chargeTimer !== undefined && (
+              <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-32 flex flex-col items-center pointer-events-none z-30 animate-bounce">
+                <div className="bg-rose-950/95 border border-rose-500 rounded px-2 py-0.5 text-[10px] font-black text-rose-300 shadow-xl flex items-center gap-1">
+                  <span className="animate-ping">⚠️</span>
+                  <span>超神撃チャージ中!</span>
+                </div>
+                <div className="w-28 h-2 bg-black/80 rounded-full border border-rose-400 overflow-hidden mt-1 shadow-inner">
+                  <div
+                    className="h-full bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 transition-all duration-100"
+                    style={{
+                      width: `${Math.max(0, Math.min(100, (1 - (enemy.chargeTimer || 0) / 12) * 100))}%`,
+                    }}
+                  />
+                </div>
+                <span className="text-[8px] font-black text-yellow-300 mt-0.5 drop-shadow">
+                  KBでチャージ阻止可能!
+                </span>
+              </div>
+            )}
+
             <UnitSpriteRenderer
               spriteType={enemy.spriteType}
               isCat={false}
@@ -568,6 +601,33 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
                   <div className="absolute w-96 h-96 rounded-full border-2 border-red-500/80 animate-pulse" />
                 </div>
               )}
+              {fx.type === 'barrier_break' && (
+                <div className="relative flex flex-col items-center justify-center pointer-events-none">
+                  <div className="w-36 h-36 rounded-full border-4 border-cyan-300 bg-cyan-400/40 blur-md animate-ping" />
+                  <span className="font-black text-sm text-cyan-200 uppercase tracking-wider drop-shadow-[0_0_12px_rgba(6,182,212,1)]">
+                    💥 バリアブレイク!!
+                  </span>
+                </div>
+              )}
+              {fx.type === 'warp_fx' && (
+                <div className="relative flex flex-col items-center justify-center pointer-events-none">
+                  <div className="w-24 h-24 rounded-full border-4 border-purple-500 bg-purple-950/80 animate-spin" />
+                  <span className="font-black text-xs text-purple-300 drop-shadow">🌀 ワープ発動!</span>
+                </div>
+              )}
+              {fx.type === 'filibuster_charge' && (
+                <div className="relative flex items-center justify-center pointer-events-none">
+                  <div className="w-48 h-48 rounded-full border-2 border-rose-500 bg-rose-900/30 blur-sm animate-pulse" />
+                </div>
+              )}
+              {fx.type === 'filibuster_oblivion' && (
+                <div className="relative flex flex-col items-center justify-center pointer-events-none">
+                  <div className="w-[600px] h-[300px] bg-gradient-to-r from-rose-600 via-white to-purple-600 blur-xl opacity-90 animate-ping" />
+                  <span className="font-black text-2xl text-yellow-300 uppercase tracking-widest drop-shadow-[0_0_20px_rgba(239,68,68,1)]">
+                    ☠️ 超 神 撃 破 滅 ☠️
+                  </span>
+                </div>
+              )}
             </div>
           );
         })}
@@ -577,7 +637,9 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
           <div
             key={d.id}
             className={`absolute font-black pointer-events-none z-30 transition-all ${
-              d.isCritical
+              d.isBarrierBlock
+                ? 'text-cyan-300 text-xs sm:text-sm animate-pulse drop-shadow-[0_0_6px_rgba(6,182,212,0.9)]'
+                : d.isCritical
                 ? 'text-yellow-300 text-lg sm:text-xl scale-125 animate-bounce drop-shadow-[0_0_8px_rgba(253,224,71,0.9)]'
                 : d.isCatDamage
                 ? 'text-white text-xs sm:text-sm drop-shadow'
@@ -591,7 +653,7 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
               textShadow: '-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000',
             }}
           >
-            {d.isCritical ? `CRIT! -${d.value}` : `-${d.value}`}
+            {d.isBarrierBlock ? '🛡️ バリア無効化!' : d.isCritical ? `CRIT! -${d.value}` : `-${d.value}`}
           </div>
         ))}
       </div>

@@ -8,6 +8,7 @@ export type EnemyTrait =
   | 'floating'
   | 'black'
   | 'alien'
+  | 'star_alien'
   | 'angel'
   | 'metal'
   | 'zombie'
@@ -22,6 +23,10 @@ export interface AbilityDefinition {
   strong?: { traits?: EnemyTrait[] };
   resist?: { traits?: EnemyTrait[] };
   zombieKiller?: boolean;
+  barrier?: { hp: number }; // スターエイリアンのバリア耐久値 (単発ダメージがこれ以上で破壊)
+  warp?: { chance: number; distance: number }; // ワープ能力 (味方を後方にテレポート)
+  barrierBreaker?: { chance: number }; // バリアブレイカー能力 (バリアを即座に粉砕)
+  chargeAttack?: { chargeTime: number; isOneHitKill?: boolean }; // フィリバスター等の大溜め即死攻撃
   burrow?: { count: number; distance: number };
   revive?: { count: number; hpPercent: number; delaySeconds: number };
   criticalChance?: number;
@@ -132,8 +137,17 @@ export interface ActiveEntity {
   reviveHpPercent?: number;
   isPermadead?: boolean;
 
+  // Star Alien & Filibuster mechanics
+  barrierHp?: number; // 残りバリア耐久値 (0以上ならダメージ無効化、単発威力>=barrierHpで破壊)
+  maxBarrierHp?: number;
+  isCharging?: boolean; // フィリバスター等のチャージ中フラグ
+  chargeTimer?: number; // チャージ残り時間
+  maxChargeTime?: number;
+  isWarping?: boolean; // ワープ移動中フラグ
+  warpDistanceLeft?: number;
+
   // Animation states
-  state: 'walk' | 'attack' | 'knockback' | 'die' | 'burrow' | 'revive';
+  state: 'walk' | 'attack' | 'knockback' | 'die' | 'burrow' | 'revive' | 'charge';
   animTimer: number;
   knockbackVelocityX: number;
   knockbackTimer: number;
@@ -147,6 +161,7 @@ export interface DamageNumber {
   value: number;
   isCritical?: boolean;
   isCatDamage: boolean;
+  isBarrierBlock?: boolean; // バリアで防がれた
   lifetime: number;
   maxLifetime: number;
 }
@@ -174,6 +189,11 @@ export interface VisualEffect {
     | 'zombie_burrow'
     | 'zombie_revive'
     | 'zombie_killer_fx'
+    | 'barrier_hit'
+    | 'barrier_break'
+    | 'warp_portal'
+    | 'filibuster_charge'
+    | 'filibuster_oblivion'
     | 'metal_spark';
   lifetime: number;
   maxLifetime: number;
@@ -221,6 +241,10 @@ export type ChapterId =
   | 'legend_6'
   | 'legend_7'
   | 'legend_8'
+  | 'legend_9'
+  | 'legend_10'
+  | 'legend_11'
+  | 'legend_12'
   | 'crazed_event'
   | 'special_event'
   | 'japan'
@@ -345,6 +369,7 @@ export interface PlayerProfile {
     sniper?: number; // スニャイパー (定期狙撃)
   };
   gachaPityCounter: number;
+  hasClearedFilibuster?: boolean; // 宇宙編3章フィリバスター撃破フラグ (Lv.25解放＆レジェンド9章以降解放)
   devMode?: DevModeSettings;
 }
 

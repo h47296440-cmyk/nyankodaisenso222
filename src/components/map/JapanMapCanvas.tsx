@@ -1,5 +1,6 @@
-import React from 'react';
-import { StageDefinition, ChapterDefinition, PlayerProfile } from '../../types';
+import React, { useEffect, useRef, useState } from 'react';
+import { StageDefinition, ChapterDefinition } from '../../types';
+import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 
 interface JapanMapCanvasProps {
   chapter: ChapterDefinition;
@@ -7,7 +8,7 @@ interface JapanMapCanvasProps {
   selectedStageId: string;
   clearedStages: Record<string, any>;
   onSelectStage: (stage: StageDefinition) => void;
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef?: React.RefObject<HTMLDivElement>;
 }
 
 export const JapanMapCanvas: React.FC<JapanMapCanvasProps> = ({
@@ -16,8 +17,12 @@ export const JapanMapCanvas: React.FC<JapanMapCanvasProps> = ({
   selectedStageId,
   clearedStages,
   onSelectStage,
-  containerRef,
+  containerRef: externalContainerRef,
 }) => {
+  const localContainerRef = useRef<HTMLDivElement>(null);
+  const scrollContainer = externalContainerRef?.current || localContainerRef.current;
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
+
   const isJapan = chapter.category === 'japan' || chapter.id.startsWith('japan');
   const isFuture = chapter.category === 'future' || chapter.id.startsWith('future');
   const isCosmos = chapter.category === 'cosmos' || chapter.id.startsWith('cosmos');
@@ -26,118 +31,194 @@ export const JapanMapCanvas: React.FC<JapanMapCanvasProps> = ({
 
   const selectedStage = stages.find((s) => s.id === selectedStageId) || stages[0];
 
+  // Auto-scroll to center on the selected stage
+  useEffect(() => {
+    if (!scrollContainer || !selectedStage) return;
+
+    const timer = setTimeout(() => {
+      const stagePixelX = ((selectedStage.mapX ?? 50) / 100) * 1400 + 80;
+      const stagePixelY = ((selectedStage.mapY ?? 50) / 100) * 700 + 70;
+
+      const viewportWidth = scrollContainer.clientWidth;
+      const viewportHeight = scrollContainer.clientHeight;
+
+      const targetScrollLeft = (stagePixelX * zoomLevel) - viewportWidth / 2;
+      const targetScrollTop = (stagePixelY * zoomLevel) - viewportHeight / 2;
+
+      scrollContainer.scrollTo({
+        left: Math.max(0, targetScrollLeft),
+        top: Math.max(0, targetScrollTop),
+        behavior: 'smooth',
+      });
+    }, 80);
+
+    return () => clearTimeout(timer);
+  }, [selectedStageId, chapter.id, zoomLevel]);
+
+  // Handle zoom changes
+  const handleZoom = (delta: number) => {
+    setZoomLevel((prev) => {
+      const next = Math.min(1.5, Math.max(0.65, prev + delta));
+      return Math.round(next * 100) / 100;
+    });
+  };
+
+  const handleResetZoom = () => {
+    setZoomLevel(1);
+  };
+
   return (
-    <div
-      ref={containerRef}
-      className={`relative w-full h-full overflow-auto select-none cursor-grab active:cursor-grabbing ${
-        isJapan
-          ? 'bg-[#ded4bc]'
-          : isFuture
-          ? 'bg-[#0a1224]'
-          : isCosmos
-          ? 'bg-[#050510]'
-          : isLegend
-          ? 'bg-[#261d15]'
-          : 'bg-[#18081f]'
-      }`}
-      style={{
-        backgroundImage: isJapan
-          ? `
-            radial-gradient(#baa98a 1px, transparent 1px),
-            linear-gradient(to right, rgba(186, 169, 138, 0.15) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(186, 169, 138, 0.15) 1px, transparent 1px)
-          `
-          : isFuture
-          ? `
-            linear-gradient(to right, rgba(34, 211, 238, 0.1) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(34, 211, 238, 0.1) 1px, transparent 1px)
-          `
-          : isCosmos
-          ? `
-            radial-gradient(white 1px, transparent 1px),
-            radial-gradient(rgba(147, 51, 234, 0.4) 1px, transparent 1px)
-          `
-          : isLegend
-          ? `
-            radial-gradient(#d97706 1px, transparent 1px),
-            linear-gradient(to right, rgba(217, 119, 6, 0.15) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(217, 119, 6, 0.15) 1px, transparent 1px)
-          `
-          : `
-            radial-gradient(#f43f5e 1.5px, transparent 1.5px),
-            radial-gradient(rgba(168, 85, 247, 0.3) 1px, transparent 1px)
-          `,
-        backgroundSize: isJapan
-          ? '40px 40px, 40px 40px, 40px 40px'
-          : isFuture
-          ? '50px 50px, 50px 50px'
-          : isCosmos
-          ? '80px 80px, 120px 120px'
-          : isLegend
-          ? '45px 45px, 45px 45px, 45px 45px'
-          : '60px 60px, 90px 90px',
-      }}
-    >
-      {/* Scrollable Stage Area: 1600px x 850px */}
-      <div className="relative w-[1600px] h-[850px] min-w-[1600px] min-h-[850px] pointer-events-auto">
-        {/* Map Silhouette SVG */}
-        <svg
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          viewBox="0 0 1600 850"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+    <div className="relative w-full h-full min-h-0 flex-1 overflow-hidden">
+      {/* Zoom / View Control Floating Toolbar */}
+      <div className="absolute bottom-3 left-3 z-30 flex items-center gap-1.5 bg-stone-900/90 border border-amber-600/60 p-1.5 rounded-xl shadow-lg backdrop-blur-sm">
+        <button
+          onClick={() => handleZoom(0.15)}
+          className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 active:scale-95 text-xs font-black"
+          title="拡大 (+)"
         >
-          <defs>
-            {/* Japan Vintage Parchment / Land Gradient */}
-            <linearGradient id="japanLandGrad" x1="0" y1="0" x2="1600" y2="850" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#d5c7a5" />
-              <stop offset="50%" stopColor="#cdbf9b" />
-              <stop offset="100%" stopColor="#c5b58d" />
-            </linearGradient>
+          <ZoomIn size={16} />
+        </button>
+        <button
+          onClick={() => handleZoom(-0.15)}
+          className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 active:scale-95 text-xs font-black"
+          title="縮小 (-)"
+        >
+          <ZoomOut size={16} />
+        </button>
+        <button
+          onClick={handleResetZoom}
+          className="px-2 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px] font-black active:scale-95 flex items-center gap-1"
+          title="倍率リセット"
+        >
+          <Maximize2 size={13} />
+          <span>{Math.round(zoomLevel * 100)}%</span>
+        </button>
+      </div>
 
-            <filter id="mapShadow" x="-5%" y="-5%" width="110%" height="110%">
-              <feDropShadow dx="3" dy="5" stdDeviation="4" floodColor="#8c7755" floodOpacity="0.4" />
-            </filter>
+      {/* Main Scrollable Canvas Container */}
+      <div
+        ref={externalContainerRef || localContainerRef}
+        className={`w-full h-full overflow-auto select-none cursor-grab active:cursor-grabbing touch-pan-x touch-pan-y ${
+          isJapan
+            ? 'bg-[#ded4bc]'
+            : isFuture
+            ? 'bg-[#0a1224]'
+            : isCosmos
+            ? 'bg-[#050510]'
+            : isLegend
+            ? 'bg-[#261d15]'
+            : 'bg-[#18081f]'
+        }`}
+        style={{
+          backgroundImage: isJapan
+            ? `
+              radial-gradient(#baa98a 1px, transparent 1px),
+              linear-gradient(to right, rgba(186, 169, 138, 0.15) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(186, 169, 138, 0.15) 1px, transparent 1px)
+            `
+            : isFuture
+            ? `
+              linear-gradient(to right, rgba(34, 211, 238, 0.1) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(34, 211, 238, 0.1) 1px, transparent 1px)
+            `
+            : isCosmos
+            ? `
+              radial-gradient(white 1px, transparent 1px),
+              radial-gradient(rgba(147, 51, 234, 0.4) 1px, transparent 1px)
+            `
+            : isLegend
+            ? `
+              radial-gradient(#d97706 1px, transparent 1px),
+              linear-gradient(to right, rgba(217, 119, 6, 0.15) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(217, 119, 6, 0.15) 1px, transparent 1px)
+            `
+            : `
+              radial-gradient(#f43f5e 1.5px, transparent 1.5px),
+              radial-gradient(rgba(168, 85, 247, 0.3) 1px, transparent 1px)
+            `,
+          backgroundSize: isJapan
+            ? '40px 40px, 40px 40px, 40px 40px'
+            : isFuture
+            ? '50px 50px, 50px 50px'
+            : isCosmos
+            ? '80px 80px, 120px 120px'
+            : isLegend
+            ? '45px 45px, 45px 45px, 45px 45px'
+            : '60px 60px, 90px 90px',
+        }}
+      >
+        {/* Scaled Map Inner Area */}
+        <div
+          className="relative pointer-events-auto origin-top-left transition-transform duration-200"
+          style={{
+            width: `${1600 * zoomLevel}px`,
+            height: `${850 * zoomLevel}px`,
+            minWidth: `${1600 * zoomLevel}px`,
+            minHeight: `${850 * zoomLevel}px`,
+            transform: `scale(${zoomLevel})`,
+            transformOrigin: '0 0',
+          }}
+        >
+          {/* Scrollable Stage Area: 1600px x 850px Base */}
+          <div className="relative w-[1600px] h-[850px]">
+            {/* Map Silhouette SVG */}
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              viewBox="0 0 1600 850"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                {/* Japan Vintage Parchment / Land Gradient */}
+                <linearGradient id="japanLandGrad" x1="0" y1="0" x2="1600" y2="850" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#d5c7a5" />
+                  <stop offset="50%" stopColor="#cdbf9b" />
+                  <stop offset="100%" stopColor="#c5b58d" />
+                </linearGradient>
 
-            {/* Future Cyber Glow */}
-            <filter id="neonGlow">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-              <feMerge>
-                <feMergeNode in="coloredBlur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
+                <filter id="mapShadow" x="-5%" y="-5%" width="110%" height="110%">
+                  <feDropShadow dx="3" dy="5" stdDeviation="4" floodColor="#8c7755" floodOpacity="0.4" />
+                </filter>
 
-            {/* Red Marker 3D Gradient */}
-            <radialGradient id="marker3D" cx="35%" cy="35%" r="65%">
-              <stop offset="0%" stopColor="#ff7b7b" />
-              <stop offset="40%" stopColor="#e61919" />
-              <stop offset="100%" stopColor="#800505" />
-            </radialGradient>
-          </defs>
+                {/* Future Cyber Glow */}
+                <filter id="neonGlow">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                  <feMerge>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
 
-          {/* JAPAN MAP LAND MASSES */}
-          {isJapan && (
-            <g filter="url(#mapShadow)">
-              {/* Kyushu Island */}
-              <path
-                d="M 220 540 Q 250 510 290 490 Q 340 500 370 530 Q 380 570 360 620 Q 340 680 320 730 Q 280 740 250 710 Q 230 650 210 600 Q 180 580 200 550 Z"
-                fill="url(#japanLandGrad)"
-                stroke="#b09f7a"
-                strokeWidth="3"
-              />
-              {/* Nagasaki Peninsula & Gotō Islands */}
-              <path
-                d="M 180 570 Q 160 590 170 630 Q 200 620 210 590 Z"
-                fill="url(#japanLandGrad)"
-                stroke="#b09f7a"
-                strokeWidth="2"
-              />
-              <circle cx="145" cy="550" r="10" fill="url(#japanLandGrad)" stroke="#b09f7a" strokeWidth="2" />
-              <circle cx="130" cy="580" r="12" fill="url(#japanLandGrad)" stroke="#b09f7a" strokeWidth="2" />
+                {/* Red Marker 3D Gradient */}
+                <radialGradient id="marker3D" cx="35%" cy="35%" r="65%">
+                  <stop offset="0%" stopColor="#ff7b7b" />
+                  <stop offset="40%" stopColor="#e61919" />
+                  <stop offset="100%" stopColor="#800505" />
+                </radialGradient>
+              </defs>
 
-              {/* Shikoku Island */}
-              <path
+              {/* JAPAN MAP LAND MASSES */}
+              {isJapan && (
+                <g filter="url(#mapShadow)">
+                  {/* Kyushu Island */}
+                  <path
+                    d="M 220 540 Q 250 510 290 490 Q 340 500 370 530 Q 380 570 360 620 Q 340 680 320 730 Q 280 740 250 710 Q 230 650 210 600 Q 180 580 200 550 Z"
+                    fill="url(#japanLandGrad)"
+                    stroke="#b09f7a"
+                    strokeWidth="3"
+                  />
+                  {/* Nagasaki Peninsula & Gotō Islands */}
+                  <path
+                    d="M 180 570 Q 160 590 170 630 Q 200 620 210 590 Z"
+                    fill="url(#japanLandGrad)"
+                    stroke="#b09f7a"
+                    strokeWidth="2"
+                  />
+                  <circle cx="145" cy="550" r="10" fill="url(#japanLandGrad)" stroke="#b09f7a" strokeWidth="2" />
+                  <circle cx="130" cy="580" r="12" fill="url(#japanLandGrad)" stroke="#b09f7a" strokeWidth="2" />
+
+                  {/* Shikoku Island */}
+                  <path
                 d="M 450 580 Q 520 560 590 590 Q 610 630 580 660 Q 520 680 460 660 Q 430 620 450 580 Z"
                 fill="url(#japanLandGrad)"
                 stroke="#b09f7a"
@@ -375,6 +456,8 @@ export const JapanMapCanvas: React.FC<JapanMapCanvasProps> = ({
             <div className="w-10 h-2 bg-black/25 rounded-full blur-[1px] -mt-1" />
           </div>
         )}
+          </div>
+        </div>
       </div>
     </div>
   );

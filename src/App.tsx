@@ -163,6 +163,10 @@ export default function App() {
         }
       }
 
+      const isFilibusterCleared =
+        prev.hasClearedFilibuster ||
+        (result.victory && (activeStage.id === 'cosmos_3_filibuster' || activeStage.id === 'legend_12_3'));
+
       return {
         ...prev,
         xp: prev.xp + result.xpEarned,
@@ -170,6 +174,7 @@ export default function App() {
         clearedStages: nextClearedStages,
         treasures: nextTreasures,
         cats: nextCats,
+        hasClearedFilibuster: isFilibusterCleared,
       };
     });
   };

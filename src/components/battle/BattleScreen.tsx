@@ -417,6 +417,11 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       abilities: def.abilities,
       burrowRemaining: def.abilities?.burrow?.count,
       reviveCountRemaining: def.abilities?.revive?.count,
+      barrierHp: def.abilities?.barrier?.hp,
+      maxBarrierHp: def.abilities?.barrier?.hp,
+      isCharging: false,
+      chargeTimer: def.abilities?.chargeAttack?.chargeTime,
+      maxChargeTime: def.abilities?.chargeAttack?.chargeTime,
       state: 'walk',
       animTimer: 0,
       knockbackVelocityX: 0,
@@ -461,20 +466,41 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
     setTimeout(() => {
       enemiesRef.current.forEach((enemy) => {
-        const nextHp = Math.max(0, enemy.hp - cannonDmg);
+        // Cannon can break barriers if damage >= barrierHp
+        let damageToApply = cannonDmg;
+        if (enemy.barrierHp && enemy.barrierHp > 0) {
+          if (cannonDmg >= enemy.barrierHp) {
+            enemy.barrierHp = 0;
+            spawnFx(enemy.x, 30, 'barrier_break');
+          } else {
+            damageToApply = 0;
+            spawnFx(enemy.x, 30, 'barrier_hit');
+            spawnDamageNum(enemy.x, 30, 0, false, true, true);
+          }
+        }
+
+        const nextHp = Math.max(0, enemy.hp - damageToApply);
         enemy.hp = nextHp;
-        spawnDamageNum(enemy.x, 30, cannonDmg, true, true);
+        if (damageToApply > 0) {
+          spawnDamageNum(enemy.x, 30, damageToApply, true, true);
+        }
+
+        // Cannon forces knockback & resets Filibuster charge
         enemy.state = 'knockback';
         enemy.knockbackVelocityX = 220;
         enemy.knockbackTimer = 0.5;
         enemy.x = Math.min(enemyCastleX, enemy.x + 80);
         enemy.isWindupActive = false;
+        if (enemy.abilities?.chargeAttack) {
+          enemy.chargeTimer = enemy.abilities.chargeAttack.chargeTime;
+          enemy.isCharging = false;
+        }
       });
       setIsCannonFiring(false);
     }, 450);
   };
 
-  const spawnDamageNum = (x: number, y: number, value: number, isCritical: boolean, isCatDamage: boolean) => {
+  const spawnDamageNum = (x: number, y: number, value: number, isCritical: boolean, isCatDamage: boolean, isBarrierBlock?: boolean) => {
     const newDmg: DamageNumber = {
       id: `dmg_${Date.now()}_${Math.random()}`,
       x,
@@ -482,6 +508,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       value,
       isCritical,
       isCatDamage,
+      isBarrierBlock,
       lifetime: 0,
       maxLifetime: 0.8,
     };
@@ -496,7 +523,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       type,
       color,
       lifetime: 0,
-      maxLifetime: 0.35,
+      maxLifetime: type === 'filibuster_oblivion' ? 2.5 : type === 'warp_portal' ? 0.6 : 0.35,
     };
     visualEffectsRef.current.push(newFx);
   };
@@ -621,10 +648,47 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       if (enemy.state === 'knockback') {
         enemy.knockbackTimer -= dt;
         enemy.x = Math.min(enemyCastleX, enemy.x + enemy.knockbackVelocityX * dt);
+        // Reset charge on knockback
+        if (enemy.abilities?.chargeAttack) {
+          enemy.chargeTimer = enemy.abilities.chargeAttack.chargeTime;
+          enemy.isCharging = false;
+        }
         if (enemy.knockbackTimer <= 0) {
           enemy.state = 'walk';
         }
         continue;
+      }
+
+      // Handle Filibuster / Charge Attack Boss Mechanics
+      if (enemy.abilities?.chargeAttack && enemy.state !== 'burrow' && enemy.state !== 'revive' && enemy.state !== 'knockback') {
+        enemy.isCharging = true;
+        enemy.chargeTimer = (enemy.chargeTimer ?? enemy.abilities.chargeAttack.chargeTime) - dt;
+
+        // Visual charge aura & audio pulsing
+        if (Math.random() < 0.18) {
+          spawnFx(enemy.x, 50, 'filibuster_charge');
+        }
+
+        // Charge completed -> TRIGGER 9,999,999 OBLIVION / GAME OVER
+        if (enemy.chargeTimer <= 0) {
+          enemy.chargeTimer = enemy.abilities.chargeAttack.chargeTime;
+          audio.playBossRoar();
+          audio.playCastleDamage();
+          spawnFx(playerCastleX + 300, 60, 'filibuster_oblivion');
+
+          // Obliterate all allied cats on field
+          catsRef.current.forEach((c) => {
+            c.hp = 0;
+            spawnDamageNum(c.x, 35, 9999999, true, false);
+            spawnFx(c.x, 30, 'cat_soul');
+          });
+
+          // Instantly destroy player castle -> Game Over
+          playerCastleHpRef.current = 0;
+          setPlayerCastleHp(0);
+          handleMatchEnd(false);
+          return;
+        }
       }
 
       // Handle Zombie Burrow State
@@ -841,13 +905,31 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
             }
           }
 
+          // Star Alien Barrier Logic
+          if (e.barrierHp && e.barrierHp > 0) {
+            const hasBreaker = cat.abilities?.barrierBreaker && Math.random() < cat.abilities.barrierBreaker.chance;
+            if (hasBreaker || actualDmg >= e.barrierHp) {
+              // Barrier shattered!
+              e.barrierHp = 0;
+              spawnFx(e.x, 35, 'barrier_break');
+              audio.playKnockback();
+            } else {
+              // Damage completely absorbed by barrier
+              actualDmg = 0;
+              spawnFx(e.x, 30, 'barrier_hit');
+              spawnDamageNum(e.x, 25, 0, false, true, true);
+            }
+          }
+
           const nextHp = Math.max(0, e.hp - actualDmg);
           const willDie = nextHp <= 0;
 
           applyAbilitiesToEnemy(e, actualDmg, willDie);
 
           e.hp = nextHp;
-          spawnDamageNum(e.x, 25, actualDmg, isCrit, true);
+          if (actualDmg > 0) {
+            spawnDamageNum(e.x, 25, actualDmg, isCrit, true);
+          }
 
           const maxKbs = Math.max(1, e.maxKnockbacks || 1);
           const kbThreshold = e.maxHp / maxKbs;
@@ -869,6 +951,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
             e.knockbackTimer = 0.4;
             e.x = Math.min(enemyCastleX, e.x + 60);
             e.isWindupActive = false;
+            if (e.abilities?.chargeAttack) {
+              e.chargeTimer = e.abilities.chargeAttack.chargeTime;
+              e.isCharging = false;
+            }
           }
         });
       } else {
@@ -900,12 +986,28 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           spawnFx(target.x, 20, isCrit ? 'crit_flash' : 'hit');
         }
 
+        // Star Alien Barrier Logic (Single Target)
+        if (target.barrierHp && target.barrierHp > 0) {
+          const hasBreaker = cat.abilities?.barrierBreaker && Math.random() < cat.abilities.barrierBreaker.chance;
+          if (hasBreaker || actualDmg >= target.barrierHp) {
+            target.barrierHp = 0;
+            spawnFx(target.x, 35, 'barrier_break');
+            audio.playKnockback();
+          } else {
+            actualDmg = 0;
+            spawnFx(target.x, 30, 'barrier_hit');
+            spawnDamageNum(target.x, 25, 0, false, true, true);
+          }
+        }
+
         const nextHp = Math.max(0, target.hp - actualDmg);
         const willDie = nextHp <= 0;
 
         applyAbilitiesToEnemy(target, actualDmg, willDie);
 
-        spawnDamageNum(target.x, 25, actualDmg, isCrit, true);
+        if (actualDmg > 0) {
+          spawnDamageNum(target.x, 25, actualDmg, isCrit, true);
+        }
         target.hp = nextHp;
 
         const maxKbs = Math.max(1, target.maxKnockbacks || 1);
@@ -928,6 +1030,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           target.knockbackTimer = 0.4;
           target.x = Math.min(enemyCastleX, target.x + 60);
           target.isWindupActive = false;
+          if (target.abilities?.chargeAttack) {
+            target.chargeTimer = target.abilities.chargeAttack.chargeTime;
+            target.isCharging = false;
+          }
         }
       }
     } else {
@@ -977,6 +1083,17 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         c.knockbackTimer = 0.45;
         c.x = Math.max(playerCastleX, c.x - 70);
         c.isWindupActive = false;
+      }
+      // Star Alien Warp Ability (Teleports cat leftwards towards player castle)
+      if (enemy.abilities?.warp && Math.random() < enemy.abilities.warp.chance) {
+        spawnFx(c.x, 25, 'warp_portal');
+        const warpDistance = enemy.abilities.warp.distance || 250;
+        c.x = Math.max(playerCastleX + 30, c.x - warpDistance);
+        c.isWindupActive = false;
+        c.state = 'walk';
+        setTimeout(() => {
+          spawnFx(c.x, 25, 'warp_portal');
+        }, 120);
       }
     };
 

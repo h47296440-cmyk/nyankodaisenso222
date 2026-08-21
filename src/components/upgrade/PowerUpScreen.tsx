@@ -38,10 +38,11 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
     unlocked: false,
     activeForm: 0,
   };
+  const maxLevel = profile.hasClearedFilibuster ? 25 : 20;
   const currentForm = selectedCatDef.forms[catProgress.activeForm || 0];
   const catLevelCost = getCatLevelUpCost(selectedCatDef.rarity, catProgress.level);
   const canLevelUpCat =
-    catProgress.unlocked && (isInfiniteXp || profile.xp >= catLevelCost) && catProgress.level < 20;
+    catProgress.unlocked && (isInfiniteXp || profile.xp >= catLevelCost) && catProgress.level < maxLevel;
 
   // Base upgrades list
   const baseSkills: { key: keyof PlayerUpgrades; name: string; desc: string; icon: string }[] = [
@@ -124,8 +125,12 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
       }
 
       if (!canLevelUpCat) {
-        if (catProgress.level >= 20) {
-          alert('このキャラクターは既に最大レベル(Lv.20)だにゃ！');
+        if (catProgress.level >= maxLevel) {
+          alert(
+            profile.hasClearedFilibuster
+              ? 'このキャラクターは既に最大レベル(Lv.25)だにゃ！'
+              : 'このキャラクターは既に最大レベル(Lv.20)だにゃ！宇宙編3章のフィリバスターを撃破するとLv.25まで強化可能になるにゃ！'
+          );
         } else {
           alert('経験値（XP）が足りないにゃ！');
         }
@@ -210,16 +215,29 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
          ======================================================== */}
       <div className="relative z-20 w-full bg-gradient-to-b from-[#8a4e1d] via-[#63330f] to-[#432007] border-b-[3px] border-[#291102] px-3 sm:px-6 py-1.5 flex items-center justify-between shadow-lg">
         {/* Title: パワーアップ */}
-        <h1
-          className="text-2xl sm:text-3xl font-black text-amber-100 tracking-wider"
-          style={{
-            fontFamily: '"Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
-            textShadow:
-              '3px 3px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000, 0px 4px 6px rgba(0,0,0,0.8)',
-          }}
-        >
-          パワーアップ
-        </h1>
+        <div className="flex items-center gap-3">
+          <h1
+            className="text-2xl sm:text-3xl font-black text-amber-100 tracking-wider"
+            style={{
+              fontFamily: '"Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif',
+              textShadow:
+                '3px 3px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000, 0px 4px 6px rgba(0,0,0,0.8)',
+            }}
+          >
+            パワーアップ
+          </h1>
+          {profile.hasClearedFilibuster ? (
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 border border-yellow-300 rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-yellow-300 shadow flex items-center gap-1 animate-pulse">
+              <span>★</span>
+              <span>上限Lv.25解放中!!</span>
+            </div>
+          ) : (
+            <div className="bg-stone-900/80 border border-stone-600 rounded-full px-2.5 py-0.5 text-[9px] sm:text-[11px] font-bold text-stone-300 shadow hidden sm:flex items-center gap-1">
+              <span>上限Lv.20</span>
+              <span className="text-yellow-400 text-[9px]">(宇宙編3章クリアでLv.25解放)</span>
+            </div>
+          )}
+        </div>
 
         {/* Right Info: 経験値 XP Counter */}
         <div className="flex items-center bg-black/75 border-2 border-amber-800 rounded-lg px-2.5 py-0.5 shadow-inner">
@@ -324,7 +342,7 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
               const isInDeck = profile.deck.includes(cat.id);
               const form = cat.forms[prog.activeForm || 0];
               const cost = getCatLevelUpCost(cat.rarity, prog.level);
-              const isMax = prog.level >= 20;
+              const isMax = prog.level >= maxLevel;
 
               return (
                 <div

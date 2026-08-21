@@ -700,7 +700,7 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
       {
         name: 'ネコ漂流記',
         jpName: 'ネコ漂流記',
-        description: '【範囲攻撃】未知の宇宙空間を漂流する伝説の波乗り。エイリアン停止確率が超UPし、未来編・宇宙編の攻略に必須！',
+        description: '【範囲攻撃 / バリアブレイカー50%】未知の宇宙空間を漂流する伝説の波乗り。エイリアン停止確率が超UPし、スターエイリアンのバリアを50%で破壊！',
         hp: 2600,
         attackPower: 850,
         attackRange: 220,
@@ -714,6 +714,60 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         scale: 1.3,
         spriteType: 'cat_castaway',
         traitBonus: { trait: 'alien', multiplier: 2.0, effect: 'freeze' },
+        abilities: {
+          freeze: { chance: 0.65, duration: 2.5, traits: ['alien', 'star_alien'] },
+          barrierBreaker: { chance: 0.5 }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_fencer',
+    rarity: 'rare',
+    unlockedAtStart: false,
+    unlockCostXp: 80000,
+    forms: [
+      {
+        name: 'フェンシングネコ',
+        jpName: 'フェンシングネコ',
+        description: '【バリアブレイカー100%】レイピアで急所を鋭く突く剣士ネコ。スターエイリアンのバリアを100%確定で一突き粉砕する！',
+        hp: 1200,
+        attackPower: 650,
+        attackRange: 160,
+        attackSpeed: 1.2,
+        attackWindup: 0.2,
+        speed: 48,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 600,
+        cooldown: 5.0,
+        scale: 1.15,
+        spriteType: 'cat_fencer',
+        abilities: {
+          barrierBreaker: { chance: 1.0 }
+        }
+      },
+      {
+        name: '自由のネコ',
+        jpName: '自由のネコ',
+        description: '【バリアブレイカー100% / エイリアンめっぽう強い】自由の女神像を掲げたネコ。スターエイリアンのどんな頑丈なバリアも確定で破壊！',
+        hp: 2400,
+        attackPower: 1250,
+        attackRange: 180,
+        attackSpeed: 1.3,
+        attackWindup: 0.18,
+        speed: 52,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 600,
+        cooldown: 4.5,
+        scale: 1.25,
+        spriteType: 'cat_liberty',
+        traitBonus: { trait: 'alien', multiplier: 1.8, effect: 'strong' },
+        abilities: {
+          barrierBreaker: { chance: 1.0 },
+          strong: { traits: ['alien', 'star_alien'] }
+        }
       }
     ]
   },
@@ -2874,6 +2928,197 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     abilities: {
       freeze: { chance: 0.6, duration: 3.0 },
       weaken: { chance: 0.7, duration: 4.5, mult: 0.4 }
+    }
+  },
+
+  // =========================================================================
+  // STAR ALIEN ENEMIES (スターエイリアン新敵: バリア＆ワープ)
+  // =========================================================================
+  enemy_star_doge: {
+    id: 'enemy_star_doge',
+    name: 'スター・ぽるた',
+    description: '【スターエイリアン / バリア 2,000 / 近距離ワープ】星型の光の輪をまとった宇宙わんこ。2,000未満の単発ダメージを無効化するクリスタルバリアを展開し、味方を後方にワープさせる！',
+    hp: 4500,
+    attackPower: 380,
+    attackRange: 80,
+    attackSpeed: 1.2,
+    attackWindup: 0.15,
+    speed: 40,
+    knockbacks: 3,
+    attackType: 'single',
+    rewardMoney: 350,
+    rewardXp: 280,
+    traits: ['alien', 'star_alien'],
+    spriteType: 'enemy_star_doge',
+    scale: 1.1,
+    abilities: {
+      barrier: { hp: 2000 },
+      warp: { chance: 0.4, distance: 200 }
+    }
+  },
+  enemy_star_snache: {
+    id: 'enemy_star_snache',
+    name: 'ハサミー',
+    description: '【スターエイリアン / バリア 1,800 / 高速突進ワープ】両手に巨大な星ハサミを持つスターにょろ。高速で接近し、バリアで守りを固めながら味方前衛を後ろへ弾き飛ばす！',
+    hp: 3800,
+    attackPower: 420,
+    attackRange: 75,
+    attackSpeed: 1.8,
+    attackWindup: 0.1,
+    speed: 52,
+    knockbacks: 4,
+    attackType: 'single',
+    rewardMoney: 320,
+    rewardXp: 250,
+    traits: ['alien', 'star_alien'],
+    spriteType: 'enemy_star_snache',
+    scale: 1.05,
+    abilities: {
+      barrier: { hp: 1800 },
+      warp: { chance: 0.5, distance: 220 }
+    }
+  },
+  enemy_star_peng: {
+    id: 'enemy_star_peng',
+    name: 'スターペン',
+    description: '【スターエイリアン / 範囲攻撃 / バリア 7,500 / ワープ 260px】宇宙の星屑を食べるペンギン。硬度7,500の堅牢バリアを持ち、強力な範囲攻撃で味方をまとめて後方へテレポートさせる！',
+    hp: 24000,
+    attackPower: 1250,
+    attackRange: 130,
+    attackSpeed: 1.1,
+    attackWindup: 0.25,
+    speed: 36,
+    knockbacks: 4,
+    attackType: 'area',
+    rewardMoney: 1600,
+    rewardXp: 1800,
+    traits: ['alien', 'star_alien'],
+    spriteType: 'enemy_star_peng',
+    scale: 1.35,
+    abilities: {
+      barrier: { hp: 7500 },
+      warp: { chance: 0.6, distance: 260 }
+    }
+  },
+  enemy_star_gregory: {
+    id: 'enemy_star_gregory',
+    name: 'グレゴリー将軍',
+    description: '【スターエイリアン / 範囲攻撃 / バリア 14,000 / 超高速突進ワープ】星間突撃軍を率いる怪力将軍。超高速ダッシュで前線へ突撃し、14,000の強固バリアと強烈なワープラッシュで戦線を粉砕する！',
+    hp: 68000,
+    attackPower: 2600,
+    attackRange: 110,
+    attackSpeed: 2.2,
+    attackWindup: 0.12,
+    speed: 65,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 3800,
+    rewardXp: 5500,
+    traits: ['alien', 'star_alien', 'boss'],
+    spriteType: 'enemy_star_gregory',
+    scale: 1.6,
+    isBoss: true,
+    abilities: {
+      barrier: { hp: 14000 },
+      warp: { chance: 0.75, distance: 300 }
+    }
+  },
+  enemy_star_manticore: {
+    id: 'enemy_star_manticore',
+    name: 'キャプテン・モグー',
+    description: '【スターエイリアン / 長射程レーザー / バリア 22,000 / 強制長距離ワープ 380px】宇宙海賊船長モグラ。長射程420pxから放たれるプラズマ砲で、味方主力を安全圏から一気に自城近くまで強制ワープ！',
+    hp: 95000,
+    attackPower: 3400,
+    attackRange: 420,
+    attackSpeed: 0.85,
+    attackWindup: 0.45,
+    speed: 22,
+    knockbacks: 5,
+    attackType: 'area',
+    rewardMoney: 6500,
+    rewardXp: 9000,
+    traits: ['alien', 'star_alien', 'boss'],
+    spriteType: 'enemy_star_manticore',
+    scale: 1.8,
+    isBoss: true,
+    abilities: {
+      barrier: { hp: 22000 },
+      warp: { chance: 0.85, distance: 380 }
+    }
+  },
+  enemy_star_manboros: {
+    id: 'enemy_star_manboros',
+    name: 'スペースマンボロス',
+    description: '【スターエイリアンBOSS / 超遠距離範囲 / バリア 28,000 / 全体ワープ 420px】虚空を漂う超巨大宇宙マンボウ。射程480pxの星間ビームで広範囲の味方を一網打尽に遠方ワープさせる超難敵！',
+    hp: 180000,
+    attackPower: 4500,
+    attackRange: 480,
+    attackSpeed: 0.55,
+    attackWindup: 0.65,
+    speed: 15,
+    knockbacks: 4,
+    attackType: 'area',
+    rewardMoney: 9500,
+    rewardXp: 16000,
+    traits: ['alien', 'star_alien', 'floating', 'boss'],
+    spriteType: 'enemy_star_manboros',
+    scale: 2.3,
+    isBoss: true,
+    abilities: {
+      barrier: { hp: 28000 },
+      warp: { chance: 0.9, distance: 420 }
+    }
+  },
+  enemy_star_evil: {
+    id: 'enemy_star_evil',
+    name: 'エビル星人',
+    description: '【スターエイリアンBOSS / 超高耐久バリア 35,000 / 攻撃力激減＋ワープ】悪意の星から飛来した暗黒エイリアン。35,000の超高強度バリアで鉄壁を誇り、味方の攻撃力を50%奪いながら戦線を後退させる！',
+    hp: 220000,
+    attackPower: 4800,
+    attackRange: 240,
+    attackSpeed: 0.75,
+    attackWindup: 0.4,
+    speed: 25,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 12000,
+    rewardXp: 22000,
+    traits: ['alien', 'star_alien', 'boss'],
+    spriteType: 'enemy_star_evil',
+    scale: 2.1,
+    isBoss: true,
+    abilities: {
+      barrier: { hp: 35000 },
+      warp: { chance: 0.8, distance: 350 },
+      weaken: { chance: 0.8, duration: 5.0, mult: 0.4 }
+    }
+  },
+
+  // =========================================================================
+  // FILIBUSTER (宇宙編第3章 隠し降臨ボス: 原初を司る神 フィリバスター)
+  // =========================================================================
+  enemy_filibuster: {
+    id: 'enemy_filibuster',
+    name: '原初を司る神 フィリバスター',
+    description: '【宇宙編第3章 隠し降臨神 / 特殊チャージ即死攻撃 / ノックバック多数】全宇宙の原初と終焉を司る神。攻撃まで14秒間の超大チャージが必要だが、放たれると【9,999,999ダメージ】で味方全滅・自城即死の確定ゲームオーバー！ノックバックさせることでチャージを解除・リセットできる！絶え間ない攻撃でチャージを阻止し続けろ！',
+    hp: 880000,
+    attackPower: 9999999, // 確定即死・ゲームオーバー
+    attackRange: 800, // 全画面即死射程
+    attackSpeed: 0.07, // 14秒に1回
+    attackWindup: 14.0, // 14秒のチャージ
+    speed: 12,
+    knockbacks: 15, // 頻繁にKBする（ダメージを与えてKBさせるとチャージキャンセル！）
+    attackType: 'area',
+    rewardMoney: 30000,
+    rewardXp: 80000,
+    traits: ['alien', 'star_alien', 'floating', 'boss'],
+    spriteType: 'enemy_filibuster',
+    scale: 2.8,
+    isBoss: true,
+    waveLevel: 8,
+    abilities: {
+      chargeAttack: { chargeTime: 14.0, isOneHitKill: true },
+      knockback: { chance: 1.0 }
     }
   }
 };
