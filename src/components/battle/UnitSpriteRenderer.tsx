@@ -2233,6 +2233,8 @@ function renderSpriteSvg(
     // =========================================================================
     // DEBUFF ALLY CATS (妨害・状態異常 味方ネコスプライト)
     // =========================================================================
+    case 'cat_onmyoji':
+    case 'cat_onmyoji_evolved':
     case 'cat_shikigami':
     case 'cat_shikigami_evolved':
       return (
@@ -2253,6 +2255,7 @@ function renderSpriteSvg(
 
     case 'cat_pirate':
     case 'cat_pirate_captain':
+    case 'cat_pirate_evolved':
       return (
         <svg width="65" height="65" viewBox="0 0 65 65" className="drop-shadow-md">
           {/* Pirate Tricorne Hat */}
@@ -2271,6 +2274,7 @@ function renderSpriteSvg(
 
     case 'cat_shaman':
     case 'cat_necromancer':
+    case 'cat_shaman_evolved':
       return (
         <svg width="65" height="65" viewBox="0 0 65 65" className="drop-shadow-md">
           {/* Feathered Headdress */}
@@ -2292,6 +2296,7 @@ function renderSpriteSvg(
 
     case 'cat_witch':
     case 'cat_sorceress':
+    case 'cat_witch_evolved':
       return (
         <svg width="65" height="65" viewBox="0 0 65 65" className="drop-shadow-md">
           {/* Pointy Witch Hat */}
@@ -2305,6 +2310,136 @@ function renderSpriteSvg(
           <polygon points="56,22 52,26 56,30 60,26" fill="#facc15" />
           <ellipse cx={24 + legOffset1} cy="52" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
           <ellipse cx={40 + legOffset2} cy="52" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_monk':
+    case 'cat_monk_evolved':
+      return (
+        <svg width="65" height="65" viewBox="0 0 65 65" className="drop-shadow-md">
+          {/* Monk Robe and Beads */}
+          <ellipse cx="32" cy="34" rx="18" ry="17" fill="#ffffff" stroke="#0f172a" strokeWidth="2.5" />
+          <path d="M 22 28 Q 32 38 42 28" fill="none" stroke="#78350f" strokeWidth="3" />
+          <circle cx="26" cy="28" r="2.5" fill="#0f172a" />
+          <circle cx="38" cy="28" r="2.5" fill="#0f172a" />
+          <g transform={`rotate(${isAttacking ? -30 : 15} 46 32)`}>
+            <line x1="46" y1="12" x2="46" y2="48" stroke="#d97706" strokeWidth="3" />
+            <circle cx="46" cy="14" r="6" fill="none" stroke="#d97706" strokeWidth="2" />
+          </g>
+          <ellipse cx={24 + legOffset1} cy="52" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={40 + legOffset2} cy="52" rx="4" ry="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_flower':
+    case 'cat_bomber':
+      return (
+        <svg width="68" height="65" viewBox="0 0 68 65" className="drop-shadow-md">
+          {/* Black Body Bomber Cat */}
+          <ellipse cx="34" cy="34" rx="18" ry="17" fill="#0f172a" stroke="#000000" strokeWidth="2.5" />
+          <circle cx="28" cy="30" r="3" fill="#ffffff" />
+          <circle cx="28" cy="30" r="1.5" fill="#0f172a" />
+          <circle cx="40" cy="30" r="3" fill="#ffffff" />
+          <circle cx="40" cy="30" r="1.5" fill="#0f172a" />
+          {/* Flower on head or Sparking Bomb */}
+          <circle cx="34" cy="14" r="7" fill="#ef4444" stroke="#000000" strokeWidth="1.5" />
+          <line x1="34" y1="7" x2="34" y2="2" stroke="#eab308" strokeWidth="2" />
+          {isAttacking && (
+            <circle cx="34" cy="14" r="12" fill="none" stroke="#f59e0b" strokeWidth="3" className="animate-ping" />
+          )}
+          <ellipse cx={26 + legOffset1} cy="52" rx="4" ry="5" fill="#0f172a" stroke="#000000" strokeWidth="2" />
+          <ellipse cx={42 + legOffset2} cy="52" rx="4" ry="5" fill="#0f172a" stroke="#000000" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_chronos':
+    case 'cat_chronos_evolved':
+      return (
+        <svg width="90" height="90" viewBox="0 0 90 90" className="drop-shadow-xl">
+          {/* Chronos Time Dial Ring */}
+          <circle cx="45" cy="45" r="36" fill="none" stroke="#facc15" strokeWidth="2.5" strokeDasharray="8,4" className="animate-spin" />
+          <ellipse cx="45" cy="48" rx="22" ry="20" fill="#f8fafc" stroke="#1e1b4b" strokeWidth="2.5" />
+          {/* Goddess Crown */}
+          <polygon points="35,28 45,16 55,28 45,24" fill="#fbbf24" stroke="#b45309" strokeWidth="1.5" />
+          <circle cx="38" cy="44" r="3" fill="#3b82f6" />
+          <circle cx="52" cy="44" r="3" fill="#3b82f6" />
+          {/* Hourglass Staff */}
+          <g transform={`rotate(${isAttacking ? 45 : -10} 60 45)`}>
+            <line x1="60" y1="20" x2="60" y2="70" stroke="#f59e0b" strokeWidth="3" />
+            <polygon points="56,22 64,22 60,30" fill="#38bdf8" />
+            <polygon points="56,38 64,38 60,30" fill="#38bdf8" />
+          </g>
+          {isAttacking && (
+            <circle cx="45" cy="45" r="28" fill="none" stroke="#38bdf8" strokeWidth="4" className="animate-ping" />
+          )}
+          <ellipse cx={36 + legOffset1} cy="68" rx="5" ry="6" fill="#f8fafc" stroke="#1e1b4b" strokeWidth="2" />
+          <ellipse cx={54 + legOffset2} cy="68" rx="5" ry="6" fill="#f8fafc" stroke="#1e1b4b" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_amaterasu':
+    case 'cat_amaterasu_evolved':
+      return (
+        <svg width="95" height="95" viewBox="0 0 95 95" className="drop-shadow-xl">
+          {/* Solar Mirror Ring */}
+          <circle cx="47" cy="47" r="38" fill="none" stroke="#ef4444" strokeWidth="3" strokeDasharray="12,6" className="animate-spin" />
+          <circle cx="47" cy="47" r="28" fill="#fef08a" opacity="0.25" />
+          <ellipse cx="47" cy="50" rx="20" ry="18" fill="#ffffff" stroke="#991b1b" strokeWidth="2.5" />
+          {/* Sun Goddess Headdress */}
+          <polygon points="37,30 47,15 57,30" fill="#dc2626" />
+          <circle cx="40" cy="46" r="3" fill="#dc2626" />
+          <circle cx="54" cy="46" r="3" fill="#dc2626" />
+          {/* Sacred Mirror */}
+          <circle cx="20" cy="45" r="10" fill="#facc15" stroke="#b45309" strokeWidth="2" />
+          {isAttacking && (
+            <circle cx="47" cy="47" r="35" fill="none" stroke="#f97316" strokeWidth="5" className="animate-ping" />
+          )}
+          <ellipse cx={38 + legOffset1} cy="70" rx="5" ry="6" fill="#ffffff" stroke="#991b1b" strokeWidth="2" />
+          <ellipse cx={56 + legOffset2} cy="70" rx="5" ry="6" fill="#ffffff" stroke="#991b1b" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_poseidon':
+    case 'cat_poseidon_evolved':
+      return (
+        <svg width="95" height="95" viewBox="0 0 95 95" className="drop-shadow-xl">
+          {/* Sea God Aura */}
+          <circle cx="47" cy="47" r="36" fill="none" stroke="#06b6d4" strokeWidth="3" strokeDasharray="10,5" className="animate-spin" />
+          <ellipse cx="47" cy="50" rx="20" ry="18" fill="#ffffff" stroke="#0e7490" strokeWidth="2.5" />
+          {/* Ocean Crown */}
+          <polygon points="36,32 40,20 47,26 54,20 58,32" fill="#06b6d4" stroke="#083344" strokeWidth="1.5" />
+          <circle cx="40" cy="46" r="3" fill="#0891b2" />
+          <circle cx="54" cy="46" r="3" fill="#0891b2" />
+          {/* Trident */}
+          <g transform={`rotate(${isAttacking ? 45 : -15} 65 45)`}>
+            <line x1="65" y1="15" x2="65" y2="75" stroke="#f59e0b" strokeWidth="3.5" />
+            <path d="M 55 25 L 65 15 L 75 25" fill="none" stroke="#06b6d4" strokeWidth="3" />
+          </g>
+          <ellipse cx={38 + legOffset1} cy="70" rx="5" ry="6" fill="#ffffff" stroke="#0e7490" strokeWidth="2" />
+          <ellipse cx={56 + legOffset2} cy="70" rx="5" ry="6" fill="#ffffff" stroke="#0e7490" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_sarukani':
+    case 'cat_sarukani_evolved':
+      return (
+        <svg width="90" height="85" viewBox="0 0 90 85" className="drop-shadow-lg">
+          {/* Sarukani Crab & Monkey mech */}
+          <ellipse cx="45" cy="46" rx="24" ry="20" fill="#ef4444" stroke="#7f1d1d" strokeWidth="2.5" />
+          {/* Monkey Driver Head */}
+          <circle cx="45" cy="24" r="12" fill="#d97706" stroke="#78350f" strokeWidth="2" />
+          <ellipse cx="45" cy="26" rx="8" ry="6" fill="#fde68a" />
+          <circle cx="42" cy="24" r="2" fill="#000000" />
+          <circle cx="48" cy="24" r="2" fill="#000000" />
+          {/* Giant Crab Pincers */}
+          <g transform={`rotate(${isAttacking ? -30 : 0} 22 45)`}>
+            <path d="M 22 45 Q 8 30 14 20 Q 24 35 22 45" fill="#dc2626" stroke="#7f1d1d" strokeWidth="2" />
+          </g>
+          <g transform={`rotate(${isAttacking ? 30 : 0} 68 45)`}>
+            <path d="M 68 45 Q 82 30 76 20 Q 66 35 68 45" fill="#dc2626" stroke="#7f1d1d" strokeWidth="2" />
+          </g>
+          <ellipse cx={34 + legOffset1} cy="68" rx="6" ry="5" fill="#b91c1c" stroke="#7f1d1d" strokeWidth="2" />
+          <ellipse cx={56 + legOffset2} cy="68" rx="6" ry="5" fill="#b91c1c" stroke="#7f1d1d" strokeWidth="2" />
         </svg>
       );
 
@@ -2344,9 +2479,10 @@ function renderSpriteSvg(
 
     case 'cat_fencer':
     case 'cat_swordmaster':
+    case 'cat_liberty':
       return (
         <svg width="76" height="70" viewBox="0 0 76 70" className="drop-shadow-md">
-          {/* Fencing Helmet / Rapier */}
+          {/* Fencing Helmet / Rapier or Statue of Liberty torch */}
           <ellipse cx="38" cy="34" rx="20" ry="18" fill="#ffffff" stroke="#0f172a" strokeWidth="2.5" />
           {/* Fencing Mesh Mask */}
           <ellipse cx="34" cy="32" rx="12" ry="10" fill="#334155" stroke="#0f172a" strokeWidth="1.5" />
@@ -2388,6 +2524,17 @@ function renderSpriteSvg(
         </svg>
       );
 
+    case 'enemy_star_snache':
+      return (
+        <svg width="74" height="55" viewBox="0 0 74 55" className="drop-shadow-lg">
+          <ellipse cx="37" cy="27" rx="28" ry="12" fill="none" stroke="#38bdf8" strokeWidth="2" strokeDasharray="8,4" className="animate-spin" />
+          <path d="M 60 40 Q 40 15 20 40 Q 10 30 5 22" fill="none" stroke="#0284c7" strokeWidth="12" strokeLinecap="round" />
+          <circle cx="8" cy="20" r="7" fill="#06b6d4" stroke="#0c4a6e" strokeWidth="2" />
+          <polygon points="8,8 10,14 16,14 11,18 13,24 8,20 3,24 5,18 0,14 6,14" fill="#facc15" />
+          <circle cx="6" cy="18" r="2.5" fill="#f43f5e" />
+        </svg>
+      );
+
     case 'enemy_star_croc':
       return (
         <svg width="78" height="55" viewBox="0 0 78 55" className="drop-shadow-lg">
@@ -2402,6 +2549,84 @@ function renderSpriteSvg(
           <circle cx="38" cy="24" r="3" fill="#f43f5e" />
           <ellipse cx={26 + legOffset1} cy="45" rx="5" ry="4" fill="#0369a1" stroke="#0c4a6e" strokeWidth="2" />
           <ellipse cx={52 + legOffset2} cy="45" rx="5" ry="4" fill="#0369a1" stroke="#0c4a6e" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_star_peng':
+    case 'enemy_alien_penguin':
+      return (
+        <svg width="70" height="65" viewBox="0 0 70 65" className="drop-shadow-lg">
+          {/* Star Penguin */}
+          <polygon points="35,4 38,12 46,12 40,17 42,25 35,20 28,25 30,17 24,12 32,12" fill="#facc15" />
+          <ellipse cx="36" cy="35" rx="18" ry="16" fill="#0ea5e9" stroke="#075985" strokeWidth="2.5" />
+          <polygon points="16,35 6,38 16,42" fill="#f43f5e" stroke="#075985" strokeWidth="1.5" />
+          <circle cx="24" cy="32" r="3.5" fill="#facc15" />
+          <circle cx="23" cy="31" r="1.5" fill="#000000" />
+          {/* Cosmic Wing */}
+          <g transform={`rotate(${Math.sin(timer * 25) * 30} 42 34)`}>
+            <ellipse cx="46" cy="32" rx="14" ry="7" fill="#38bdf8" stroke="#075985" strokeWidth="2" />
+          </g>
+          <line x1={30 + legOffset1} y1="50" x2="30" y2="58" stroke="#f43f5e" strokeWidth="2.5" />
+          <line x1={42 + legOffset2} y1="50" x2="42" y2="58" stroke="#f43f5e" strokeWidth="2.5" />
+        </svg>
+      );
+
+    case 'enemy_star_gregory':
+      return (
+        <svg width="85" height="75" viewBox="0 0 85 75" className="drop-shadow-xl">
+          <circle cx="42" cy="38" r="32" fill="none" stroke="#f43f5e" strokeWidth="2.5" strokeDasharray="10,5" className="animate-spin" />
+          <ellipse cx="42" cy="40" rx="24" ry="20" fill="#0284c7" stroke="#082f49" strokeWidth="3" />
+          {/* Gregory Horns / Stars */}
+          <polygon points="26,20 18,6 30,16" fill="#facc15" stroke="#b45309" strokeWidth="1.5" />
+          <polygon points="58,20 66,6 54,16" fill="#facc15" stroke="#b45309" strokeWidth="1.5" />
+          {/* Fierce Alien Visage */}
+          <circle cx="34" cy="36" r="4" fill="#f43f5e" />
+          <circle cx="50" cy="36" r="4" fill="#f43f5e" />
+          <ellipse cx={32 + legOffset1} cy="60" rx="7" ry="6" fill="#0369a1" stroke="#082f49" strokeWidth="2" />
+          <ellipse cx={52 + legOffset2} cy="60" rx="7" ry="6" fill="#0369a1" stroke="#082f49" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_star_manticore':
+      return (
+        <svg width="105" height="85" viewBox="0 0 105 85" className="drop-shadow-2xl">
+          <circle cx="52" cy="42" r="38" fill="none" stroke="#a855f7" strokeWidth="3" strokeDasharray="12,6" className="animate-spin" />
+          {/* Mole Pirate Captain Star Alien */}
+          <ellipse cx="52" cy="45" rx="30" ry="22" fill="#0f766e" stroke="#042f2e" strokeWidth="3" />
+          <polygon points="32,24 52,10 72,24 52,20" fill="#0f172a" stroke="#facc15" strokeWidth="2" />
+          <circle cx="42" cy="40" r="4" fill="#facc15" />
+          <circle cx="62" cy="40" r="4" fill="#f43f5e" />
+          {/* Mole Claws */}
+          <g transform={`rotate(${isAttacking ? -35 : 10} 25 50)`}>
+            <polygon points="12,42 28,45 18,58" fill="#14b8a6" stroke="#042f2e" strokeWidth="2" />
+          </g>
+          <ellipse cx={40 + legOffset1} cy="68" rx="8" ry="6" fill="#115e59" stroke="#042f2e" strokeWidth="2.5" />
+          <ellipse cx={64 + legOffset2} cy="68" rx="8" ry="6" fill="#115e59" stroke="#042f2e" strokeWidth="2.5" />
+        </svg>
+      );
+
+    case 'enemy_star_manboros':
+      return (
+        <svg width="125" height="95" viewBox="0 0 125 95" className="drop-shadow-2xl">
+          <circle cx="62" cy="48" r="44" fill="none" stroke="#38bdf8" strokeWidth="3.5" strokeDasharray="14,7" className="animate-spin" />
+          {/* Cosmic Sunfish Manboros */}
+          <ellipse cx="62" cy="48" rx="38" ry="28" fill="#0369a1" stroke="#082f49" strokeWidth="3.5" />
+          <polygon points="62,10 72,22 52,22" fill="#38bdf8" stroke="#082f49" strokeWidth="2" />
+          <polygon points="62,86 72,74 52,74" fill="#38bdf8" stroke="#082f49" strokeWidth="2" />
+          <circle cx="36" cy="44" r="6" fill="#f43f5e" />
+          <circle cx="34" cy="42" r="2.5" fill="#ffffff" />
+          <circle cx="20" cy="48" r="4" fill="#082f49" />
+        </svg>
+      );
+
+    case 'enemy_star_evil':
+      return (
+        <svg width="115" height="100" viewBox="0 0 115 100" className="drop-shadow-2xl">
+          <circle cx="58" cy="50" r="45" fill="none" stroke="#9333ea" strokeWidth="3.5" strokeDasharray="16,8" className="animate-spin" />
+          {/* Evil Star Alien Boss */}
+          <polygon points="58,15 72,38 98,42 78,60 84,85 58,72 32,85 38,60 18,42 44,38" fill="#4c1d95" stroke="#c084fc" strokeWidth="3" />
+          <ellipse cx="58" cy="48" rx="14" ry="16" fill="#09090b" stroke="#f43f5e" strokeWidth="3" />
+          <circle cx="58" cy="48" r="6" fill="#f43f5e" className="animate-pulse" />
         </svg>
       );
 
@@ -2497,6 +2722,7 @@ function renderSpriteSvg(
     // =========================================================================
     // BOSS: FILIBUSTER (フィリバスター・超神撃チャージボス)
     // =========================================================================
+    case 'enemy_filibuster':
     case 'boss_filibuster':
       return (
         <svg width="165" height="155" viewBox="0 0 165 155" className="drop-shadow-[0_0_25px_rgba(168,85,247,0.9)]">

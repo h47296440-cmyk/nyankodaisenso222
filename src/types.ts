@@ -192,6 +192,7 @@ export interface VisualEffect {
     | 'barrier_hit'
     | 'barrier_break'
     | 'warp_portal'
+    | 'warp_fx'
     | 'filibuster_charge'
     | 'filibuster_oblivion'
     | 'metal_spark';

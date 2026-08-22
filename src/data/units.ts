@@ -2192,9 +2192,9 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     spriteType: 'enemy_black_gorilla',
     scale: 1.4,
   },
-  enemy_star_peng: {
-    id: 'enemy_star_peng',
-    name: 'スター・ペン',
+  enemy_alien_space_peng: {
+    id: 'enemy_alien_space_peng',
+    name: 'スペース・ペン',
     description: '【エイリアン / 範囲攻撃】宇宙服を着込んだペンギン。嘴からフォトン光弾を連射する。',
     hp: 3800,
     attackPower: 360,
@@ -2207,7 +2207,7 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     rewardMoney: 900,
     rewardXp: 700,
     traits: ['alien'],
-    spriteType: 'enemy_star_peng',
+    spriteType: 'enemy_alien_penguin',
     scale: 1.2,
   },
   enemy_future_satellite: {
@@ -2937,13 +2937,13 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
   enemy_star_doge: {
     id: 'enemy_star_doge',
     name: 'スター・ぽるた',
-    description: '【スターエイリアン / バリア 2,000 / 近距離ワープ】星型の光の輪をまとった宇宙わんこ。2,000未満の単発ダメージを無効化するクリスタルバリアを展開し、味方を後方にワープさせる！',
-    hp: 4500,
-    attackPower: 380,
+    description: '【スターエイリアン / バリア 1,500 / 近距離ワープ】星型の光の輪をまとった宇宙わんこ。1,500未満の単発ダメージを無効化するクリスタルバリアを展開し、味方を後方にワープさせる！',
+    hp: 4200,
+    attackPower: 350,
     attackRange: 80,
     attackSpeed: 1.2,
     attackWindup: 0.15,
-    speed: 40,
+    speed: 38,
     knockbacks: 3,
     attackType: 'single',
     rewardMoney: 350,
@@ -2952,20 +2952,20 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     spriteType: 'enemy_star_doge',
     scale: 1.1,
     abilities: {
-      barrier: { hp: 2000 },
-      warp: { chance: 0.4, distance: 200 }
+      barrier: { hp: 1500 },
+      warp: { chance: 0.25, distance: 80 }
     }
   },
   enemy_star_snache: {
     id: 'enemy_star_snache',
     name: 'ハサミー',
-    description: '【スターエイリアン / バリア 1,800 / 高速突進ワープ】両手に巨大な星ハサミを持つスターにょろ。高速で接近し、バリアで守りを固めながら味方前衛を後ろへ弾き飛ばす！',
-    hp: 3800,
-    attackPower: 420,
+    description: '【スターエイリアン / バリア 1,200 / 高速突進ワープ】両手に巨大な星ハサミを持つスターにょろ。高速で接近し、バリアで守りを固めながら味方前衛を後ろへ弾き飛ばす！',
+    hp: 3500,
+    attackPower: 380,
     attackRange: 75,
-    attackSpeed: 1.8,
+    attackSpeed: 1.6,
     attackWindup: 0.1,
-    speed: 52,
+    speed: 48,
     knockbacks: 4,
     attackType: 'single',
     rewardMoney: 320,
@@ -2974,20 +2974,20 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     spriteType: 'enemy_star_snache',
     scale: 1.05,
     abilities: {
-      barrier: { hp: 1800 },
-      warp: { chance: 0.5, distance: 220 }
+      barrier: { hp: 1200 },
+      warp: { chance: 0.25, distance: 90 }
     }
   },
   enemy_star_peng: {
     id: 'enemy_star_peng',
     name: 'スターペン',
-    description: '【スターエイリアン / 範囲攻撃 / バリア 7,500 / ワープ 260px】宇宙の星屑を食べるペンギン。硬度7,500の堅牢バリアを持ち、強力な範囲攻撃で味方をまとめて後方へテレポートさせる！',
-    hp: 24000,
-    attackPower: 1250,
+    description: '【スターエイリアン / 範囲攻撃 / バリア 4,500 / ワープ 100px】宇宙の星屑を食べるペンギン。硬度4,500の堅牢バリアを持ち、強力な範囲攻撃で味方をまとめて後方へテレポートさせる！',
+    hp: 22000,
+    attackPower: 1100,
     attackRange: 130,
-    attackSpeed: 1.1,
+    attackSpeed: 1.0,
     attackWindup: 0.25,
-    speed: 36,
+    speed: 32,
     knockbacks: 4,
     attackType: 'area',
     rewardMoney: 1600,
@@ -2996,20 +2996,20 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     spriteType: 'enemy_star_peng',
     scale: 1.35,
     abilities: {
-      barrier: { hp: 7500 },
-      warp: { chance: 0.6, distance: 260 }
+      barrier: { hp: 4500 },
+      warp: { chance: 0.3, distance: 100 }
     }
   },
   enemy_star_gregory: {
     id: 'enemy_star_gregory',
     name: 'グレゴリー将軍',
-    description: '【スターエイリアン / 範囲攻撃 / バリア 14,000 / 超高速突進ワープ】星間突撃軍を率いる怪力将軍。超高速ダッシュで前線へ突撃し、14,000の強固バリアと強烈なワープラッシュで戦線を粉砕する！',
-    hp: 68000,
-    attackPower: 2600,
-    attackRange: 110,
-    attackSpeed: 2.2,
-    attackWindup: 0.12,
-    speed: 65,
+    description: '【スターエイリアン / 範囲攻撃 / バリア 8,000 / 高速突進ワープ】星間突撃軍を率いる怪力将軍。突撃ダッシュで前線へ切り込み、8,000のバリアとワープで戦線を押し返す！',
+    hp: 58000,
+    attackPower: 2200,
+    attackRange: 120,
+    attackSpeed: 1.6,
+    attackWindup: 0.15,
+    speed: 45,
     knockbacks: 3,
     attackType: 'area',
     rewardMoney: 3800,
@@ -3019,20 +3019,20 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     scale: 1.6,
     isBoss: true,
     abilities: {
-      barrier: { hp: 14000 },
-      warp: { chance: 0.75, distance: 300 }
+      barrier: { hp: 8000 },
+      warp: { chance: 0.35, distance: 120 }
     }
   },
   enemy_star_manticore: {
     id: 'enemy_star_manticore',
     name: 'キャプテン・モグー',
-    description: '【スターエイリアン / 長射程レーザー / バリア 22,000 / 強制長距離ワープ 380px】宇宙海賊船長モグラ。長射程420pxから放たれるプラズマ砲で、味方主力を安全圏から一気に自城近くまで強制ワープ！',
-    hp: 95000,
-    attackPower: 3400,
-    attackRange: 420,
-    attackSpeed: 0.85,
-    attackWindup: 0.45,
-    speed: 22,
+    description: '【スターエイリアン / 中射程レーザー / バリア 12,000 / 戦線ワープ 150px】宇宙海賊船長モグラ。射程240pxから放たれるプラズマ砲で、味方主力を後方にワープさせる！',
+    hp: 75000,
+    attackPower: 2800,
+    attackRange: 240,
+    attackSpeed: 0.7,
+    attackWindup: 0.35,
+    speed: 20,
     knockbacks: 5,
     attackType: 'area',
     rewardMoney: 6500,
@@ -3042,20 +3042,20 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     scale: 1.8,
     isBoss: true,
     abilities: {
-      barrier: { hp: 22000 },
-      warp: { chance: 0.85, distance: 380 }
+      barrier: { hp: 12000 },
+      warp: { chance: 0.4, distance: 150 }
     }
   },
   enemy_star_manboros: {
     id: 'enemy_star_manboros',
     name: 'スペースマンボロス',
-    description: '【スターエイリアンBOSS / 超遠距離範囲 / バリア 28,000 / 全体ワープ 420px】虚空を漂う超巨大宇宙マンボウ。射程480pxの星間ビームで広範囲の味方を一網打尽に遠方ワープさせる超難敵！',
-    hp: 180000,
-    attackPower: 4500,
-    attackRange: 480,
-    attackSpeed: 0.55,
-    attackWindup: 0.65,
-    speed: 15,
+    description: '【スターエイリアンBOSS / 遠距離範囲 / バリア 18,000 / 全体ワープ 160px】虚空を漂う超巨大宇宙マンボウ。射程340pxの星間ビームで広範囲の味方を後退させる！',
+    hp: 140000,
+    attackPower: 3600,
+    attackRange: 340,
+    attackSpeed: 0.5,
+    attackWindup: 0.5,
+    speed: 14,
     knockbacks: 4,
     attackType: 'area',
     rewardMoney: 9500,
@@ -3065,20 +3065,20 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     scale: 2.3,
     isBoss: true,
     abilities: {
-      barrier: { hp: 28000 },
-      warp: { chance: 0.9, distance: 420 }
+      barrier: { hp: 18000 },
+      warp: { chance: 0.45, distance: 160 }
     }
   },
   enemy_star_evil: {
     id: 'enemy_star_evil',
     name: 'エビル星人',
-    description: '【スターエイリアンBOSS / 超高耐久バリア 35,000 / 攻撃力激減＋ワープ】悪意の星から飛来した暗黒エイリアン。35,000の超高強度バリアで鉄壁を誇り、味方の攻撃力を50%奪いながら戦線を後退させる！',
-    hp: 220000,
-    attackPower: 4800,
-    attackRange: 240,
-    attackSpeed: 0.75,
-    attackWindup: 0.4,
-    speed: 25,
+    description: '【スターエイリアンBOSS / 高耐久バリア 22,000 / 攻撃力低下＋ワープ】悪意の星から飛来した暗黒エイリアン。22,000の強度バリアで防御し、味方の攻撃力を奪いながら後退させる！',
+    hp: 180000,
+    attackPower: 4200,
+    attackRange: 220,
+    attackSpeed: 0.65,
+    attackWindup: 0.35,
+    speed: 22,
     knockbacks: 3,
     attackType: 'area',
     rewardMoney: 12000,
@@ -3088,9 +3088,9 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     scale: 2.1,
     isBoss: true,
     abilities: {
-      barrier: { hp: 35000 },
-      warp: { chance: 0.8, distance: 350 },
-      weaken: { chance: 0.8, duration: 5.0, mult: 0.4 }
+      barrier: { hp: 22000 },
+      warp: { chance: 0.4, distance: 140 },
+      weaken: { chance: 0.6, duration: 4.0, mult: 0.5 }
     }
   },
 
@@ -3115,7 +3115,6 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     spriteType: 'enemy_filibuster',
     scale: 2.8,
     isBoss: true,
-    waveLevel: 8,
     abilities: {
       chargeAttack: { chargeTime: 14.0, isOneHitKill: true },
       knockback: { chance: 1.0 }

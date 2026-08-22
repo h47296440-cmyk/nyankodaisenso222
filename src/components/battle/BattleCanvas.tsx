@@ -457,21 +457,30 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
 
             {/* Boss Filibuster Mega Attack Charge Bar */}
             {enemy.isCharging && enemy.chargeTimer !== undefined && (
-              <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-32 flex flex-col items-center pointer-events-none z-30 animate-bounce">
-                <div className="bg-rose-950/95 border border-rose-500 rounded px-2 py-0.5 text-[10px] font-black text-rose-300 shadow-xl flex items-center gap-1">
+              <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-36 flex flex-col items-center pointer-events-none z-30">
+                <div className="bg-rose-950/95 border border-rose-500 rounded-full px-2.5 py-0.5 text-[10px] font-black text-rose-300 shadow-xl flex items-center gap-1 animate-pulse">
                   <span className="animate-ping">⚠️</span>
-                  <span>超神撃チャージ中!</span>
+                  <span>即死チャージ:</span>
+                  <span className="font-mono text-yellow-300 font-black">
+                    {Math.max(0, enemy.chargeTimer).toFixed(1)}s
+                  </span>
                 </div>
-                <div className="w-28 h-2 bg-black/80 rounded-full border border-rose-400 overflow-hidden mt-1 shadow-inner">
+                <div className="w-32 h-2.5 bg-black/90 rounded-full border border-rose-400 overflow-hidden mt-1 shadow-inner">
                   <div
                     className="h-full bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 transition-all duration-100"
                     style={{
-                      width: `${Math.max(0, Math.min(100, (1 - (enemy.chargeTimer || 0) / 12) * 100))}%`,
+                      width: `${Math.max(
+                        0,
+                        Math.min(
+                          100,
+                          (1 - (enemy.chargeTimer || 0) / (enemy.abilities?.chargeAttack?.chargeTime || 14)) * 100
+                        )
+                      )}%`,
                     }}
                   />
                 </div>
-                <span className="text-[8px] font-black text-yellow-300 mt-0.5 drop-shadow">
-                  KBでチャージ阻止可能!
+                <span className="text-[9px] font-black text-yellow-300 mt-0.5 drop-shadow bg-black/60 px-1.5 rounded">
+                  💥 KBでチャージ阻止・解除！
                 </span>
               </div>
             )}

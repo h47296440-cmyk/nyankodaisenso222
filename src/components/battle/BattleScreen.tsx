@@ -660,34 +660,47 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       }
 
       // Handle Filibuster / Charge Attack Boss Mechanics
-      if (enemy.abilities?.chargeAttack && enemy.state !== 'burrow' && enemy.state !== 'revive' && enemy.state !== 'knockback') {
-        enemy.isCharging = true;
-        enemy.chargeTimer = (enemy.chargeTimer ?? enemy.abilities.chargeAttack.chargeTime) - dt;
-
-        // Visual charge aura & audio pulsing
-        if (Math.random() < 0.18) {
-          spawnFx(enemy.x, 50, 'filibuster_charge');
-        }
-
-        // Charge completed -> TRIGGER 9,999,999 OBLIVION / GAME OVER
-        if (enemy.chargeTimer <= 0) {
+      if (enemy.abilities?.chargeAttack && enemy.state !== 'burrow' && enemy.state !== 'revive') {
+        if (enemy.state === 'knockback') {
+          // Being knocked back interrupts and cancels the current charge!
           enemy.chargeTimer = enemy.abilities.chargeAttack.chargeTime;
-          audio.playBossRoar();
-          audio.playCastleDamage();
-          spawnFx(playerCastleX + 300, 60, 'filibuster_oblivion');
+          enemy.isCharging = false;
+        } else {
+          enemy.isCharging = true;
+          enemy.chargeTimer = (enemy.chargeTimer ?? enemy.abilities.chargeAttack.chargeTime) - dt;
 
-          // Obliterate all allied cats on field
-          catsRef.current.forEach((c) => {
-            c.hp = 0;
-            spawnDamageNum(c.x, 35, 9999999, true, false);
-            spawnFx(c.x, 30, 'cat_soul');
-          });
+          // Visual charge aura & audio pulsing
+          if (Math.random() < 0.22) {
+            spawnFx(enemy.x, 50, 'filibuster_charge');
+          }
 
-          // Instantly destroy player castle -> Game Over
-          playerCastleHpRef.current = 0;
-          setPlayerCastleHp(0);
-          handleMatchEnd(false);
-          return;
+          // Charge completed -> TRIGGER 9,999,999 OBLIVION / GAME OVER
+          if (enemy.chargeTimer <= 0) {
+            enemy.chargeTimer = enemy.abilities.chargeAttack.chargeTime;
+            audio.playBossAppear();
+            audio.playCastleDamage();
+            spawnFx(playerCastleX + 300, 60, 'filibuster_oblivion');
+
+            // Obliterate all allied cats on field
+            catsRef.current.forEach((c) => {
+              c.hp = 0;
+              spawnDamageNum(c.x, 35, 9999999, true, false);
+              spawnFx(c.x, 30, 'cat_soul');
+            });
+
+            // Instantly destroy player castle -> Game Over
+            playerCastleHpRef.current = 0;
+            setPlayerCastleHp(0);
+            handleMatchEnd(false);
+            return;
+          }
+
+          // Filibuster slowly advances or hovers in charging posture, but NEVER triggers normal attacks!
+          enemy.state = 'attack';
+          const currentSpeed = (enemy.slowTimer && enemy.slowTimer > 0) ? enemy.speed * 0.25 : enemy.speed;
+          const nextX = enemy.x - currentSpeed * dt;
+          enemy.x = Math.max(playerCastleX + 160, nextX);
+          continue;
         }
       }
 
@@ -1086,13 +1099,13 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       }
       // Star Alien Warp Ability (Teleports cat leftwards towards player castle)
       if (enemy.abilities?.warp && Math.random() < enemy.abilities.warp.chance) {
-        spawnFx(c.x, 25, 'warp_portal');
-        const warpDistance = enemy.abilities.warp.distance || 250;
-        c.x = Math.max(playerCastleX + 30, c.x - warpDistance);
+        spawnFx(c.x, 25, 'warp_fx');
+        const warpDistance = enemy.abilities.warp.distance || 120;
+        c.x = Math.max(playerCastleX + 60, c.x - warpDistance);
         c.isWindupActive = false;
         c.state = 'walk';
         setTimeout(() => {
-          spawnFx(c.x, 25, 'warp_portal');
+          spawnFx(c.x, 25, 'warp_fx');
         }, 120);
       }
     };
