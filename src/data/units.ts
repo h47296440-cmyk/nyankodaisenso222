@@ -431,7 +431,7 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
       {
         name: 'ネコヴァルキリー',
         jpName: 'ネコヴァルキリー',
-        description: '【範囲攻撃】戦乙女の槍を携えし天使ネコ。高速移動と華麗な薙ぎ払いで敵を制圧する。',
+        description: '【第1形態 / 範囲攻撃】戦乙女の槍を携えし天使ネコ。高速移動と華麗な薙ぎ払いで敵前線を制圧する。',
         hp: 1800,
         attackPower: 750,
         attackRange: 180,
@@ -439,28 +439,54 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         attackWindup: 0.4,
         speed: 65,
         knockbacks: 3,
-        attackType: 'area', // ★ AREA ATTACK
+        attackType: 'area',
         cost: 2400,
         cooldown: 25.0,
         scale: 1.4,
         spriteType: 'cat_valkyrie',
       },
       {
-        name: 'ネコヴァルキリー・聖',
-        jpName: 'ネコヴァルキリー・聖',
-        description: '【範囲攻撃】聖なる加護を受け覚醒した戦乙女。高確率で敵の動きを一瞬停止させる！',
-        hp: 3400,
-        attackPower: 1400,
-        attackRange: 200,
+        name: 'ネコヴァルキリー・真',
+        jpName: 'ネコヴァルキリー・真',
+        description: '【第2形態 / 範囲攻撃】真の力を解放した戦乙女。研ぎ澄まされた連撃槍で広範囲の敵に大ダメージを与える。',
+        hp: 3200,
+        attackPower: 1350,
+        attackRange: 195,
         attackSpeed: 0.85,
         attackWindup: 0.35,
         speed: 70,
         knockbacks: 3,
-        attackType: 'area', // ★ AREA ATTACK
+        attackType: 'area',
         cost: 2400,
         cooldown: 22.0,
         scale: 1.45,
+        spriteType: 'cat_valkyrie_true',
+      },
+      {
+        name: '聖ヴァルキリー',
+        jpName: '聖ヴァルキリー',
+        description: '【第3形態 / 範囲攻撃 / 停止能力 / 波動LV2】未来編ゾンビ最終決戦を制し神聖覚醒を遂げた戦乙女。35%の確率で全属性の動きを2.5秒完全停止させ、聖なる神聖波動を放つ究極形態！',
+        hp: 5200,
+        attackPower: 2200,
+        attackRange: 220,
+        attackSpeed: 0.95,
+        attackWindup: 0.28,
+        speed: 78,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 2400,
+        cooldown: 19.0,
+        scale: 1.55,
         spriteType: 'cat_valkyrie_holy',
+        waveLevel: 2,
+        abilities: {
+          freeze: {
+            chance: 0.35,
+            duration: 2.5,
+            traits: ['red', 'floating', 'black', 'alien', 'star_alien', 'angel', 'metal', 'zombie', 'white', 'boss'],
+          },
+          wave: { level: 2, chance: 0.5 },
+        },
       }
     ]
   },
@@ -1804,6 +1830,111 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         abilities: {
           zombieKiller: true,
           massiveDamage: { mult: 4.0, traits: ['zombie', 'angel'] }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_summer_2026',
+    rarity: 'uber_rare',
+    unlockedAtStart: false,
+    unlockMethod: 'start',
+    unlockHint: '2026年8月限定プレゼントコード【SUMMERCAT2026】で入手！',
+    forms: [
+      {
+        name: '夏キャット2026',
+        jpName: '夏キャット2026',
+        description: '【2026年8月限定 / 赤と浮きとエイリアンに超ダメージ＆たまに波動 / 範囲攻撃】夏休みを満喫するにゃんこ。特製浮き輪とトロピカルビームで波乗りしながら敵軍を押し流す！',
+        hp: 12500,
+        attackPower: 3600,
+        attackRange: 340,
+        attackSpeed: 0.65,
+        attackWindup: 0.45,
+        speed: 36,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 2950,
+        cooldown: 20.0,
+        scale: 1.4,
+        spriteType: 'cat_summer_2026',
+        abilities: {
+          massiveDamage: { mult: 3.5, traits: ['red', 'floating', 'alien'] },
+          wave: { level: 2, chance: 0.35 }
+        }
+      },
+      {
+        name: '真・灼熱のサマーキャット',
+        jpName: '真・灼熱のサマーキャット',
+        description: '【2026年8月限定 / 全属性にめっぽう強い＆必ずクリティカル / 波動＆超長射程】真夏の太陽を味方につけた究極のサマーにゃんこ。超高速スイカ割り光線で属性持ち敵を一網打尽！',
+        hp: 21000,
+        attackPower: 6800,
+        attackRange: 390,
+        attackSpeed: 0.7,
+        attackWindup: 0.4,
+        speed: 42,
+        knockbacks: 4,
+        attackType: 'area',
+        cost: 2950,
+        cooldown: 18.0,
+        scale: 1.55,
+        spriteType: 'cat_summer_2026_evolved',
+        abilities: {
+          strong: { traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] },
+          criticalChance: 0.45,
+          wave: { level: 3, chance: 0.5 },
+          zombieKiller: true
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_relic_emperor',
+    rarity: 'uber_rare',
+    unlockedAtStart: false,
+    unlockMethod: 'gacha',
+    unlockHint: 'レジェンドストーリー制覇記念ガチャで入手！',
+    forms: [
+      {
+        name: '古代帝王ネコ',
+        jpName: '古代帝王ネコ',
+        description: '【全属性の敵の攻撃力を低下＆ふっとばす / 範囲攻撃】太古の時代から目覚めし帝王にゃんこ。王笏から放つ古代神力で全敵を後方に押し返す！',
+        hp: 14500,
+        attackPower: 4100,
+        attackRange: 370,
+        attackSpeed: 0.55,
+        attackWindup: 0.5,
+        speed: 28,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 3800,
+        cooldown: 25.0,
+        scale: 1.5,
+        spriteType: 'cat_relic_emperor',
+        abilities: {
+          weaken: { chance: 1.0, duration: 4.0, mult: 0.5, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] },
+          knockback: { chance: 0.8, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] }
+        }
+      },
+      {
+        name: '時空超越神オメガキャット',
+        jpName: '時空超越神オメガキャット',
+        description: '【全属性を超ダメージ＆極限停止＆ゾンビキラー / 超激レア】時空を超越し神となったオメガにゃんこ。全敵の動きを完全停止し、破滅の光で消滅させる！',
+        hp: 24000,
+        attackPower: 7600,
+        attackRange: 420,
+        attackSpeed: 0.6,
+        attackWindup: 0.5,
+        speed: 32,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 3800,
+        cooldown: 23.0,
+        scale: 1.65,
+        spriteType: 'cat_relic_emperor_evolved',
+        abilities: {
+          massiveDamage: { mult: 3.5, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] },
+          freeze: { chance: 1.0, duration: 4.0, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie', 'metal'] },
+          zombieKiller: true
         }
       }
     ]
@@ -3332,6 +3463,125 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     waveLevel: 4,
     abilities: {
       knockback: { chance: 1.0 }
+    }
+  },
+
+  // =========================================================================
+  // ADVENT & ZOMBIE EXTREME (降臨＆極ムズゾンビ襲来ボス)
+  // =========================================================================
+  enemy_corrupted_valkyrie: {
+    id: 'enemy_corrupted_valkyrie',
+    name: '腐敗されしネコヴァルキリー',
+    description: '【ゾンビ / 範囲攻撃 / 停止能力 / BOSS】未来編の深淵で闇と死霊の力に呑まれ腐敗した戦乙女。猛スピードの連続槍撃と味方を凍結させる死霊波を放ち、地中潜行と蘇生能力も併せ持つ最凶の敵！撃破で聖ヴァルキリー（第3形態）が解放！',
+    hp: 280000,
+    attackPower: 3500,
+    attackRange: 220,
+    attackSpeed: 0.95,
+    attackWindup: 0.28,
+    speed: 55,
+    knockbacks: 4,
+    attackType: 'area',
+    rewardMoney: 18000,
+    rewardXp: 45000,
+    traits: ['zombie', 'boss'],
+    spriteType: 'enemy_corrupted_valkyrie',
+    scale: 2.1,
+    isBoss: true,
+    abilities: {
+      burrow: { count: 1, distance: 450 },
+      revive: { count: 1, hpPercent: 60, delaySeconds: 3.0 },
+      freeze: { chance: 0.4, duration: 2.2, traits: ['red', 'floating', 'black', 'alien', 'star_alien', 'angel', 'metal', 'zombie', 'white'] },
+      wave: { level: 2, chance: 0.4 }
+    }
+  },
+  enemy_clionel: {
+    id: 'enemy_clionel',
+    name: '断罪天使クオリネル',
+    description: '【降臨BOSS / 天使 / 範囲攻撃 / 超遠距離 / 鈍足】降臨ステージ「死に際流星群 極ムズ」の神聖なる支配者。頭上の光輪から銀河を揺るがす神罰流星を降らせ、味方の移動速度を極限まで奪う！懐に入り込んで一気に叩け！',
+    hp: 1200000,
+    attackPower: 8800,
+    attackRange: 800,
+    attackSpeed: 0.35,
+    attackWindup: 0.9,
+    speed: 10,
+    knockbacks: 5,
+    attackType: 'area',
+    rewardMoney: 30000,
+    rewardXp: 80000,
+    traits: ['angel', 'boss'],
+    spriteType: 'enemy_clionel',
+    scale: 2.6,
+    isBoss: true,
+    abilities: {
+      slow: { chance: 1.0, duration: 4.0, traits: ['red', 'floating', 'black', 'alien', 'star_alien', 'angel', 'metal', 'zombie', 'white'] }
+    }
+  },
+  enemy_hannya: {
+    id: 'enemy_hannya',
+    name: '般若我王（はんにゃがおう）',
+    description: '【降臨BOSS / 赤い敵 / 範囲攻撃 / 攻撃力激減】降臨ステージ「地獄門 極ムズ」の憤怒の鬼神。業火を纏った巨大な面で近寄るにゃんこを薙ぎ払い、攻撃力を10%に激減させる呪いをかける！高い耐久と赤い敵対策で迎え撃て！',
+    hp: 950000,
+    attackPower: 14000,
+    attackRange: 140,
+    attackSpeed: 0.45,
+    attackWindup: 0.6,
+    speed: 18,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 30000,
+    rewardXp: 80000,
+    traits: ['red', 'boss'],
+    spriteType: 'enemy_hannya',
+    scale: 2.8,
+    isBoss: true,
+    abilities: {
+      weaken: { chance: 1.0, duration: 6.0, mult: 0.1, traits: ['red', 'floating', 'black', 'alien', 'star_alien', 'angel', 'metal', 'zombie', 'white'] }
+    }
+  },
+  enemy_zombie_kang_roo: {
+    id: 'enemy_zombie_kang_roo',
+    name: 'スカル・ルー（ゾンビカンガルー）',
+    description: '【ゾンビ / 範囲高速打撃】骨と腐敗肉で跳ね回る凶悪カンガルー。超高速パンチ連打と潜行で味方の前線を瞬く間に粉砕する！',
+    hp: 42000,
+    attackPower: 1600,
+    attackRange: 110,
+    attackSpeed: 1.8,
+    attackWindup: 0.12,
+    speed: 46,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 2800,
+    rewardXp: 3500,
+    traits: ['zombie'],
+    spriteType: 'enemy_zombie_kang_roo',
+    scale: 1.6,
+    abilities: {
+      burrow: { count: 1, distance: 350 },
+      revive: { count: 1, hpPercent: 50, delaySeconds: 2.5 }
+    }
+  },
+  enemy_zombie_alien_bore: {
+    id: 'enemy_zombie_alien_bore',
+    name: 'カダヴァル・ボア（死霊異星猪）',
+    description: '【ゾンビ / スターエイリアン / バリア / 蘇生】ゾンビとスターエイリアンの二重変異を遂げた巨獣。強固なバリアで守られつつ、猛突進で全てを押し潰す！',
+    hp: 98000,
+    attackPower: 2600,
+    attackRange: 90,
+    attackSpeed: 2.2,
+    attackWindup: 0.08,
+    speed: 38,
+    knockbacks: 2,
+    attackType: 'area',
+    rewardMoney: 6000,
+    rewardXp: 9000,
+    traits: ['zombie', 'star_alien', 'boss'],
+    spriteType: 'enemy_zombie_alien_bore',
+    scale: 2.0,
+    isBoss: true,
+    abilities: {
+      barrier: { hp: 12000 },
+      burrow: { count: 1, distance: 400 },
+      revive: { count: 1, hpPercent: 100, delaySeconds: 3.0 }
     }
   }
 };

@@ -65,7 +65,25 @@ export function getDefaultPlayerProfile(): PlayerProfile {
       infiniteXp: false,
       infiniteCatFood: false,
     },
+    redeemedCodes: {},
+    infiniteEnergyUntil: 0,
+    claimedMissions: {},
+    claimedAchievements: {},
+    stats: {
+      totalBattles: 0,
+      totalVictories: 0,
+      totalGachaPulls: 0,
+      totalCatsUpgraded: 0,
+      totalBaseUpgrades: 0,
+      totalGamatotoSent: 0,
+    },
   };
+}
+
+export function isInfiniteEnergyActive(profile: PlayerProfile): boolean {
+  if (profile.devMode?.infiniteEnergy) return true;
+  if (profile.infiniteEnergyUntil && Date.now() < profile.infiniteEnergyUntil) return true;
+  return false;
 }
 
 export function loadPlayerProfile(): PlayerProfile {
@@ -94,16 +112,23 @@ export function loadPlayerProfile(): PlayerProfile {
       const elapsedSec = (now - (parsed.lastEnergyRefillTime || now)) / 1000;
       const energyGain = Math.floor(elapsedSec / 30);
       const maxEnergy = 100 + ((parsed.upgrades?.leadershipCap || 1) - 1) * 20;
-      const currentEnergy = Math.min(maxEnergy, (parsed.energy || 100) + energyGain);
+      const isInfinite = parsed.devMode?.infiniteEnergy || (parsed.infiniteEnergyUntil && now < parsed.infiniteEnergyUntil);
+      const currentEnergy = isInfinite ? 9999 : Math.min(maxEnergy, (parsed.energy || 100) + energyGain);
 
       return {
         ...defaultProf,
         ...parsed,
         cats: mergedCats,
         upgrades: { ...defaultProf.upgrades, ...(parsed.upgrades || {}) },
+        items: { ...defaultProf.items, ...(parsed.items || {}) },
         energy: currentEnergy,
         maxEnergy,
         lastEnergyRefillTime: now,
+        redeemedCodes: parsed.redeemedCodes || {},
+        infiniteEnergyUntil: parsed.infiniteEnergyUntil || 0,
+        claimedMissions: parsed.claimedMissions || {},
+        claimedAchievements: parsed.claimedAchievements || {},
+        stats: { ...defaultProf.stats, ...(parsed.stats || {}) },
       };
     }
   } catch (e) {

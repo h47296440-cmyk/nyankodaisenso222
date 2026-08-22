@@ -20,6 +20,10 @@ import { GamatotoModal } from './components/base/GamatotoModal';
 import { StorageModal } from './components/base/StorageModal';
 import { MenuModal } from './components/base/MenuModal';
 import { DeckFormationModal } from './components/upgrade/DeckFormationModal';
+import { GiftCodeModal } from './components/gift/GiftCodeModal';
+import { MissionsAchievementsModal } from './components/missions/MissionsAchievementsModal';
+import { PvpLobbyModal, PvpConnectionPayload } from './components/pvp/PvpLobbyModal';
+import { PvpBattleScreen } from './components/pvp/PvpBattleScreen';
 import { audio } from './utils/audio';
 
 type AppView = 'title' | 'base' | 'map' | 'battle' | 'upgrade' | 'gacha' | 'treasures' | 'encyclopedia';
@@ -38,6 +42,10 @@ export default function App() {
   const [showStorageModal, setShowStorageModal] = useState(false);
   const [showMenuModal, setShowMenuModal] = useState(false);
   const [showDeckFormationModal, setShowDeckFormationModal] = useState(false);
+  const [showGiftCodeModal, setShowGiftCodeModal] = useState(false);
+  const [showMissionsModal, setShowMissionsModal] = useState(false);
+  const [showPvpLobbyModal, setShowPvpLobbyModal] = useState(false);
+  const [pvpPayload, setPvpPayload] = useState<PvpConnectionPayload | null>(null);
   const [activeStoryKey, setActiveStoryKey] = useState<string | null>(null);
 
   // Sync BGM with current view
@@ -153,6 +161,20 @@ export default function App() {
           }
         }
 
+        // Unlock Valkyrie True Form upon clearing future zombie final boss
+        if (activeStage.id === 'future_zombie_3' || activeStage.rewardCatUnlockId === 'valkyrie_true_form') {
+          if (!nextCats['cat_valkyrie']) {
+            nextCats['cat_valkyrie'] = {
+              unlocked: true,
+              level: 20,
+              plusLevel: 0,
+              activeForm: 2,
+            };
+          } else {
+            nextCats['cat_valkyrie'].activeForm = 2;
+          }
+        }
+
         // Check if clearing final stage of a chapter to trigger Ending cutscene
         if (activeStage.id === 'japan_12' || activeStage.id === 'japan_6') {
           setTimeout(() => setActiveStoryKey('japan_ending'), 600);
@@ -167,6 +189,18 @@ export default function App() {
         prev.hasClearedFilibuster ||
         (result.victory && (activeStage.id === 'cosmos_3_filibuster' || activeStage.id === 'legend_12_3'));
 
+      const isValkyrieTrueUnlocked =
+        prev.unlockedValkyrieTrueForm ||
+        (result.victory && (activeStage.id === 'future_zombie_3' || activeStage.rewardCatUnlockId === 'valkyrie_true_form'));
+
+      const isClionelDropUnlocked =
+        prev.unlockedClionelDrop ||
+        (result.victory && activeStage.id === 'advent_stage_clionel');
+
+      const isHannyaDropUnlocked =
+        prev.unlockedHannyaDrop ||
+        (result.victory && activeStage.id === 'advent_stage_hannya');
+
       return {
         ...prev,
         xp: prev.xp + result.xpEarned,
@@ -175,8 +209,24 @@ export default function App() {
         treasures: nextTreasures,
         cats: nextCats,
         hasClearedFilibuster: isFilibusterCleared,
+        unlockedValkyrieTrueForm: isValkyrieTrueUnlocked,
+        unlockedClionelDrop: isClionelDropUnlocked,
+        unlockedHannyaDrop: isHannyaDropUnlocked,
       };
     });
+  };
+
+  const handlePvpBattleEnd = (result?: { victory: boolean; xpEarned: number; catFoodEarned: number }) => {
+    if (result) {
+      setProfile((prev) => ({
+        ...prev,
+        xp: prev.xp + result.xpEarned,
+        catFood: prev.catFood + result.catFoodEarned,
+        pvpWins: (prev.pvpWins || 0) + (result.victory ? 1 : 0),
+        pvpLosses: (prev.pvpLosses || 0) + (result.victory ? 0 : 1),
+      }));
+    }
+    setPvpPayload(null);
   };
 
   // Find next stage in sequence if available
@@ -211,87 +261,100 @@ export default function App() {
     <div className="w-full h-[100dvh] fixed inset-0 overflow-hidden bg-black select-none flex flex-col items-center justify-center">
       {/* Responsive 100dvh viewport wrapper */}
       <div className="relative w-full h-full max-w-[1920px] bg-stone-950 overflow-hidden shadow-2xl flex flex-col">
-        {currentView === 'title' && (
-          <TitleScreen
-            onStartGame={() => setCurrentView('base')}
-            onResetData={handleResetData}
-            onOpenUpdateHistory={() => setShowUpdateHistory(true)}
-            onOpenDevMode={() => setShowDevModal(true)}
+        {/* P2P PvP Battle View */}
+        {pvpPayload ? (
+          <PvpBattleScreen
+            payload={pvpPayload}
+            onExit={handlePvpBattleEnd}
           />
-        )}
+        ) : (
+          <>
+            {currentView === 'title' && (
+              <TitleScreen
+                onStartGame={() => setCurrentView('base')}
+                onResetData={handleResetData}
+                onOpenUpdateHistory={() => setShowUpdateHistory(true)}
+                onOpenDevMode={() => setShowDevModal(true)}
+              />
+            )}
 
-        {currentView === 'base' && (
-          <CatBaseScreen
-            profile={profile}
-            onStartBattle={() => setCurrentView('map')}
-            onOpenPowerUp={() => setCurrentView('upgrade')}
-            onOpenDeckFormation={() => setShowDeckFormationModal(true)}
-            onOpenGacha={() => setCurrentView('gacha')}
-            onOpenTreasures={() => setCurrentView('treasures')}
-            onOpenEncyclopedia={() => setCurrentView('encyclopedia')}
-            onOpenItemShop={() => setShowItemShopModal(true)}
-            onOpenUserRankRewards={() => setShowUserRankRewardsModal(true)}
-            onOpenGamatoto={() => setShowGamatotoModal(true)}
-            onOpenStorage={() => setShowStorageModal(true)}
-            onOpenMenu={() => setShowMenuModal(true)}
-            onBackToTitle={() => setCurrentView('title')}
-          />
-        )}
+            {currentView === 'base' && (
+              <CatBaseScreen
+                profile={profile}
+                onStartBattle={() => setCurrentView('map')}
+                onOpenPowerUp={() => setCurrentView('upgrade')}
+                onOpenDeckFormation={() => setShowDeckFormationModal(true)}
+                onOpenPvp={() => setShowPvpLobbyModal(true)}
+                onOpenGacha={() => setCurrentView('gacha')}
+                onOpenTreasures={() => setCurrentView('treasures')}
+                onOpenEncyclopedia={() => setCurrentView('encyclopedia')}
+                onOpenItemShop={() => setShowItemShopModal(true)}
+                onOpenUserRankRewards={() => setShowUserRankRewardsModal(true)}
+                onOpenGamatoto={() => setShowGamatotoModal(true)}
+                onOpenStorage={() => setShowStorageModal(true)}
+                onOpenMissions={() => setShowMissionsModal(true)}
+                onOpenGiftCode={() => setShowGiftCodeModal(true)}
+                onOpenMenu={() => setShowMenuModal(true)}
+                onBackToTitle={() => setCurrentView('title')}
+              />
+            )}
 
-        {currentView === 'map' && (
-          <StageSelectScreen
-            profile={profile}
-            onSelectStage={handleSelectStage}
-            onOpenUpgrade={() => setCurrentView('upgrade')}
-            onOpenGacha={() => setCurrentView('gacha')}
-            onOpenTreasures={() => setCurrentView('treasures')}
-            onOpenEncyclopedia={() => setCurrentView('encyclopedia')}
-            onOpenUpdateHistory={() => setShowUpdateHistory(true)}
-            onOpenDevMode={() => setShowDevModal(true)}
-            onOpenStorySelect={() => setShowStorySelectModal(true)}
-            onBackToTitle={() => setCurrentView('base')}
-          />
-        )}
+            {currentView === 'map' && (
+              <StageSelectScreen
+                profile={profile}
+                onSelectStage={handleSelectStage}
+                onOpenUpgrade={() => setCurrentView('upgrade')}
+                onOpenGacha={() => setCurrentView('gacha')}
+                onOpenTreasures={() => setCurrentView('treasures')}
+                onOpenEncyclopedia={() => setCurrentView('encyclopedia')}
+                onOpenUpdateHistory={() => setShowUpdateHistory(true)}
+                onOpenDevMode={() => setShowDevModal(true)}
+                onOpenStorySelect={() => setShowStorySelectModal(true)}
+                onBackToTitle={() => setCurrentView('base')}
+              />
+            )}
 
-        {currentView === 'battle' && activeStage && (
-          <BattleScreen
-            stage={activeStage}
-            profile={profile}
-            activeItems={battleActiveItems}
-            onBattleEnd={handleBattleEnd}
-            onExit={() => setCurrentView('map')}
-            onNextStage={nextStage ? handleNextStage : undefined}
-            hasNextStage={!!nextStage}
-          />
-        )}
+            {currentView === 'battle' && activeStage && (
+              <BattleScreen
+                stage={activeStage}
+                profile={profile}
+                activeItems={battleActiveItems}
+                onBattleEnd={handleBattleEnd}
+                onExit={() => setCurrentView('map')}
+                onNextStage={nextStage ? handleNextStage : undefined}
+                hasNextStage={!!nextStage}
+              />
+            )}
 
-        {currentView === 'upgrade' && (
-          <PowerUpScreen
-            profile={profile}
-            onUpdateProfile={handleUpdateProfile}
-            onBack={() => setCurrentView('base')}
-          />
-        )}
+            {currentView === 'upgrade' && (
+              <PowerUpScreen
+                profile={profile}
+                onUpdateProfile={handleUpdateProfile}
+                onBack={() => setCurrentView('base')}
+              />
+            )}
 
-        {currentView === 'gacha' && (
-          <GachaScreen
-            profile={profile}
-            onUpdateProfile={handleUpdateProfile}
-            onBack={() => setCurrentView('base')}
-          />
-        )}
+            {currentView === 'gacha' && (
+              <GachaScreen
+                profile={profile}
+                onUpdateProfile={handleUpdateProfile}
+                onBack={() => setCurrentView('base')}
+              />
+            )}
 
-        {currentView === 'treasures' && (
-          <TreasuresScreen
-            profile={profile}
-            onBack={() => setCurrentView('base')}
-          />
-        )}
+            {currentView === 'treasures' && (
+              <TreasuresScreen
+                profile={profile}
+                onBack={() => setCurrentView('base')}
+              />
+            )}
 
-        {currentView === 'encyclopedia' && (
-          <CatEncyclopediaScreen
-            onBack={() => setCurrentView('base')}
-          />
+            {currentView === 'encyclopedia' && (
+              <CatEncyclopediaScreen
+                onBack={() => setCurrentView('base')}
+              />
+            )}
+          </>
         )}
 
         {/* Global Update History Modal */}
@@ -363,6 +426,14 @@ export default function App() {
         <MenuModal
           isOpen={showMenuModal}
           onClose={() => setShowMenuModal(false)}
+          onOpenMissions={() => {
+            setShowMenuModal(false);
+            setShowMissionsModal(true);
+          }}
+          onOpenGiftCode={() => {
+            setShowMenuModal(false);
+            setShowGiftCodeModal(true);
+          }}
           onOpenTreasures={() => {
             setShowMenuModal(false);
             setCurrentView('treasures');
@@ -395,6 +466,33 @@ export default function App() {
           profile={profile}
           onClose={() => setShowDeckFormationModal(false)}
           onUpdateProfile={handleUpdateProfile}
+        />
+
+        {/* Gift Code Redemption Modal */}
+        <GiftCodeModal
+          isOpen={showGiftCodeModal}
+          profile={profile}
+          onClose={() => setShowGiftCodeModal(false)}
+          onUpdateProfile={handleUpdateProfile}
+        />
+
+        {/* Missions & Achievements Modal */}
+        <MissionsAchievementsModal
+          isOpen={showMissionsModal}
+          profile={profile}
+          onClose={() => setShowMissionsModal(false)}
+          onUpdateProfile={handleUpdateProfile}
+        />
+
+        {/* P2P PvP Lobby Modal */}
+        <PvpLobbyModal
+          isOpen={showPvpLobbyModal}
+          profile={profile}
+          onClose={() => setShowPvpLobbyModal(false)}
+          onStartBattle={(payload) => {
+            setShowPvpLobbyModal(false);
+            setPvpPayload(payload);
+          }}
         />
       </div>
     </div>

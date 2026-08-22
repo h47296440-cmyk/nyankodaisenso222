@@ -8,6 +8,7 @@ interface CatBaseScreenProps {
   onStartBattle: () => void;
   onOpenPowerUp: () => void;
   onOpenDeckFormation: () => void;
+  onOpenPvp?: () => void;
   onOpenGacha: () => void;
   onOpenTreasures: () => void;
   onOpenEncyclopedia: () => void;
@@ -15,6 +16,8 @@ interface CatBaseScreenProps {
   onOpenUserRankRewards: () => void;
   onOpenGamatoto: () => void;
   onOpenStorage: () => void;
+  onOpenMissions: () => void;
+  onOpenGiftCode: () => void;
   onOpenMenu: () => void;
   onBackToTitle: () => void;
 }
@@ -35,6 +38,7 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
   onStartBattle,
   onOpenPowerUp,
   onOpenDeckFormation,
+  onOpenPvp,
   onOpenGacha,
   onOpenTreasures,
   onOpenEncyclopedia,
@@ -42,6 +46,8 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
   onOpenUserRankRewards,
   onOpenGamatoto,
   onOpenStorage,
+  onOpenMissions,
+  onOpenGiftCode,
   onOpenMenu,
   onBackToTitle,
 }) => {
@@ -271,8 +277,8 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
               </span>
             </button>
 
-            {/* Bottom-Left Quick Icons: メニュー, ガマトト, ネコ道場 */}
-            <div className="flex items-center gap-3 pt-2">
+            {/* Bottom-Left Quick Icons: メニュー, ミッション, プレゼント, ガマトト, ネコ道場 */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 pt-1.5">
               {/* メニュー (Menu) with Orange '!' badge */}
               <button
                 id="btn-sub-menu"
@@ -280,17 +286,57 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
                   audio.playClick();
                   onOpenMenu();
                 }}
-                className="relative flex flex-col items-center justify-center p-1 hover:scale-110 transition-transform group"
+                className="relative flex flex-col items-center justify-center p-0.5 hover:scale-110 transition-transform group"
               >
-                <div className="relative w-12 h-12 rounded-xl bg-gradient-to-b from-stone-100 to-stone-300 border-2 border-stone-800 shadow-md flex items-center justify-center">
-                  <span className="text-2xl">📖</span>
+                <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-b from-stone-100 to-stone-300 border-2 border-stone-800 shadow-md flex items-center justify-center">
+                  <span className="text-xl sm:text-2xl">📖</span>
                   {/* Orange '!' badge */}
-                  <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-orange-500 border-2 border-white text-white text-[10px] font-black flex items-center justify-center animate-pulse">
+                  <div className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-orange-500 border-2 border-white text-white text-[9px] font-black flex items-center justify-center animate-pulse">
                     !
                   </div>
                 </div>
-                <span className="text-[10px] font-black text-amber-100 tracking-tighter mt-0.5 stroke-black stroke-2 drop-shadow">
+                <span className="text-[9px] sm:text-[10px] font-black text-amber-100 tracking-tighter mt-0.5 drop-shadow">
                   メニュー
+                </span>
+              </button>
+
+              {/* ミッション (Missions) */}
+              <button
+                id="btn-sub-missions"
+                onClick={() => {
+                  audio.playClick();
+                  onOpenMissions();
+                }}
+                className="relative flex flex-col items-center justify-center p-0.5 hover:scale-110 transition-transform group"
+              >
+                <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-b from-yellow-100 to-amber-200 border-2 border-amber-800 shadow-md flex items-center justify-center">
+                  <span className="text-xl sm:text-2xl animate-pulse">🎯</span>
+                  <div className="absolute -top-1.5 -right-1.5 px-1 py-0.2 rounded-full bg-red-600 border border-white text-white text-[8px] font-black shadow">
+                    報酬
+                  </div>
+                </div>
+                <span className="text-[9px] sm:text-[10px] font-black text-amber-100 tracking-tighter mt-0.5 drop-shadow">
+                  ミッション
+                </span>
+              </button>
+
+              {/* プレゼントコード (Gift Code) */}
+              <button
+                id="btn-sub-gift"
+                onClick={() => {
+                  audio.playClick();
+                  onOpenGiftCode();
+                }}
+                className="relative flex flex-col items-center justify-center p-0.5 hover:scale-110 transition-transform group"
+              >
+                <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-b from-pink-100 to-rose-200 border-2 border-rose-800 shadow-md flex items-center justify-center">
+                  <span className="text-xl sm:text-2xl">🎁</span>
+                  <div className="absolute -top-1.5 -right-1.5 px-1 py-0.2 rounded-full bg-pink-600 border border-white text-white text-[8px] font-black shadow">
+                    配布
+                  </div>
+                </div>
+                <span className="text-[9px] sm:text-[10px] font-black text-amber-100 tracking-tighter mt-0.5 drop-shadow">
+                  コード
                 </span>
               </button>
 
@@ -301,12 +347,12 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
                   audio.playClick();
                   onOpenGamatoto();
                 }}
-                className="relative flex flex-col items-center justify-center p-1 hover:scale-110 transition-transform group"
+                className="relative flex flex-col items-center justify-center p-0.5 hover:scale-110 transition-transform group"
               >
-                <div className="relative w-12 h-12 rounded-xl bg-gradient-to-b from-stone-100 to-stone-300 border-2 border-stone-800 shadow-md flex items-center justify-center">
-                  <span className="text-2xl">⛏️</span>
+                <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-b from-stone-100 to-stone-300 border-2 border-stone-800 shadow-md flex items-center justify-center">
+                  <span className="text-xl sm:text-2xl">⛏️</span>
                 </div>
-                <span className="text-[10px] font-black text-amber-100 tracking-tighter mt-0.5 drop-shadow">
+                <span className="text-[9px] sm:text-[10px] font-black text-amber-100 tracking-tighter mt-0.5 drop-shadow">
                   ガマトト
                 </span>
               </button>
@@ -318,15 +364,37 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
                   audio.playClick();
                   onOpenEncyclopedia();
                 }}
-                className="relative flex flex-col items-center justify-center p-1 hover:scale-110 transition-transform group"
+                className="relative flex flex-col items-center justify-center p-0.5 hover:scale-110 transition-transform group"
               >
-                <div className="relative w-12 h-12 rounded-xl bg-gradient-to-b from-stone-100 to-stone-300 border-2 border-stone-800 shadow-md flex items-center justify-center">
-                  <span className="text-2xl">⛩️</span>
+                <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-b from-stone-100 to-stone-300 border-2 border-stone-800 shadow-md flex items-center justify-center">
+                  <span className="text-xl sm:text-2xl">⛩️</span>
                 </div>
-                <span className="text-[10px] font-black text-amber-100 tracking-tighter mt-0.5 drop-shadow">
-                  ネコ道場
+                <span className="text-[9px] sm:text-[10px] font-black text-amber-100 tracking-tighter mt-0.5 drop-shadow">
+                  図鑑
                 </span>
               </button>
+
+              {/* P2P 対戦 (PvP) */}
+              {onOpenPvp && (
+                <button
+                  id="btn-sub-pvp"
+                  onClick={() => {
+                    audio.playClick();
+                    onOpenPvp();
+                  }}
+                  className="relative flex flex-col items-center justify-center p-0.5 hover:scale-110 transition-transform group"
+                >
+                  <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-b from-red-500 to-amber-600 border-2 border-yellow-300 shadow-md flex items-center justify-center animate-pulse">
+                    <span className="text-xl sm:text-2xl">⚔️</span>
+                    <div className="absolute -top-1.5 -right-1.5 px-1 py-0.2 rounded-full bg-red-700 border border-yellow-200 text-yellow-200 text-[8px] font-black shadow">
+                      P2P
+                    </div>
+                  </div>
+                  <span className="text-[9px] sm:text-[10px] font-black text-yellow-300 tracking-tighter mt-0.5 drop-shadow">
+                    対戦
+                  </span>
+                </button>
+              )}
             </div>
           </div>
 

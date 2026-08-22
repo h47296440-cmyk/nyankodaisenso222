@@ -64,7 +64,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
 
   // Category filter for the chapter select menu
-  const [activeCategoryTab, setActiveCategoryTab] = useState<'all' | 'japan' | 'future' | 'cosmos' | 'legend' | 'crazed'>('all');
+  const [activeCategoryTab, setActiveCategoryTab] = useState<'all' | 'japan' | 'future' | 'cosmos' | 'legend' | 'crazed' | 'advent'>('all');
 
   const isInfiniteEnergy = !!profile.devMode?.infiniteEnergy;
   const isInfiniteXp = !!profile.devMode?.infiniteXp;
@@ -143,6 +143,14 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
         return !!profile.hasClearedFilibuster && checkChapterCleared('legend_11');
       case 'crazed_event':
       case 'crazed':
+        return checkChapterCleared('japan_1');
+      case 'zombie_future':
+        return checkChapterCleared('future_1') || checkChapterCleared('japan_1');
+      case 'zombie_cosmos':
+        return checkChapterCleared('cosmos_1') || checkChapterCleared('future_1');
+      case 'advent_clionel':
+      case 'advent_hannya':
+      case 'advent':
         return checkChapterCleared('japan_1');
       default:
         return true;
@@ -531,7 +539,8 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                 { id: 'future' as const, label: '未来編' },
                 { id: 'cosmos' as const, label: '宇宙編' },
                 { id: 'legend' as const, label: 'レジェンド' },
-                { id: 'crazed' as const, label: '狂乱降臨' },
+                { id: 'crazed' as const, label: '狂乱祭' },
+                { id: 'advent' as const, label: '降臨BOSS' },
               ].map((tab) => (
                 <button
                   key={tab.id}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { audio } from '../../utils/audio';
-import { X, BookOpen, Volume2, Wrench, History, Compass, Trophy } from 'lucide-react';
+import { X, BookOpen, Volume2, Wrench, History, Compass, Trophy, Gift, Target } from 'lucide-react';
 
 interface MenuModalProps {
   isOpen: boolean;
@@ -10,6 +10,8 @@ interface MenuModalProps {
   onOpenStorySelect: () => void;
   onOpenUpdateHistory: () => void;
   onOpenDevMode: () => void;
+  onOpenMissions: () => void;
+  onOpenGiftCode: () => void;
   onBackToTitle: () => void;
 }
 
@@ -21,6 +23,8 @@ export const MenuModal: React.FC<MenuModalProps> = ({
   onOpenStorySelect,
   onOpenUpdateHistory,
   onOpenDevMode,
+  onOpenMissions,
+  onOpenGiftCode,
   onBackToTitle,
 }) => {
   if (!isOpen) return null;
@@ -43,9 +47,42 @@ export const MenuModal: React.FC<MenuModalProps> = ({
         </div>
 
         {/* Buttons List */}
-        <div className="p-4 space-y-2.5">
+        <div className="p-4 space-y-2.5 max-h-[75vh] overflow-y-auto">
+          {/* ミッション＆実績 */}
+          <button
+            id="menu-btn-missions"
+            onClick={() => {
+              onClose();
+              onOpenMissions();
+            }}
+            className="w-full bg-gradient-to-r from-yellow-700 to-amber-700 hover:brightness-110 border border-yellow-400 p-3 rounded-2xl flex items-center justify-between text-left shadow text-white font-black text-sm"
+          >
+            <div className="flex items-center gap-3">
+              <Target className="w-5 h-5 text-yellow-300 animate-pulse" />
+              <span>🎯 ミッション＆実績</span>
+            </div>
+            <span className="text-xs text-yellow-200">報酬受取 →</span>
+          </button>
+
+          {/* プレゼントコード */}
+          <button
+            id="menu-btn-gift-code"
+            onClick={() => {
+              onClose();
+              onOpenGiftCode();
+            }}
+            className="w-full bg-gradient-to-r from-pink-800 to-rose-700 hover:brightness-110 border border-pink-400 p-3 rounded-2xl flex items-center justify-between text-left shadow text-white font-black text-sm"
+          >
+            <div className="flex items-center gap-3">
+              <Gift className="w-5 h-5 text-pink-300 animate-bounce" />
+              <span>🎁 プレゼントコード入力</span>
+            </div>
+            <span className="text-xs text-pink-200">受取 →</span>
+          </button>
+
           {/* お宝ギャラリー */}
           <button
+            id="menu-btn-treasures"
             onClick={() => {
               onClose();
               onOpenTreasures();
@@ -61,6 +98,7 @@ export const MenuModal: React.FC<MenuModalProps> = ({
 
           {/* にゃんこ図鑑 */}
           <button
+            id="menu-btn-encyclopedia"
             onClick={() => {
               onClose();
               onOpenEncyclopedia();
@@ -76,6 +114,7 @@ export const MenuModal: React.FC<MenuModalProps> = ({
 
           {/* ストーリー回想 */}
           <button
+            id="menu-btn-story"
             onClick={() => {
               onClose();
               onOpenStorySelect();
@@ -91,6 +130,7 @@ export const MenuModal: React.FC<MenuModalProps> = ({
 
           {/* アップデート履歴 */}
           <button
+            id="menu-btn-history"
             onClick={() => {
               onClose();
               onOpenUpdateHistory();
@@ -106,6 +146,7 @@ export const MenuModal: React.FC<MenuModalProps> = ({
 
           {/* 開発者デバッグモード */}
           <button
+            id="menu-btn-dev"
             onClick={() => {
               onClose();
               onOpenDevMode();
@@ -114,13 +155,14 @@ export const MenuModal: React.FC<MenuModalProps> = ({
           >
             <div className="flex items-center gap-3">
               <Wrench className="w-5 h-5 text-purple-400" />
-              <span>🛠️ デバッグ・無限機能</span>
+              <span>🛠️ 開発者モード・配布コード一覧</span>
             </div>
             <span className="text-xs text-purple-300">開く →</span>
           </button>
 
           {/* タイトルへ戻る */}
           <button
+            id="menu-btn-back-title"
             onClick={() => {
               onClose();
               onBackToTitle();
@@ -144,3 +186,4 @@ export const MenuModal: React.FC<MenuModalProps> = ({
     </div>
   );
 };
+

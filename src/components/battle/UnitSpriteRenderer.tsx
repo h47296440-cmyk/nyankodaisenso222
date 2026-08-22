@@ -535,7 +535,6 @@ function renderSpriteSvg(
       );
 
     case 'cat_valkyrie':
-    case 'cat_valkyrie_holy':
       return (
         <svg width="84" height="90" viewBox="0 0 84 90" className="drop-shadow-2xl">
           {/* Angel Wings */}
@@ -560,6 +559,74 @@ function renderSpriteSvg(
           {/* Legs */}
           <line x1="28" y1="56" x2={26 + legOffset1} y2="82" stroke="#0f172a" strokeWidth="3" strokeLinecap="round" />
           <line x1="40" y1="56" x2={38 + legOffset2} y2="82" stroke="#0f172a" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+      );
+
+    case 'cat_valkyrie_true':
+      return (
+        <svg width="92" height="95" viewBox="0 0 92 95" className="drop-shadow-2xl">
+          {/* Radiant True Valkyrie Angel Wings */}
+          <path d="M 14 30 Q -4 0 22 -2 Q 32 6 30 36 Z" fill="#e0e7ff" stroke="#312e81" strokeWidth="2.5" />
+          <path d="M 58 30 Q 76 0 50 -2 Q 40 6 42 36 Z" fill="#e0e7ff" stroke="#312e81" strokeWidth="2.5" />
+          {/* Multi-layered Halo */}
+          <ellipse cx="36" cy="3" rx="14" ry="4.5" fill="none" stroke="#facc15" strokeWidth="3" />
+          <ellipse cx="36" cy="3" rx="8" ry="2.5" fill="none" stroke="#38bdf8" strokeWidth="2" />
+          {/* True Silver-Gold Twin Lance */}
+          <g transform={isAttacking ? "rotate(50 60 44)" : "rotate(-12 60 44)"} className="transition-transform duration-100">
+            <line x1="12" y1="88" x2="74" y2="8" stroke="#38bdf8" strokeWidth="4.5" />
+            <polygon points="74,8 88,-2 82,18" fill="#facc15" stroke="#713f12" strokeWidth="2" />
+            <polygon points="12,88 2,98 8,78" fill="#facc15" stroke="#713f12" strokeWidth="2" />
+          </g>
+          {/* Silver Valkyrie Body */}
+          <ellipse cx="36" cy="40" rx="16" ry="20" fill="#c7d2fe" stroke="#312e81" strokeWidth="2.5" />
+          <polygon points="26,20 30,8 36,18" fill="#f8fafc" stroke="#312e81" strokeWidth="2" />
+          <polygon points="38,18 44,8 48,20" fill="#f8fafc" stroke="#312e81" strokeWidth="2" />
+          <circle cx="36" cy="24" r="12" fill="#f8fafc" stroke="#312e81" strokeWidth="2.5" />
+          <ellipse cx="33" cy="23" rx="1.8" ry="2.2" fill="#1e1b4b" />
+          <ellipse cx="39" cy="23" rx="1.8" ry="2.2" fill="#1e1b4b" />
+          {/* Royal Armor Plate */}
+          <circle cx="36" cy="44" r="6" fill="#facc15" stroke="#713f12" strokeWidth="2" />
+          {/* Legs */}
+          <line x1="30" y1="60" x2={28 + legOffset1} y2="86" stroke="#312e81" strokeWidth="3.5" strokeLinecap="round" />
+          <line x1="42" y1="60" x2={40 + legOffset2} y2="86" stroke="#312e81" strokeWidth="3.5" strokeLinecap="round" />
+        </svg>
+      );
+
+    case 'cat_valkyrie_holy':
+      return (
+        <svg width="105" height="105" viewBox="0 0 105 105" className="drop-shadow-[0_0_25px_rgba(250,204,21,0.85)]">
+          {/* Sacred Golden Holy Aura Ring */}
+          <circle cx="50" cy="50" r="46" fill="none" stroke="#fef08a" strokeWidth="2" strokeDasharray="8,6" className="animate-spin" />
+          {/* Divine Golden Archangel Feather Wings */}
+          <path d="M 20 35 Q -10 -5 28 -8 Q 42 2 38 42 Z" fill="#fef08a" stroke="#ca8a04" strokeWidth="3" />
+          <path d="M 68 35 Q 98 -5 60 -8 Q 46 2 50 42 Z" fill="#fef08a" stroke="#ca8a04" strokeWidth="3" />
+          <path d="M 28 42 Q 6 12 36 6 Z" fill="#ffffff" stroke="#eab308" strokeWidth="2" />
+          <path d="M 60 42 Q 82 12 52 6 Z" fill="#ffffff" stroke="#eab308" strokeWidth="2" />
+          {/* Sacred Sun Halo */}
+          <ellipse cx="44" cy="2" rx="18" ry="6" fill="#fef08a" stroke="#eab308" strokeWidth="3" className="animate-pulse" />
+          <ellipse cx="44" cy="2" rx="10" ry="3.5" fill="#38bdf8" />
+          {/* Divine Holy Thunder Twin Lances */}
+          <g transform={isAttacking ? "rotate(55 72 48)" : "rotate(-15 72 48)"} className="transition-transform duration-100">
+            <line x1="10" y1="96" x2="82" y2="4" stroke="#eab308" strokeWidth="5.5" />
+            <line x1="10" y1="96" x2="82" y2="4" stroke="#ffffff" strokeWidth="2.5" />
+            <polygon points="82,4 98,-8 90,14" fill="#38bdf8" stroke="#0369a1" strokeWidth="2" />
+            <polygon points="10,96 -2,106 4,86" fill="#38bdf8" stroke="#0369a1" strokeWidth="2" />
+            {isAttacking && (
+              <circle cx="88" cy="4" r="16" fill="none" stroke="#facc15" strokeWidth="4" className="animate-ping" />
+            )}
+          </g>
+          {/* Holy Valkyrie Armor Body */}
+          <ellipse cx="44" cy="44" rx="18" ry="22" fill="#ffffff" stroke="#ca8a04" strokeWidth="3" />
+          <polygon points="32,22 38,8 44,20" fill="#fef08a" stroke="#ca8a04" strokeWidth="2.5" />
+          <polygon points="46,20 52,8 58,22" fill="#fef08a" stroke="#ca8a04" strokeWidth="2.5" />
+          <circle cx="44" cy="26" r="13" fill="#ffffff" stroke="#ca8a04" strokeWidth="2.5" />
+          <ellipse cx="40" cy="25" rx="2" ry="2.5" fill="#0284c7" />
+          <ellipse cx="48" cy="25" rx="2" ry="2.5" fill="#0284c7" />
+          {/* Glowing Divine Core Jewel */}
+          <circle cx="44" cy="48" r="8" fill="#38bdf8" stroke="#0284c7" strokeWidth="2" className="animate-pulse" />
+          {/* Golden Plated Legs */}
+          <line x1="36" y1="66" x2={34 + legOffset1} y2="94" stroke="#ca8a04" strokeWidth="4" strokeLinecap="round" />
+          <line x1="52" y1="66" x2={50 + legOffset2} y2="94" stroke="#ca8a04" strokeWidth="4" strokeLinecap="round" />
         </svg>
       );
 
@@ -2875,6 +2942,274 @@ function renderSpriteSvg(
           {isAttacking && (
             <circle cx="82" cy="68" r="45" fill="none" stroke="#f43f5e" strokeWidth="8" className="animate-ping" />
           )}
+        </svg>
+      );
+
+    // =========================================================================
+    // NEW CAT: SUMMER CAT 2026 (夏キャット2026)
+    // =========================================================================
+    case 'cat_summer_2026':
+      return (
+        <svg width="75" height="70" viewBox="0 0 75 70" className="drop-shadow-lg">
+          {/* Inflatable Flamingo / Tropical Floatie Ring */}
+          <ellipse cx="38" cy="44" rx="28" ry="12" fill="#fb7185" stroke="#be123c" strokeWidth="2.5" />
+          <ellipse cx="38" cy="44" rx="16" ry="6" fill="#f43f5e" />
+          {/* Floatie Flamingo Head */}
+          <g transform={`rotate(${Math.sin(timer * 10) * 8} 14 36)`}>
+            <path d="M 14 44 Q 10 32 12 24 Q 15 18 20 22 Q 16 28 16 44 Z" fill="#fb7185" stroke="#be123c" strokeWidth="2" />
+            <polygon points="12,24 6,26 12,28" fill="#1e293b" />
+          </g>
+          {/* Cat Body in Swimwear */}
+          <polygon points="26,18 30,6 38,15" fill="#ffffff" stroke="#000000" strokeWidth="2.5" strokeLinejoin="round" />
+          <polygon points="44,15 52,6 56,18" fill="#ffffff" stroke="#000000" strokeWidth="2.5" strokeLinejoin="round" />
+          <ellipse cx="40" cy="28" rx="18" ry="17" fill="#ffffff" stroke="#000000" strokeWidth="2.5" />
+          {/* Sunglasses */}
+          <rect x="26" y="22" width="12" height="8" rx="2" fill="#0284c7" stroke="#0f172a" strokeWidth="1.5" />
+          <rect x="42" y="22" width="12" height="8" rx="2" fill="#0284c7" stroke="#0f172a" strokeWidth="1.5" />
+          <line x1="38" y1="26" x2="42" y2="26" stroke="#0f172a" strokeWidth="2" />
+          {/* Smiling Tongue */}
+          <path d="M 37 32 Q 40 37 43 32 Z" fill="#f43f5e" stroke="#000000" strokeWidth="1.5" />
+          {/* Surfboard / Tropical Drink on attack */}
+          <g transform={`rotate(${isAttacking ? -35 : 15} 58 35)`}>
+            <rect x="54" y="15" width="8" height="26" rx="4" fill="#facc15" stroke="#ca8a04" strokeWidth="2" />
+            <ellipse cx="58" cy="14" rx="6" ry="3" fill="#38bdf8" />
+            {isAttacking && (
+              <polygon points="62,10 75,5 68,18" fill="#38bdf8" className="animate-ping" />
+            )}
+          </g>
+          {/* Water Splash at bottom */}
+          <ellipse cx="38" cy="56" rx="24" ry="4" fill="#38bdf8" opacity="0.6" />
+        </svg>
+      );
+
+    case 'cat_summer_2026_evolved':
+      return (
+        <svg width="90" height="85" viewBox="0 0 90 85" className="drop-shadow-2xl">
+          {/* Blazing Sun Aura */}
+          <circle cx="45" cy="40" r="36" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeDasharray="10,6" className="animate-spin" />
+          {/* Giant Tropical Sun Parasol Laser Cannon */}
+          <g transform={`rotate(${isAttacking ? -45 : -10} 60 25)`}>
+            <path d="M 40 20 Q 60 0 80 20 Z" fill="#ef4444" stroke="#7f1d1d" strokeWidth="2.5" />
+            <path d="M 46 20 Q 60 4 74 20 Z" fill="#facc15" />
+            <line x1="60" y1="20" x2="60" y2="55" stroke="#b45309" strokeWidth="3.5" />
+            {isAttacking && (
+              <g className="animate-ping">
+                <circle cx="60" cy="5" r="14" fill="#fbbf24" opacity="0.8" />
+                <line x1="60" y1="5" x2="90" y2="-10" stroke="#f43f5e" strokeWidth="5" />
+              </g>
+            )}
+          </g>
+          {/* High-speed Jet Wave Surfboard */}
+          <ellipse cx="42" cy="62" rx="34" ry="9" fill="#0284c7" stroke="#075985" strokeWidth="3" />
+          <polygon points="12,62 6,56 16,56" fill="#38bdf8" />
+          {/* Cat Supreme Body */}
+          <polygon points="28,26 32,12 42,22" fill="#ffffff" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
+          <polygon points="48,22 58,12 62,26" fill="#ffffff" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
+          <ellipse cx="45" cy="38" rx="20" ry="19" fill="#ffffff" stroke="#000000" strokeWidth="3" />
+          {/* Gold Star Sunglasses */}
+          <polygon points="34,28 36,33 41,33 37,36 39,41 34,38 29,41 31,36 27,33 32,33" fill="#fbbf24" stroke="#000000" strokeWidth="1.5" />
+          <polygon points="54,28 56,33 61,33 57,36 59,41 54,38 49,41 51,36 47,33 52,33" fill="#fbbf24" stroke="#000000" strokeWidth="1.5" />
+          {/* Water Splash */}
+          <ellipse cx="42" cy="74" rx="32" ry="5" fill="#38bdf8" opacity="0.7" />
+        </svg>
+      );
+
+    // =========================================================================
+    // NEW CAT: RELIC EMPEROR (古代帝王ネコ / 時空超越神オメガキャット)
+    // =========================================================================
+    case 'cat_relic_emperor':
+      return (
+        <svg width="85" height="85" viewBox="0 0 85 85" className="drop-shadow-2xl">
+          {/* Relic Emperor Crown & Robes */}
+          <polygon points="26,20 30,8 38,18" fill="#fef08a" stroke="#854d0e" strokeWidth="2.5" strokeLinejoin="round" />
+          <polygon points="46,18 54,8 58,20" fill="#fef08a" stroke="#854d0e" strokeWidth="2.5" strokeLinejoin="round" />
+          {/* Crown */}
+          <polygon points="32,18 36,6 42,14 48,6 52,18" fill="#eab308" stroke="#713f12" strokeWidth="2" />
+          {/* Body */}
+          <ellipse cx="42" cy="42" rx="24" ry="22" fill="#fef9c3" stroke="#854d0e" strokeWidth="3" />
+          <circle cx="34" cy="38" r="3.5" fill="#713f12" />
+          <circle cx="50" cy="38" r="3.5" fill="#713f12" />
+          {/* Scepter */}
+          <g transform={`rotate(${isAttacking ? -30 : 10} 65 45)`}>
+            <line x1="65" y1="20" x2="65" y2="65" stroke="#ca8a04" strokeWidth="4" />
+            <circle cx="65" cy="18" r="8" fill="#38bdf8" stroke="#0284c7" strokeWidth="2" />
+          </g>
+          {/* Legs */}
+          <ellipse cx={32 + legOffset1} cy="66" rx="6" ry="6" fill="#fef08a" stroke="#854d0e" strokeWidth="2" />
+          <ellipse cx={52 + legOffset2} cy="66" rx="6" ry="6" fill="#fef08a" stroke="#854d0e" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_relic_emperor_evolved':
+      return (
+        <svg width="105" height="100" viewBox="0 0 105 100" className="drop-shadow-[0_0_20px_rgba(234,179,8,0.8)]">
+          {/* Cosmic Relic Halo */}
+          <circle cx="52" cy="50" r="44" fill="none" stroke="#eab308" strokeWidth="3" strokeDasharray="14,7" className="animate-spin" />
+          {/* God Wings */}
+          <path d="M 45 40 Q 15 15 10 50 Q 25 60 45 48 Z" fill="#ca8a04" stroke="#713f12" strokeWidth="2.5" />
+          <path d="M 60 40 Q 90 15 95 50 Q 80 60 60 48 Z" fill="#ca8a04" stroke="#713f12" strokeWidth="2.5" />
+          {/* Omega Cat Sphere Body */}
+          <circle cx="52" cy="48" r="24" fill="#fef08a" stroke="#713f12" strokeWidth="3.5" />
+          {/* Radiant Omega Eyes */}
+          <circle cx="44" cy="44" r="4.5" fill="#0284c7" />
+          <circle cx="60" cy="44" r="4.5" fill="#0284c7" />
+          {/* Divine Omega Sigil */}
+          <circle cx="52" cy="48" r="8" fill="none" stroke="#dc2626" strokeWidth="2" className="animate-pulse" />
+          {isAttacking && (
+            <circle cx="52" cy="48" r="32" fill="none" stroke="#38bdf8" strokeWidth="6" className="animate-ping" />
+          )}
+        </svg>
+      );
+
+    // =========================================================================
+    // CORRUPTED VALKYRIE (腐敗されしネコヴァルキリー)
+    // =========================================================================
+    case 'enemy_corrupted_valkyrie':
+      return (
+        <svg width="95" height="98" viewBox="0 0 95 98" className="drop-shadow-[0_0_20px_rgba(168,85,247,0.85)]">
+          {/* Decayed Necrotic Wings */}
+          <path d="M 16 32 Q -6 6 18 2 Q 28 8 26 38 Z" fill="#581c87" stroke="#3b0764" strokeWidth="2.5" />
+          <path d="M 56 32 Q 78 6 52 2 Q 42 8 44 38 Z" fill="#581c87" stroke="#3b0764" strokeWidth="2.5" />
+          {/* Torn Wing Feathers */}
+          <polygon points="6,12 12,24 2,22" fill="#2e1065" />
+          <polygon points="72,12 66,24 76,22" fill="#2e1065" />
+          {/* Broken Corrupted Dark Halo */}
+          <ellipse cx="36" cy="4" rx="14" ry="4" fill="none" stroke="#a855f7" strokeWidth="3" strokeDasharray="6,4" />
+          {/* Cursed Purple Necro Spear */}
+          <g transform={isAttacking ? "rotate(45 60 44)" : "rotate(-15 60 44)"} className="transition-transform duration-100">
+            <line x1="12" y1="88" x2="76" y2="10" stroke="#7e22ce" strokeWidth="5" />
+            <line x1="12" y1="88" x2="76" y2="10" stroke="#c084fc" strokeWidth="2" />
+            <polygon points="76,10 92,2 84,20" fill="#22c55e" stroke="#14532d" strokeWidth="2" />
+            {isAttacking && (
+              <circle cx="86" cy="10" r="14" fill="#a855f7" fillOpacity="0.6" className="animate-ping" />
+            )}
+          </g>
+          {/* Corrupted Valkyrie Body with exposed zombie bones */}
+          <ellipse cx="36" cy="42" rx="16" ry="20" fill="#475569" stroke="#0f172a" strokeWidth="2.5" />
+          <polygon points="26,22 30,10 36,20" fill="#64748b" stroke="#0f172a" strokeWidth="2" />
+          <polygon points="38,20 44,10 48,22" fill="#64748b" stroke="#0f172a" strokeWidth="2" />
+          <circle cx="36" cy="26" r="12" fill="#94a3b8" stroke="#0f172a" strokeWidth="2" />
+          {/* Glowing Cursed Eyes */}
+          <ellipse cx="33" cy="25" rx="2" ry="3" fill="#ef4444" />
+          <ellipse cx="39" cy="25" rx="2" ry="3" fill="#ef4444" />
+          {/* Toxic Zombie Goo Drip */}
+          <path d="M 32 50 Q 36 60 38 52" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" />
+          {/* Skeletal Legs */}
+          <line x1="28" y1="62" x2={26 + legOffset1} y2="88" stroke="#334155" strokeWidth="3.5" strokeLinecap="round" />
+          <line x1="44" y1="62" x2={42 + legOffset2} y2="88" stroke="#334155" strokeWidth="3.5" strokeLinecap="round" />
+        </svg>
+      );
+
+    // =========================================================================
+    // ADVENT BOSS: CLIONEL (断罪天使クオリネル)
+    // =========================================================================
+    case 'enemy_clionel':
+      return (
+        <svg width="115" height="110" viewBox="0 0 115 110" className="drop-shadow-[0_0_30px_rgba(56,189,248,0.9)]">
+          {/* Heavenly Holy Ring */}
+          <circle cx="58" cy="55" r="50" fill="none" stroke="#fef08a" strokeWidth="3" strokeDasharray="12,6" className="animate-spin" />
+          {/* Angelic Clione Floating Wings */}
+          <path d="M 46 45 Q 10 15 15 55 Q 30 65 46 55 Z" fill="#bae6fd" fillOpacity="0.85" stroke="#0284c7" strokeWidth="3" />
+          <path d="M 70 45 Q 106 15 101 55 Q 86 65 70 55 Z" fill="#bae6fd" fillOpacity="0.85" stroke="#0284c7" strokeWidth="3" />
+          {/* Angel Clione Body */}
+          <path d="M 58 18 Q 42 35 48 75 Q 58 92 68 75 Q 74 35 58 18 Z" fill="#e0f2fe" stroke="#0284c7" strokeWidth="3.5" />
+          {/* Inner Glowing Sacred Core / Organs */}
+          <circle cx="58" cy="48" r="11" fill="#f43f5e" stroke="#be123c" strokeWidth="2" className="animate-pulse" />
+          {/* Angelic Golden Halo */}
+          <ellipse cx="58" cy="10" rx="20" ry="6" fill="#fef08a" stroke="#eab308" strokeWidth="3.5" />
+          {/* Sacred Antennae / Horns */}
+          <path d="M 52 18 Q 46 4 40 8" stroke="#0284c7" strokeWidth="3" fill="none" />
+          <path d="M 64 18 Q 70 4 76 8" stroke="#0284c7" strokeWidth="3" fill="none" />
+          {/* Holy Eyes */}
+          <circle cx="53" cy="28" r="2.5" fill="#0369a1" />
+          <circle cx="63" cy="28" r="2.5" fill="#0369a1" />
+          {/* Attack Blast: Divine Meteor Condemnation */}
+          {isAttacking && (
+            <g>
+              <circle cx="58" cy="48" r="38" fill="none" stroke="#facc15" strokeWidth="5" className="animate-ping" />
+              <line x1="58" y1="48" x2="110" y2="48" stroke="#38bdf8" strokeWidth="6" strokeLinecap="round" />
+            </g>
+          )}
+        </svg>
+      );
+
+    // =========================================================================
+    // ADVENT BOSS: HANNYA (般若我王)
+    // =========================================================================
+    case 'enemy_hannya':
+      return (
+        <svg width="120" height="115" viewBox="0 0 120 115" className="drop-shadow-[0_0_30px_rgba(239,68,68,0.95)]">
+          {/* Infernal Hellfire Ring */}
+          <circle cx="60" cy="58" r="52" fill="none" stroke="#f97316" strokeWidth="4" strokeDasharray="16,8" className="animate-spin" />
+          {/* Blazing Horns */}
+          <path d="M 38 28 Q 20 -8 10 2 Q 22 18 34 32 Z" fill="#ef4444" stroke="#7f1d1d" strokeWidth="3.5" />
+          <path d="M 82 28 Q 100 -8 110 2 Q 98 18 86 32 Z" fill="#ef4444" stroke="#7f1d1d" strokeWidth="3.5" />
+          {/* Flaming Demon Hair */}
+          <path d="M 22 45 Q 6 30 18 60 Q 24 75 32 68 Z" fill="#b91c1c" stroke="#450a0a" strokeWidth="2.5" />
+          <path d="M 98 45 Q 114 30 102 60 Q 96 75 88 68 Z" fill="#b91c1c" stroke="#450a0a" strokeWidth="2.5" />
+          {/* Demonic Crimson Hannya Face Mask */}
+          <path d="M 36 28 L 84 28 Q 96 55 84 88 Q 60 102 36 88 Q 24 55 36 28 Z" fill="#dc2626" stroke="#450a0a" strokeWidth="4" />
+          {/* Golden Demonic Eyes */}
+          <polygon points="38,44 54,42 46,50" fill="#facc15" stroke="#78350f" strokeWidth="2" />
+          <polygon points="82,44 66,42 74,50" fill="#facc15" stroke="#78350f" strokeWidth="2" />
+          <circle cx="46" cy="46" r="2.5" fill="#000000" />
+          <circle cx="74" cy="46" r="2.5" fill="#000000" />
+          {/* Terrifying Fangs and Wide Mouth */}
+          <path d="M 40 70 Q 60 84 80 70 Q 60 66 40 70 Z" fill="#450a0a" stroke="#7f1d1d" strokeWidth="2.5" />
+          <polygon points="44,68 48,78 52,68" fill="#ffffff" />
+          <polygon points="68,68 72,78 76,68" fill="#ffffff" />
+          <polygon points="42,76 46,66 50,76" fill="#ffffff" />
+          <polygon points="70,76 74,66 78,76" fill="#ffffff" />
+          {/* Attack Blast: Hellfire Curse Wave */}
+          {isAttacking && (
+            <g>
+              <ellipse cx="60" cy="74" rx="42" ry="20" fill="none" stroke="#ef4444" strokeWidth="6" className="animate-ping" />
+            </g>
+          )}
+        </svg>
+      );
+
+    // =========================================================================
+    // ZOMBIE EXTREME UNITS (スカル・ルー & カダヴァル・ボア)
+    // =========================================================================
+    case 'enemy_zombie_kang_roo':
+      return (
+        <svg width="78" height="75" viewBox="0 0 78 75" className="drop-shadow-lg">
+          {/* Kangaroo Body with Necrotic Tone */}
+          <ellipse cx="38" cy="38" rx="20" ry="16" fill="#64748b" stroke="#0f172a" strokeWidth="2.5" />
+          {/* Ears */}
+          <polygon points="46,16 52,4 58,16" fill="#64748b" stroke="#0f172a" strokeWidth="2" />
+          <polygon points="36,16 38,4 44,16" fill="#64748b" stroke="#0f172a" strokeWidth="2" />
+          {/* Head & Boxing Gloves */}
+          <circle cx="50" cy="24" r="11" fill="#64748b" stroke="#0f172a" strokeWidth="2" />
+          <circle cx="48" cy="22" r="2.5" fill="#ef4444" />
+          {/* Boxing Gloves */}
+          <circle cx={isAttacking ? 68 : 58} cy="32" r="8" fill="#9333ea" stroke="#581c87" strokeWidth="2.5" />
+          {/* Big Bounding Tail */}
+          <path d="M 20 40 Q 6 48 10 60" stroke="#0f172a" strokeWidth="4" fill="none" />
+          {/* Legs */}
+          <rect x={28 + legOffset1} y="50" width="8" height="18" rx="3" fill="#64748b" stroke="#0f172a" strokeWidth="2" />
+          <rect x={42 + legOffset2} y="50" width="8" height="18" rx="3" fill="#64748b" stroke="#0f172a" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_zombie_alien_bore':
+      return (
+        <svg width="88" height="75" viewBox="0 0 88 75" className="drop-shadow-xl">
+          {/* Star Alien Star on Forehead */}
+          <polygon points="62,10 65,16 72,16 67,20 69,26 62,22 55,26 57,20 52,16 59,16" fill="#38bdf8" stroke="#0284c7" strokeWidth="1.5" />
+          {/* Bore Body (Cyan-Zombie hybrid) */}
+          <ellipse cx="44" cy="40" rx="32" ry="22" fill="#0d9488" stroke="#042f2e" strokeWidth="3" />
+          {/* Sharp Tusks */}
+          <polygon points="68,44 82,32 74,48" fill="#f8fafc" stroke="#042f2e" strokeWidth="2" />
+          {/* Spiky Spine */}
+          <polygon points="22,22 28,14 34,22" fill="#a855f7" stroke="#042f2e" strokeWidth="2" />
+          <polygon points="36,20 42,12 48,20" fill="#a855f7" stroke="#042f2e" strokeWidth="2" />
+          {/* Evil Star Eye */}
+          <circle cx="62" cy="30" r="4" fill="#ef4444" />
+          {/* Stomping Hooves */}
+          <rect x={24 + legOffset1} y="56" width="9" height="15" rx="3" fill="#042f2e" />
+          <rect x={54 + legOffset2} y="56" width="9" height="15" rx="3" fill="#042f2e" />
         </svg>
       );
 

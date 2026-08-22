@@ -62,7 +62,7 @@ export interface UnitForm {
 export interface CatDefinition {
   id: string;
   rarity: Rarity;
-  forms: [UnitForm, UnitForm]; // Form 1 and Form 2 (Evolved)
+  forms: UnitForm[]; // Form 1, Form 2 (Evolved), and optional Form 3 (True Form)
   unlockedAtStart?: boolean;
   unlockCostXp?: number;
   unlockCostCatFood?: number;
@@ -252,6 +252,11 @@ export type ChapterId =
   | 'legend_16'
   | 'crazed_event'
   | 'special_event'
+  | 'advent_clionel'
+  | 'advent_hannya'
+  | 'advent'
+  | 'zombie_future'
+  | 'zombie_cosmos'
   | 'japan'
   | 'future'
   | 'cosmos'
@@ -275,8 +280,10 @@ export interface StageDefinition {
     | 'japan_zombie'
     | 'future_neon'
     | 'future_space'
+    | 'future_zombie'
     | 'cosmos_galaxy'
     | 'cosmos_dimension'
+    | 'cosmos_zombie'
     | 'legend_ancient'
     | 'legend_cave'
     | 'legend_passion'
@@ -285,7 +292,9 @@ export interface StageDefinition {
     | 'legend_ice'
     | 'legend_sky'
     | 'legend_ruins'
-    | 'crazed_hell';
+    | 'crazed_hell'
+    | 'advent_heaven'
+    | 'advent_hell';
   battlefieldWidth: number;
   baseRewardXp: number;
   baseRewardCatFood: number;
@@ -315,7 +324,7 @@ export interface BattleActiveItems {
 
 export interface ChapterDefinition {
   id: ChapterId;
-  category: 'japan' | 'future' | 'cosmos' | 'legend' | 'crazed' | 'special';
+  category: 'japan' | 'future' | 'cosmos' | 'legend' | 'crazed' | 'special' | 'advent';
   chapterNumber: number;
   name: string;
   jpName: string;
@@ -354,6 +363,100 @@ export interface DevModeSettings {
   infiniteCatFood: boolean;
 }
 
+export type GiftRewardType = 'infinite_energy_1day' | 'unlock_cat' | 'cat_food' | 'xp' | 'items' | 'special_pack';
+
+export interface GiftCodeReward {
+  type: GiftRewardType;
+  catId?: string;
+  catFood?: number;
+  xp?: number;
+  items?: {
+    speedUp?: number;
+    catCpu?: number;
+    treasureRadar?: number;
+    richCat?: number;
+    catJobs?: number;
+    sniper?: number;
+  };
+  infiniteEnergyDurationHours?: number; // e.g. 24 hours
+  description: string;
+}
+
+export interface GiftCodeDefinition {
+  code: string;
+  title: string;
+  description: string;
+  validFrom: string; // YYYY-MM-DD
+  validTo: string; // YYYY-MM-DD
+  reward: GiftCodeReward;
+  isDevOnlyPreview?: boolean;
+}
+
+export type MissionCategory = 'daily' | 'main' | 'event';
+
+export interface MissionDefinition {
+  id: string;
+  category: MissionCategory;
+  title: string;
+  description: string;
+  targetCount: number;
+  targetType:
+    | 'clear_any_stage'
+    | 'clear_legend_stage'
+    | 'clear_crazed_stage'
+    | 'upgrade_cat_level'
+    | 'upgrade_base_skill'
+    | 'draw_gacha'
+    | 'collect_treasures'
+    | 'reach_user_rank'
+    | 'send_gamatoto'
+    | 'defeat_bosses';
+  reward: {
+    catFood?: number;
+    xp?: number;
+    items?: {
+      speedUp?: number;
+      catCpu?: number;
+      treasureRadar?: number;
+      richCat?: number;
+      catJobs?: number;
+      sniper?: number;
+    };
+  };
+}
+
+export interface AchievementDefinition {
+  id: string;
+  title: string;
+  subtitle: string;
+  category: 'progress' | 'battle' | 'collection' | 'special';
+  icon: string;
+  targetCount: number;
+  targetType:
+    | 'total_cleared_stages'
+    | 'legend_cleared_stages'
+    | 'unlocked_cats_count'
+    | 'gold_treasures_count'
+    | 'user_rank_reached'
+    | 'max_level_cats_count'
+    | 'defeat_filibuster'
+    | 'gacha_pulls_count';
+  reward: {
+    catFood: number;
+    xp?: number;
+    badgeTitle?: string;
+  };
+}
+
+export interface PlayerStats {
+  totalBattles: number;
+  totalVictories: number;
+  totalGachaPulls: number;
+  totalCatsUpgraded: number;
+  totalBaseUpgrades: number;
+  totalGamatotoSent: number;
+}
+
 export interface PlayerProfile {
   xp: number;
   catFood: number;
@@ -375,6 +478,17 @@ export interface PlayerProfile {
   };
   gachaPityCounter: number;
   hasClearedFilibuster?: boolean; // 宇宙編3章フィリバスター撃破フラグ (Lv.25解放＆レジェンド9章以降解放)
+  unlockedValkyrieTrueForm?: boolean; // 未来編ゾンビ最終決戦クリアでネコヴァルキリー第3形態解放
+  unlockedClionelDrop?: boolean; // 断罪天使クオリネル降臨クリア特典
+  unlockedHannyaDrop?: boolean; // 般若我王降臨クリア特典
+  pvpWins?: number;
+  pvpLosses?: number;
   devMode?: DevModeSettings;
+  redeemedCodes?: Record<string, number>; // code -> redeemedTimestamp
+  infiniteEnergyUntil?: number; // timestamp in ms until infinite energy expires
+  claimedMissions?: Record<string, number>; // missionId -> claimedTimestamp
+  claimedAchievements?: Record<string, number>; // achievementId -> claimedTimestamp
+  stats?: PlayerStats;
 }
+
 
