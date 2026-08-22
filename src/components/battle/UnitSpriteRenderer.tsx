@@ -951,22 +951,151 @@ function renderSpriteSvg(
       );
 
     case 'enemy_bunbun':
+    case 'enemy_red_bunbun':
+    case 'enemy_black_bunbun':
+    case 'enemy_alien_bunbun':
+    case 'enemy_star_bunbun':
+    case 'enemy_angel_bunbun':
+    case 'enemy_relic_bunbun': {
+      const isRed = type === 'enemy_red_bunbun';
+      const isBlack = type === 'enemy_black_bunbun';
+      const isAlien = type === 'enemy_alien_bunbun';
+      const isStar = type === 'enemy_star_bunbun';
+      const isAngel = type === 'enemy_angel_bunbun';
+      const isRelic = type === 'enemy_relic_bunbun';
+
+      const torsoColor = isRed ? '#991b1b' : isBlack ? '#18181b' : isAlien ? '#0891b2' : isStar ? '#1e1b4b' : isAngel ? '#fef08a' : isRelic ? '#713f12' : '#78350f';
+      const gloveColor = isRed ? '#ef4444' : isBlack ? '#dc2626' : isAlien ? '#06b6d4' : isStar ? '#3b82f6' : isAngel ? '#facc15' : isRelic ? '#ca8a04' : '#dc2626';
+      const bandanaColor = isRed ? '#f87171' : isBlack ? '#7f1d1d' : isAlien ? '#22d3ee' : isStar ? '#a855f7' : isAngel ? '#fef9c3' : isRelic ? '#fbbf24' : '#dc2626';
+      const faceColor = isRed ? '#fca5a5' : isBlack ? '#3f3f46' : isAlien ? '#a5f3fc' : isStar ? '#c084fc' : isAngel ? '#ffffff' : isRelic ? '#fde047' : '#fbcfe8';
+
       return (
         <svg width="96" height="96" viewBox="0 0 96 96" className="drop-shadow-2xl">
-          {/* Teacher Bun Bun (ぶんぶん先生) */}
+          {/* Angel Wings / Relic Gears / Star Nebula */}
+          {isAngel && (
+            <g className="animate-pulse">
+              <path d="M 28 32 Q 4 10 12 50 Z" fill="#ffffff" stroke="#facc15" strokeWidth="2" />
+              <path d="M 68 32 Q 92 10 84 50 Z" fill="#ffffff" stroke="#facc15" strokeWidth="2" />
+              <ellipse cx="48" cy="14" rx="16" ry="5" fill="none" stroke="#facc15" strokeWidth="3" />
+            </g>
+          )}
+          {isStar && (
+            <ellipse cx="48" cy="48" rx="44" ry="16" fill="none" stroke="#38bdf8" strokeWidth="2.5" strokeDasharray="4,4" className="animate-spin" />
+          )}
+
           {/* Spinning Boxing Gloves */}
           <g className="animate-spin" style={{ transformOrigin: '48px 48px' }}>
-            <circle cx="16" cy="48" r="14" fill="#dc2626" stroke="#0f172a" strokeWidth="3" />
-            <circle cx="80" cy="48" r="14" fill="#dc2626" stroke="#0f172a" strokeWidth="3" />
+            <circle cx="16" cy="48" r="15" fill={gloveColor} stroke="#0f172a" strokeWidth="3" />
+            <circle cx="80" cy="48" r="15" fill={gloveColor} stroke="#0f172a" strokeWidth="3" />
+            {isAlien && <circle cx="16" cy="48" r="6" fill="#67e8f9" />}
+            {isAlien && <circle cx="80" cy="48" r="6" fill="#67e8f9" />}
+            {isBlack && <circle cx="16" cy="48" r="5" fill="#450a0a" />}
+            {isBlack && <circle cx="80" cy="48" r="5" fill="#450a0a" />}
           </g>
+
           {/* Muscular Torso */}
-          <ellipse cx="48" cy="48" rx="26" ry="32" fill="#78350f" stroke="#0f172a" strokeWidth="3.5" />
+          <ellipse cx="48" cy="48" rx="26" ry="32" fill={torsoColor} stroke="#0f172a" strokeWidth="3.5" />
+
           {/* Fierce Face with Bandana */}
-          <rect x="28" y="24" width="40" height="10" fill="#dc2626" stroke="#0f172a" strokeWidth="2" />
-          <circle cx="48" cy="34" r="16" fill="#fbcfe8" stroke="#0f172a" strokeWidth="2.5" />
-          <ellipse cx="42" cy="32" rx="3" ry="3" fill="#0f172a" />
-          <ellipse cx="54" cy="32" rx="3" ry="3" fill="#0f172a" />
+          <rect x="28" y="24" width="40" height="10" rx="2" fill={bandanaColor} stroke="#0f172a" strokeWidth="2" />
+          <circle cx="48" cy="34" r="16" fill={faceColor} stroke="#0f172a" strokeWidth="2.5" />
+          
+          {/* Eyes */}
+          <ellipse cx="42" cy="32" rx="3" ry="3" fill={isBlack || isRed ? '#ef4444' : isAngel ? '#3b82f6' : '#0f172a'} />
+          <ellipse cx="54" cy="32" rx="3" ry="3" fill={isBlack || isRed ? '#ef4444' : isAngel ? '#3b82f6' : '#0f172a'} />
+          
+          {/* Mouth */}
           <line x1="38" y1="42" x2="58" y2="42" stroke="#0f172a" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+      );
+    }
+
+    case 'enemy_super_metal_hippoe':
+      return (
+        <svg width="86" height="74" viewBox="0 0 86 74" className="drop-shadow-2xl">
+          {/* Super Steel Armored Hippo */}
+          <ellipse cx="28" cy="16" rx="5" ry="7" fill="#94a3b8" stroke="#0f172a" strokeWidth="2.5" />
+          <ellipse cx="44" cy="16" rx="5" ry="7" fill="#94a3b8" stroke="#0f172a" strokeWidth="2.5" />
+          <ellipse cx="38" cy="38" rx="28" ry="24" fill="#cbd5e1" stroke="#0f172a" strokeWidth="3" />
+          <ellipse cx="62" cy="42" rx="20" ry="18" fill="#e2e8f0" stroke="#0f172a" strokeWidth="3" />
+          {/* Metal Bolts and Armor Plates */}
+          <circle cx="34" cy="30" r="3" fill="#64748b" />
+          <circle cx="46" cy="30" r="3" fill="#64748b" />
+          <line x1="20" y1="38" x2="54" y2="38" stroke="#64748b" strokeWidth="2" />
+          {/* Glowing Red Robotic Eyes */}
+          <circle cx="40" cy="26" r="3.5" fill="#ef4444" className="animate-pulse" />
+          {/* Snout Nostrils */}
+          <ellipse cx="72" cy="38" rx="4" ry="5" fill="#0f172a" />
+          {/* Armored Legs */}
+          <rect x={22 + legOffset1} y="54" width="12" height="16" rx="3" fill="#94a3b8" stroke="#0f172a" strokeWidth="2.5" />
+          <rect x={44 + legOffset2} y="54" width="12" height="16" rx="3" fill="#94a3b8" stroke="#0f172a" strokeWidth="2.5" />
+        </svg>
+      );
+
+    case 'enemy_metal_cyclone':
+      return (
+        <svg width="96" height="96" viewBox="0 0 96 96" className="drop-shadow-2xl">
+          {/* Rotating Metal Saws / Blades */}
+          <g className="animate-spin" style={{ transformOrigin: '48px 48px' }}>
+            <circle cx="48" cy="48" r="42" fill="#94a3b8" stroke="#334155" strokeWidth="3" strokeDasharray="12,6" />
+            <polygon points="48,6 56,24 40,24" fill="#cbd5e1" stroke="#0f172a" strokeWidth="2" />
+            <polygon points="90,48 72,56 72,40" fill="#cbd5e1" stroke="#0f172a" strokeWidth="2" />
+            <polygon points="48,90 40,72 56,72" fill="#cbd5e1" stroke="#0f172a" strokeWidth="2" />
+            <polygon points="6,48 24,40 24,56" fill="#cbd5e1" stroke="#0f172a" strokeWidth="2" />
+          </g>
+          {/* Center Steel Core with Glowing Crimson Eye */}
+          <circle cx="48" cy="48" r="24" fill="#334155" stroke="#0f172a" strokeWidth="3" />
+          <circle cx="48" cy="48" r="14" fill="#ef4444" stroke="#f87171" strokeWidth="2" className="animate-ping" />
+          <circle cx="48" cy="48" r="8" fill="#ffffff" />
+        </svg>
+      );
+
+    case 'enemy_zombie_master':
+      return (
+        <svg width="98" height="98" viewBox="0 0 98 98" className="drop-shadow-2xl">
+          {/* Grim Reaper Robe (Purple/Dark) */}
+          <path d="M 24 36 Q 49 10 74 36 L 82 86 Q 49 76 16 86 Z" fill="#2e1065" stroke="#581c87" strokeWidth="3" />
+          {/* Skull Face */}
+          <circle cx="49" cy="36" r="16" fill="#e2e8f0" stroke="#0f172a" strokeWidth="2.5" />
+          <ellipse cx="44" cy="34" rx="3.5" ry="4.5" fill="#0f172a" />
+          <ellipse cx="54" cy="34" rx="3.5" ry="4.5" fill="#0f172a" />
+          <polygon points="49,38 47,43 51,43" fill="#0f172a" />
+          <path d="M 42 47 L 56 47" stroke="#0f172a" strokeWidth="2" />
+          {/* Death Scythe */}
+          <g transform={isAttacking ? "rotate(40 68 36)" : "rotate(-10 68 36)"} className="transition-transform duration-100">
+            <line x1="68" y1="12" x2="68" y2="88" stroke="#78350f" strokeWidth="4" />
+            <path d="M 68 14 Q 92 -4 94 28 Q 78 22 68 18" fill="#84cc16" stroke="#0f172a" strokeWidth="2.5" />
+          </g>
+          {/* Toxic Miasma Bubbles */}
+          <circle cx="28" cy="65" r="5" fill="#a855f7" opacity="0.7" className="animate-bounce" />
+          <circle cx="70" cy="72" r="6" fill="#22c55e" opacity="0.7" className="animate-pulse" />
+        </svg>
+      );
+
+    case 'enemy_ancient_omega':
+      return (
+        <svg width="105" height="105" viewBox="0 0 105 105" className="drop-shadow-2xl">
+          {/* Transcendent Omega God Halo */}
+          <g className="animate-spin" style={{ transformOrigin: '52px 52px' }}>
+            <circle cx="52" cy="52" r="46" fill="none" stroke="#fbbf24" strokeWidth="3" strokeDasharray="14,8" />
+            <circle cx="52" cy="6" r="6" fill="#ef4444" />
+            <circle cx="98" cy="52" r="6" fill="#3b82f6" />
+            <circle cx="52" cy="98" r="6" fill="#a855f7" />
+            <circle cx="6" cy="52" r="6" fill="#22c55e" />
+          </g>
+          {/* Divine Body */}
+          <path d="M 32 46 Q 52 14 72 46 L 78 92 Q 52 84 26 92 Z" fill="#78350f" stroke="#fbbf24" strokeWidth="3" />
+          {/* Supreme Golden Face */}
+          <circle cx="52" cy="38" r="18" fill="#fef08a" stroke="#d97706" strokeWidth="3" />
+          {/* Third Eye of Omniscience */}
+          <ellipse cx="52" cy="28" rx="4" ry="2.5" fill="#ef4444" stroke="#7f1d1d" strokeWidth="1" />
+          <ellipse cx="46" cy="38" rx="3.5" ry="3.5" fill="#0f172a" />
+          <ellipse cx="58" cy="38" rx="3.5" ry="3.5" fill="#0f172a" />
+          <path d="M 44 48 Q 52 54 60 48" fill="none" stroke="#0f172a" strokeWidth="2.5" />
+          {/* Glowing Divine Aura Hands */}
+          {isAttacking && (
+            <circle cx="52" cy="52" r="38" fill="#f59e0b" fillOpacity="0.4" className="animate-ping" />
+          )}
         </svg>
       );
 
