@@ -141,6 +141,27 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
         return !!profile.hasClearedFilibuster && checkChapterCleared('legend_10');
       case 'legend_12':
         return !!profile.hasClearedFilibuster && checkChapterCleared('legend_11');
+      case 'legend_13':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_12');
+      case 'legend_14':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_13');
+      case 'legend_15':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_14');
+      case 'legend_16':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_15');
+      case 'legend_17':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_16');
+      case 'legend_18':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_17');
+      case 'legend_19':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_18');
+      case 'legend_20':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_19');
+      case 'legend_21':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_20');
+      case 'real_legend_1':
+      case 'real_legend':
+        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_21');
       case 'crazed_event':
       case 'crazed':
         return checkChapterCleared('japan_1');
@@ -150,10 +171,17 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
         return checkChapterCleared('cosmos_1') || checkChapterCleared('future_1');
       case 'advent_clionel':
       case 'advent_hannya':
+      case 'advent_red_cyclone':
+      case 'advent_black_cyclone':
+      case 'advent_alien_cyclone':
+      case 'advent_zombie_cyclone':
+      case 'advent_ancient_cyclone':
       case 'advent':
+        return checkChapterCleared('japan_3') || checkChapterCleared('japan_1');
+      case 'challenge_score_attack':
         return checkChapterCleared('japan_1');
       default:
-        return true;
+        return false;
     }
   };
 

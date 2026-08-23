@@ -12,6 +12,7 @@ export type EnemyTrait =
   | 'angel'
   | 'metal'
   | 'zombie'
+  | 'ancient'
   | 'boss';
 
 export interface AbilityDefinition {
@@ -255,6 +256,7 @@ export type ChapterId =
   | 'legend_19'
   | 'legend_20'
   | 'legend_21'
+  | 'real_legend_1'
   | 'crazed_event'
   | 'special_event'
   | 'advent_clionel'
@@ -263,6 +265,7 @@ export type ChapterId =
   | 'advent_black_cyclone'
   | 'advent_alien_cyclone'
   | 'advent_zombie_cyclone'
+  | 'advent_ancient_cyclone'
   | 'challenge_score_attack'
   | 'advent'
   | 'zombie_future'
@@ -271,6 +274,7 @@ export type ChapterId =
   | 'future'
   | 'cosmos'
   | 'legend'
+  | 'real_legend'
   | 'crazed'
   | 'special';
 

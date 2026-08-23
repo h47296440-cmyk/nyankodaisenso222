@@ -220,20 +220,31 @@ function renderSpriteSvg(
 
     case 'cat_tank':
     case 'cat_wall':
+    case 'cat_eraser':
       const isWall = type === 'cat_wall';
+      const isEraser = type === 'cat_eraser';
       return (
         <svg width="56" height="74" viewBox="0 0 56 74" className="drop-shadow-md">
           {/* Ears */}
-          <polygon points="12,14 15,3 22,12" fill={isWall ? "#e2e8f0" : "#f8fafc"} stroke="#0f172a" strokeWidth="2.5" />
-          <polygon points="34,12 41,3 44,14" fill={isWall ? "#e2e8f0" : "#f8fafc"} stroke="#0f172a" strokeWidth="2.5" />
-          {/* Pillar / Wall body */}
-          <rect x="10" y="10" width="36" height="52" rx={isWall ? "4" : "14"} fill={isWall ? "#e2e8f0" : "#f8fafc"} stroke="#0f172a" strokeWidth="2.5" />
+          <polygon points="12,14 15,3 22,12" fill={isEraser ? "#ffffff" : isWall ? "#e2e8f0" : "#f8fafc"} stroke="#0f172a" strokeWidth="2.5" />
+          <polygon points="34,12 41,3 44,14" fill={isEraser ? "#ffffff" : isWall ? "#e2e8f0" : "#f8fafc"} stroke="#0f172a" strokeWidth="2.5" />
+          {/* Pillar / Wall / Eraser body */}
+          <rect x="10" y="10" width="36" height="52" rx={isEraser ? "2" : isWall ? "4" : "14"} fill={isEraser ? "#ffffff" : isWall ? "#e2e8f0" : "#f8fafc"} stroke="#0f172a" strokeWidth="2.5" />
           {isWall && (
             <>
               {/* Brick lines */}
               <line x1="10" y1="28" x2="46" y2="28" stroke="#94a3b8" strokeWidth="2" />
               <line x1="10" y1="46" x2="46" y2="46" stroke="#94a3b8" strokeWidth="2" />
               <line x1="28" y1="28" x2="28" y2="46" stroke="#94a3b8" strokeWidth="2" />
+            </>
+          )}
+          {isEraser && (
+            <>
+              {/* MONO Eraser style blue/black sleeve */}
+              <rect x="10" y="32" width="36" height="30" fill="#0284c7" stroke="#0f172a" strokeWidth="2" />
+              <rect x="10" y="42" width="36" height="8" fill="#ffffff" />
+              <rect x="10" y="50" width="36" height="12" fill="#0f172a" />
+              <text x="28" y="48" fontSize="6" fontWeight="bold" textAnchor="middle" fill="#0284c7">GOMU</text>
             </>
           )}
           {/* Stoic Face */}
@@ -248,11 +259,19 @@ function renderSpriteSvg(
 
     case 'cat_axe':
     case 'cat_brave':
+    case 'cat_dark':
       const isBrave = type === 'cat_brave';
+      const isDark = type === 'cat_dark';
       return (
         <svg width="68" height="58" viewBox="0 0 68 58" className="drop-shadow-md">
-          {/* Sword / Axe */}
-          {isBrave ? (
+          {/* Sword / Axe / Dark Cursed Blade */}
+          {isDark ? (
+            <g transform={isAttacking ? "rotate(45 46 22)" : "rotate(-15 46 22)"} className="transition-transform duration-100">
+              <rect x="44" y="2" width="7" height="36" rx="2" fill="#450a0a" stroke="#ef4444" strokeWidth="2" />
+              <line x1="38" y1="26" x2="56" y2="26" stroke="#991b1b" strokeWidth="3" />
+              <circle cx="47" cy="38" r="4" fill="#ef4444" stroke="#450a0a" strokeWidth="2" />
+            </g>
+          ) : isBrave ? (
             <g transform={isAttacking ? "rotate(40 46 22)" : "rotate(-15 46 22)"} className="transition-transform duration-100">
               <rect x="44" y="2" width="6" height="34" rx="2" fill="#38bdf8" stroke="#0f172a" strokeWidth="2" />
               <line x1="38" y1="26" x2="56" y2="26" stroke="#fbbf24" strokeWidth="3" />
@@ -264,8 +283,10 @@ function renderSpriteSvg(
               <path d="M 47 6 Q 62 4 58 18 Q 47 22 47 16 Z" fill="#94a3b8" stroke="#0f172a" strokeWidth="2" />
             </g>
           )}
-          {/* Helmet */}
-          {isBrave ? (
+          {/* Helmet / Dark Horned Armor */}
+          {isDark ? (
+            <path d="M 14 16 Q 28 0 42 16 L 40 24 L 16 24 Z" fill="#18181b" stroke="#ef4444" strokeWidth="2" />
+          ) : isBrave ? (
             <path d="M 16 16 Q 28 4 40 16 L 38 22 L 18 22 Z" fill="#fbbf24" stroke="#0f172a" strokeWidth="2" />
           ) : (
             <g>
@@ -274,24 +295,28 @@ function renderSpriteSvg(
             </g>
           )}
           {/* Body */}
-          <ellipse cx="28" cy="30" rx="17" ry="16" fill="#f8fafc" stroke="#0f172a" strokeWidth="2.5" />
+          <ellipse cx="28" cy="30" rx="17" ry="16" fill={isDark ? "#27272a" : "#f8fafc"} stroke={isDark ? "#ef4444" : "#0f172a"} strokeWidth="2.5" />
           {/* Fierce Face */}
-          <polygon points="20,24 26,27 22,29" fill="#0f172a" />
-          <polygon points="36,24 30,27 34,29" fill="#0f172a" />
-          <path d="M 23 34 Q 28 30 33 34" fill="none" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" />
-          {/* Shield for brave cat */}
-          {isBrave && (
+          <polygon points="20,24 26,27 22,29" fill={isDark ? "#ef4444" : "#0f172a"} />
+          <polygon points="36,24 30,27 34,29" fill={isDark ? "#ef4444" : "#0f172a"} />
+          <path d="M 23 34 Q 28 30 33 34" fill="none" stroke={isDark ? "#ef4444" : "#0f172a"} strokeWidth="2" strokeLinecap="round" />
+          {/* Shield for brave / dark cat */}
+          {isDark ? (
+            <ellipse cx="14" cy="32" rx="7" ry="10" fill="#7f1d1d" stroke="#ef4444" strokeWidth="2" />
+          ) : isBrave ? (
             <ellipse cx="14" cy="32" rx="7" ry="10" fill="#dc2626" stroke="#0f172a" strokeWidth="2" />
-          )}
+          ) : null}
           {/* Legs */}
-          <ellipse cx={20 + legOffset1} cy="48" rx="4" ry="5" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" />
-          <ellipse cx={36 + legOffset2} cy="48" rx="4" ry="5" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={20 + legOffset1} cy="48" rx="4" ry="5" fill={isDark ? "#27272a" : "#f8fafc"} stroke={isDark ? "#ef4444" : "#0f172a"} strokeWidth="2" />
+          <ellipse cx={36 + legOffset2} cy="48" rx="4" ry="5" fill={isDark ? "#27272a" : "#f8fafc"} stroke={isDark ? "#ef4444" : "#0f172a"} strokeWidth="2" />
         </svg>
       );
 
     case 'cat_gross':
     case 'cat_legs':
+    case 'cat_macho_legs':
       const isLegs = type === 'cat_legs';
+      const isMachoLegs = type === 'cat_macho_legs';
       return (
         <svg width="60" height="96" viewBox="0 0 60 96" className="drop-shadow-md">
           {/* Cat Head on top */}
@@ -301,12 +326,12 @@ function renderSpriteSvg(
           <ellipse cx="25" cy="20" rx="2" ry="2.5" fill="#0f172a" />
           <ellipse cx="35" cy="20" rx="2" ry="2.5" fill="#0f172a" />
           <line x1="26" y1="26" x2="34" y2="26" stroke="#0f172a" strokeWidth="1.5" strokeLinecap="round" />
-          {/* Super long legs */}
+          {/* Legs */}
           <path
             d={`M 22 34 Q ${18 + (isAttacking ? 35 : legOffset1)} 60 20 88`}
             fill="none"
             stroke="#f8fafc"
-            strokeWidth="6"
+            strokeWidth={isMachoLegs ? "9" : "6"}
             strokeLinecap="round"
           />
           <path
@@ -320,7 +345,7 @@ function renderSpriteSvg(
             d={`M 38 34 Q ${42 + legOffset2} 60 40 88`}
             fill="none"
             stroke="#f8fafc"
-            strokeWidth="6"
+            strokeWidth={isMachoLegs ? "9" : "6"}
             strokeLinecap="round"
           />
           <path
@@ -330,7 +355,16 @@ function renderSpriteSvg(
             strokeWidth="2"
             strokeLinecap="round"
           />
-          {/* High heels / Sexy feet */}
+          {/* Muscle details for Macho Legs */}
+          {isMachoLegs && (
+            <>
+              <ellipse cx="20" cy="54" rx="4" ry="6" fill="#f8fafc" stroke="#0f172a" strokeWidth="1.5" />
+              <ellipse cx="40" cy="54" rx="4" ry="6" fill="#f8fafc" stroke="#0f172a" strokeWidth="1.5" />
+              <line x1="18" y1="52" x2="22" y2="52" stroke="#0f172a" strokeWidth="1.5" />
+              <line x1="38" y1="52" x2="42" y2="52" stroke="#0f172a" strokeWidth="1.5" />
+            </>
+          )}
+          {/* High heels / Sexy feet / Macho feet */}
           {isLegs ? (
             <>
               <polygon points="16,88 28,88 22,94" fill="#dc2626" stroke="#0f172a" strokeWidth="1.5" />
@@ -347,23 +381,35 @@ function renderSpriteSvg(
 
     case 'cat_cow':
     case 'cat_giraffe':
+    case 'cat_lion':
       const isGiraffe = type === 'cat_giraffe';
+      const isLion = type === 'cat_lion';
       return (
-        <svg width="74" height="60" viewBox="0 0 74 60" className="drop-shadow-md">
+        <svg width="78" height="60" viewBox="0 0 78 60" className="drop-shadow-md">
           {/* Four-legged running body */}
           <ellipse cx="32" cy="34" rx="20" ry="14" fill="#f8fafc" stroke="#0f172a" strokeWidth="2.5" />
-          {/* Cow spots */}
-          <circle cx="26" cy="30" r="4" fill="#0f172a" />
-          <circle cx="38" cy="36" r="5" fill="#0f172a" />
-          <circle cx="44" cy="28" r="3" fill="#0f172a" />
+          {/* Spots or Lion Mane */}
+          {isLion ? (
+            <circle cx="52" cy="24" r="14" fill="#d97706" stroke="#78350f" strokeWidth="2" />
+          ) : (
+            <>
+              <circle cx="26" cy="30" r="4" fill="#0f172a" />
+              <circle cx="38" cy="36" r="5" fill="#0f172a" />
+              <circle cx="44" cy="28" r="3" fill="#0f172a" />
+            </>
+          )}
           {/* Long Neck for giraffe */}
-          {isGiraffe ? (
+          {isGiraffe && (
             <path d="M 44 32 L 58 12 L 66 16 L 50 36 Z" fill="#f8fafc" stroke="#0f172a" strokeWidth="2.5" />
-          ) : null}
+          )}
           {/* Head & Horns */}
-          <g transform={isGiraffe ? "translate(58, 6)" : "translate(46, 20)"}>
-            <polygon points="-4,-4 0,-14 6,-4" fill="#fbbf24" stroke="#0f172a" strokeWidth="1.5" />
-            <polygon points="6,-4 12,-14 16,-4" fill="#fbbf24" stroke="#0f172a" strokeWidth="1.5" />
+          <g transform={isLion ? "translate(48, 16)" : isGiraffe ? "translate(58, 6)" : "translate(46, 20)"}>
+            {!isLion && (
+              <>
+                <polygon points="-4,-4 0,-14 6,-4" fill="#fbbf24" stroke="#0f172a" strokeWidth="1.5" />
+                <polygon points="6,-4 12,-14 16,-4" fill="#fbbf24" stroke="#0f172a" strokeWidth="1.5" />
+              </>
+            )}
             <ellipse cx="6" cy="2" rx="10" ry="9" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" />
             <ellipse cx="6" cy="0" rx="2" ry="2" fill="#0f172a" />
             <ellipse cx="12" cy="0" rx="2" ry="2" fill="#0f172a" />
@@ -378,10 +424,27 @@ function renderSpriteSvg(
 
     case 'cat_bird':
     case 'cat_ufo':
+    case 'cat_flying':
       const isUfo = type === 'cat_ufo';
+      const isFlying = type === 'cat_flying';
       return (
-        <svg width="64" height="64" viewBox="0 0 64 64" className="drop-shadow-lg">
-          {isUfo ? (
+        <svg width="68" height="68" viewBox="0 0 68 68" className="drop-shadow-lg">
+          {isFlying ? (
+            <>
+              {/* Flying Angel Wings & Halo */}
+              <circle cx="34" cy="14" r="8" fill="none" stroke="#fbbf24" strokeWidth="2" />
+              <path d={`M 10 32 Q 2 ${18 + walkCycle * 8} 20 22`} fill="#fef08a" stroke="#b45309" strokeWidth="2" />
+              <path d={`M 58 32 Q 66 ${18 + walkCycle * 8} 48 22`} fill="#fef08a" stroke="#b45309" strokeWidth="2" />
+              {/* Body */}
+              <ellipse cx="34" cy="34" rx="18" ry="16" fill="#f8fafc" stroke="#0f172a" strokeWidth="2.5" />
+              <circle cx="28" cy="30" r="2.5" fill="#0f172a" />
+              <circle cx="40" cy="30" r="2.5" fill="#0f172a" />
+              {/* Holy Light Beam on Attack */}
+              {isAttacking && (
+                <polygon points="34,42 20,68 48,68" fill="#fef08a" opacity="0.8" stroke="#fbbf24" strokeWidth="2" className="animate-pulse" />
+              )}
+            </>
+          ) : isUfo ? (
             <>
               {/* UFO Saucer */}
               <ellipse cx="32" cy="40" rx="28" ry="10" fill="#64748b" stroke="#0f172a" strokeWidth="2.5" />
@@ -416,44 +479,61 @@ function renderSpriteSvg(
 
     case 'cat_fish':
     case 'cat_whale':
+    case 'cat_island':
       const isWhale = type === 'cat_whale';
+      const isIsland = type === 'cat_island';
       return (
-        <svg width="74" height="60" viewBox="0 0 74 60" className="drop-shadow-md">
-          {/* Whale / Fish Body */}
+        <svg width="76" height="64" viewBox="0 0 76 64" className="drop-shadow-md">
+          {/* Island Palm Tree on Head */}
+          {isIsland && (
+            <g transform="translate(36, 4)">
+              <path d="M 4 14 Q 2 6 6 0" stroke="#78350f" strokeWidth="2.5" fill="none" />
+              <path d="M 6 0 Q 0 -4 -6 0 M 6 0 Q 12 -4 18 0 M 6 0 Q 6 -8 6 -10" stroke="#16a34a" strokeWidth="2" fill="none" />
+            </g>
+          )}
+          {/* Whale / Fish / Island Body */}
           <path
-            d="M 12 30 Q 30 10 60 24 Q 68 28 62 40 Q 30 52 12 30 Z"
-            fill={isWhale ? "#3b82f6" : "#f8fafc"}
+            d="M 12 34 Q 30 14 60 28 Q 68 32 62 44 Q 30 56 12 34 Z"
+            fill={isIsland ? "#15803d" : isWhale ? "#3b82f6" : "#f8fafc"}
             stroke="#0f172a"
             strokeWidth="2.5"
           />
           {/* Tail fin */}
-          <polygon points="12,30 2,18 4,42" fill={isWhale ? "#3b82f6" : "#f8fafc"} stroke="#0f172a" strokeWidth="2" />
+          <polygon points="12,34 2,22 4,46" fill={isIsland ? "#15803d" : isWhale ? "#3b82f6" : "#f8fafc"} stroke="#0f172a" strokeWidth="2" />
           {/* Ears on top */}
-          <polygon points="36,18 40,6 46,18" fill={isWhale ? "#3b82f6" : "#f8fafc"} stroke="#0f172a" strokeWidth="2" />
+          {!isIsland && (
+            <polygon points="36,22 40,10 46,22" fill={isWhale ? "#3b82f6" : "#f8fafc"} stroke="#0f172a" strokeWidth="2" />
+          )}
           {/* Eyes & Sharp Teeth */}
-          <circle cx="52" cy="25" r="3" fill="#0f172a" />
-          <path d="M 44 34 L 48 30 L 52 34 L 56 30 L 60 34" fill="none" stroke="#0f172a" strokeWidth="2" />
+          <circle cx="52" cy="29" r="3" fill="#0f172a" />
+          <path d="M 44 38 L 48 34 L 52 38 L 56 34 L 60 38" fill="none" stroke="#0f172a" strokeWidth="2" />
           {/* Water spout for whale */}
           {isWhale && (
-            <path d="M 40 8 Q 40 0 32 -4 M 40 8 Q 44 0 50 -2" fill="none" stroke="#38bdf8" strokeWidth="2" />
+            <path d="M 40 12 Q 40 4 32 0 M 40 12 Q 44 4 50 2" fill="none" stroke="#38bdf8" strokeWidth="2" />
           )}
           {/* Legs scuttling under fish */}
-          <ellipse cx={28 + legOffset1} cy="48" rx="4" ry="4" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" />
-          <ellipse cx={44 + legOffset2} cy="48" rx="4" ry="4" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={28 + legOffset1} cy="52" rx="4" ry="4" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx={44 + legOffset2} cy="52" rx="4" ry="4" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" />
         </svg>
       );
 
     case 'cat_lizard':
     case 'cat_dragon':
+    case 'cat_king_dragon':
       const isDragon = type === 'cat_dragon';
+      const isKingDragon = type === 'cat_king_dragon';
       return (
-        <svg width="80" height="65" viewBox="0 0 80 65" className="drop-shadow-lg">
+        <svg width="84" height="68" viewBox="0 0 84 68" className="drop-shadow-lg">
+          {/* King Dragon Crown */}
+          {isKingDragon && (
+            <polygon points="50,12 53,4 57,9 61,4 64,12" fill="#fbbf24" stroke="#b45309" strokeWidth="1.5" />
+          )}
           {/* Dragon Horns & Spikes */}
-          {isDragon ? (
+          {(isDragon || isKingDragon) ? (
             <>
-              <polygon points="26,14 30,2 35,16" fill="#ef4444" stroke="#0f172a" strokeWidth="2" />
-              <polygon points="38,14 44,0 48,16" fill="#ef4444" stroke="#0f172a" strokeWidth="2" />
-              <polygon points="18,30 10,24 16,36" fill="#ef4444" stroke="#0f172a" strokeWidth="2" />
+              <polygon points="26,14 30,2 35,16" fill={isKingDragon ? "#fbbf24" : "#ef4444"} stroke="#0f172a" strokeWidth="2" />
+              <polygon points="38,14 44,0 48,16" fill={isKingDragon ? "#fbbf24" : "#ef4444"} stroke="#0f172a" strokeWidth="2" />
+              <polygon points="18,30 10,24 16,36" fill={isKingDragon ? "#fbbf24" : "#ef4444"} stroke="#0f172a" strokeWidth="2" />
             </>
           ) : (
             <polygon points="28,14 32,4 37,16" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" />
@@ -467,8 +547,8 @@ function renderSpriteSvg(
           {/* Fire breath when attacking */}
           {isAttacking && (
             <g className="animate-pulse">
-              <path d="M 68 32 Q 88 26 95 35 Q 86 42 68 36 Z" fill="#ef4444" />
-              <path d="M 70 33 Q 82 29 86 35 Q 80 39 70 35 Z" fill="#facc15" />
+              <path d="M 68 32 Q 88 26 95 35 Q 86 42 68 36 Z" fill={isKingDragon ? "#3b82f6" : "#ef4444"} />
+              <path d="M 70 33 Q 82 29 86 35 Q 80 39 70 35 Z" fill={isKingDragon ? "#93c5fd" : "#facc15"} />
             </g>
           )}
           {/* Tail */}
@@ -482,17 +562,19 @@ function renderSpriteSvg(
 
     case 'cat_titan':
     case 'cat_darabocchi':
+    case 'cat_jamiera':
+      const isJamiera = type === 'cat_jamiera';
       return (
-        <svg width="86" height="96" viewBox="0 0 86 96" className="drop-shadow-2xl">
+        <svg width="88" height="98" viewBox="0 0 88 98" className="drop-shadow-2xl">
           {/* Giant Muscular Shadow Titan */}
           {/* Huge Shoulders & Arms */}
-          <path d="M 8 36 Q 0 16 16 10 Q 32 10 26 38 Z" fill="#1e293b" stroke="#0f172a" strokeWidth="3" />
-          <path d="M 78 36 Q 86 16 70 10 Q 54 10 60 38 Z" fill="#1e293b" stroke="#0f172a" strokeWidth="3" />
+          <path d="M 8 36 Q 0 16 16 10 Q 32 10 26 38 Z" fill={isJamiera ? "#475569" : "#1e293b"} stroke="#0f172a" strokeWidth="3" />
+          <path d="M 78 36 Q 86 16 70 10 Q 54 10 60 38 Z" fill={isJamiera ? "#475569" : "#1e293b"} stroke="#0f172a" strokeWidth="3" />
           {/* Fist slamming animation */}
           {isAttacking ? (
             <circle cx="72" cy="70" r="14" fill="#0f172a" stroke="#ef4444" strokeWidth="3" />
           ) : (
-            <circle cx="70" cy="50" r="10" fill="#1e293b" stroke="#0f172a" strokeWidth="2.5" />
+            <circle cx="70" cy="50" r="10" fill={isJamiera ? "#475569" : "#1e293b"} stroke="#0f172a" strokeWidth="2.5" />
           )}
           {/* Cat Head in center */}
           <polygon points="32,18 36,4 43,15" fill="#f8fafc" stroke="#0f172a" strokeWidth="2.5" />
@@ -501,12 +583,21 @@ function renderSpriteSvg(
           <circle cx="38" cy="24" r="2.5" fill="#0f172a" />
           <circle cx="50" cy="24" r="2.5" fill="#0f172a" />
           {/* Giant Torso */}
-          <path d="M 22 38 L 66 38 L 58 72 L 30 72 Z" fill="#1e293b" stroke="#0f172a" strokeWidth="3" />
-          {/* Chest lines */}
-          <path d="M 32 46 L 56 46 M 44 46 L 44 65 M 34 56 L 54 56" stroke="#475569" strokeWidth="2" />
+          <path d="M 22 38 L 66 38 L 58 72 L 30 72 Z" fill={isJamiera ? "#334155" : "#1e293b"} stroke="#0f172a" strokeWidth="3" />
+          {/* Skull T-shirt for Jamiera */}
+          {isJamiera ? (
+            <g transform="translate(44, 52)">
+              <circle cx="0" cy="0" r="7" fill="#f8fafc" />
+              <circle cx="-2.5" cy="-1" r="1.5" fill="#0f172a" />
+              <circle cx="2.5" cy="-1" r="1.5" fill="#0f172a" />
+              <rect x="-3" y="3" width="6" height="3" fill="#f8fafc" />
+            </g>
+          ) : (
+            <path d="M 32 46 L 56 46 M 44 46 L 44 65 M 34 56 L 54 56" stroke="#475569" strokeWidth="2" />
+          )}
           {/* Massive Legs */}
-          <rect x={28 + legOffset1} y="72" width="10" height="20" rx="3" fill="#1e293b" stroke="#0f172a" strokeWidth="2.5" />
-          <rect x={50 + legOffset2} y="72" width="10" height="20" rx="3" fill="#1e293b" stroke="#0f172a" strokeWidth="2.5" />
+          <rect x={28 + legOffset1} y="72" width="10" height="20" rx="3" fill={isJamiera ? "#475569" : "#1e293b"} stroke="#0f172a" strokeWidth="2.5" />
+          <rect x={50 + legOffset2} y="72" width="10" height="20" rx="3" fill={isJamiera ? "#475569" : "#1e293b"} stroke="#0f172a" strokeWidth="2.5" />
         </svg>
       );
 
@@ -3481,6 +3572,338 @@ function renderSpriteSvg(
           <circle cx="40" cy="44" r="3.5" fill="#78350f" />
           <circle cx="54" cy="44" r="3.5" fill="#78350f" />
           <path d="M 42 54 Q 47 58 52 54" stroke="#78350f" strokeWidth="2" fill="none" />
+        </svg>
+      );
+
+    // =========================================================================
+    // CRAZED CATS (狂乱のキモネコ・狂乱のトリ・狂乱のフィッシュ 等)
+    // =========================================================================
+    case 'cat_crazed_gross':
+    case 'cat_crazed_macholegs':
+      return (
+        <svg width="64" height="96" viewBox="0 0 64 96" className="drop-shadow-2xl">
+          {/* Crazed Dark Aura */}
+          <ellipse cx="32" cy="48" rx="28" ry="44" fill="#581c87" opacity="0.25" className="animate-pulse" />
+          {/* Cat Head on top with crazed dark eyes */}
+          <polygon points="20,16 24,6 30,14" fill="#18181b" stroke="#a855f7" strokeWidth="2" />
+          <polygon points="34,14 40,6 44,16" fill="#18181b" stroke="#a855f7" strokeWidth="2" />
+          <ellipse cx="32" cy="22" rx="14" ry="13" fill="#18181b" stroke="#a855f7" strokeWidth="2.5" />
+          {/* Glowing Red Eyes */}
+          <ellipse cx="27" cy="20" rx="2.5" ry="3" fill="#ef4444" />
+          <ellipse cx="37" cy="20" rx="2.5" ry="3" fill="#ef4444" />
+          {/* Muscular Dark Legs */}
+          <path
+            d={`M 24 34 Q ${20 + (isAttacking ? 35 : legOffset1)} 60 22 88`}
+            fill="none"
+            stroke="#18181b"
+            strokeWidth="8"
+            strokeLinecap="round"
+          />
+          <path
+            d={`M 24 34 Q ${20 + (isAttacking ? 35 : legOffset1)} 60 22 88`}
+            fill="none"
+            stroke="#a855f7"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d={`M 40 34 Q ${44 + legOffset2} 60 42 88`}
+            fill="none"
+            stroke="#18181b"
+            strokeWidth="8"
+            strokeLinecap="round"
+          />
+          <path
+            d={`M 40 34 Q ${44 + legOffset2} 60 42 88`}
+            fill="none"
+            stroke="#a855f7"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          {/* Shockwave burst on attack */}
+          {isAttacking && (
+            <ellipse cx="22" cy="90" rx="16" ry="6" fill="#a855f7" opacity="0.8" className="animate-ping" />
+          )}
+        </svg>
+      );
+
+    case 'cat_crazed_bird':
+    case 'cat_crazed_ufo':
+      const isCrazedUfo = type === 'cat_crazed_ufo';
+      return (
+        <svg width="70" height="70" viewBox="0 0 70 70" className="drop-shadow-2xl">
+          {isCrazedUfo ? (
+            <>
+              {/* Dark UFO Saucer */}
+              <ellipse cx="35" cy="42" rx="30" ry="11" fill="#18181b" stroke="#dc2626" strokeWidth="2.5" />
+              <ellipse cx="35" cy="40" rx="24" ry="7" fill="#7f1d1d" />
+              {/* Glass dome with Red Glowing Cat head inside */}
+              <path d="M 21 38 A 14 14 0 0 1 49 38 Z" fill="#991b1b" fillOpacity="0.7" stroke="#dc2626" strokeWidth="2" />
+              <circle cx="35" cy="32" r="8" fill="#18181b" stroke="#dc2626" strokeWidth="1.5" />
+              <ellipse cx="33" cy="30" rx="1.5" ry="2" fill="#ef4444" />
+              <ellipse cx="37" cy="30" rx="1.5" ry="2" fill="#ef4444" />
+              {/* Laser lights */}
+              <circle cx="18" cy="44" r="2.5" fill="#ef4444" className="animate-ping" />
+              <circle cx="35" cy="46" r="2.5" fill="#ef4444" className="animate-ping" />
+              <circle cx="52" cy="44" r="2.5" fill="#ef4444" className="animate-ping" />
+            </>
+          ) : (
+            <>
+              {/* Dark Flapping Wings */}
+              <path d={`M 14 26 Q 4 ${12 + walkCycle * 8} 18 16`} fill="#18181b" stroke="#dc2626" strokeWidth="2" />
+              <path d={`M 56 26 Q 66 ${12 + walkCycle * 8} 52 16`} fill="#18181b" stroke="#dc2626" strokeWidth="2" />
+              {/* Crazed Bird Head */}
+              <polygon points="22,16 25,6 32,14" fill="#18181b" stroke="#dc2626" strokeWidth="2" />
+              <polygon points="36,14 43,6 46,16" fill="#18181b" stroke="#dc2626" strokeWidth="2" />
+              <ellipse cx="34" cy="28" rx="18" ry="16" fill="#18181b" stroke="#dc2626" strokeWidth="2.5" />
+              <polygon points="28,26 46,30 28,34" fill="#dc2626" stroke="#7f1d1d" strokeWidth="2" />
+              <ellipse cx="28" cy="24" rx="2.5" ry="3" fill="#ef4444" />
+            </>
+          )}
+        </svg>
+      );
+
+    case 'cat_crazed_fish':
+    case 'cat_crazed_whale':
+      const isCrazedWhale = type === 'cat_crazed_whale';
+      return (
+        <svg width="78" height="66" viewBox="0 0 78 66" className="drop-shadow-2xl">
+          {/* Crazed Fish / Whale Body */}
+          <path
+            d="M 12 34 Q 30 14 60 28 Q 68 32 62 44 Q 30 56 12 34 Z"
+            fill={isCrazedWhale ? "#09090b" : "#18181b"}
+            stroke="#ef4444"
+            strokeWidth="3"
+          />
+          {/* Tail fin */}
+          <polygon points="12,34 2,22 4,46" fill="#18181b" stroke="#ef4444" strokeWidth="2" />
+          {/* Red Glowing Eye & Bloodthirsty Fangs */}
+          <circle cx="52" cy="29" r="3.5" fill="#ef4444" stroke="#7f1d1d" strokeWidth="1" />
+          <circle cx="52" cy="29" r="1.5" fill="#ffffff" />
+          <path d="M 42 38 L 46 32 L 50 38 L 54 32 L 58 38 L 62 32" fill="none" stroke="#ef4444" strokeWidth="2.5" />
+          {/* Legs */}
+          <ellipse cx={28 + legOffset1} cy="52" rx="4" ry="4" fill="#18181b" stroke="#ef4444" strokeWidth="2" />
+          <ellipse cx={44 + legOffset2} cy="52" rx="4" ry="4" fill="#18181b" stroke="#ef4444" strokeWidth="2" />
+        </svg>
+      );
+
+    // =========================================================================
+    // NEW CAT: ネコエンシェント / 古代神ネコ / 覚醒古代神ネコ・ゼウス
+    // =========================================================================
+    case 'cat_ancient_cyclone_drop':
+    case 'cat_ancient_cyclone_evolved':
+      const isEvolvedAncient = type === 'cat_ancient_cyclone_evolved';
+      return (
+        <svg width="84" height="84" viewBox="0 0 84 84" className="drop-shadow-2xl">
+          {/* Primordial Jade & Amber Rotating Halo */}
+          <circle cx="42" cy="42" r="36" fill="none" stroke="#10b981" strokeWidth="3.5" strokeDasharray="10,6" className="animate-spin" />
+          {isEvolvedAncient && (
+            <circle cx="42" cy="42" r="40" fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="6,4" className="animate-spin" />
+          )}
+          {/* Ancient Fossil Relic Board */}
+          <rect x="22" y="32" width="40" height="42" rx="6" fill="#78350f" stroke="#d97706" strokeWidth="2.5" />
+          <path d="M 32 40 L 52 40 M 32 48 L 52 48 M 32 56 L 46 56" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" />
+          {/* Cat Deity Face */}
+          <ellipse cx="42" cy="24" rx="16" ry="15" fill="#fef3c7" stroke="#b45309" strokeWidth="2.5" />
+          <polygon points="30,16 34,4 40,14" fill="#fef3c7" stroke="#b45309" strokeWidth="2" />
+          <polygon points="44,14 50,4 54,16" fill="#fef3c7" stroke="#b45309" strokeWidth="2" />
+          {/* Third Eye Jade Crystal */}
+          <polygon points="42,14 45,18 42,22 39,18" fill="#10b981" stroke="#047857" strokeWidth="1.5" />
+          <ellipse cx="36" cy="24" rx="2" ry="2.5" fill="#047857" />
+          <ellipse cx="48" cy="24" rx="2" ry="2.5" fill="#047857" />
+          {/* Critical Ancient Blast on Attack */}
+          {isAttacking && (
+            <g className="animate-ping">
+              <polygon points="42,0 54,22 42,30 58,54 30,46 42,0" fill="#10b981" fillOpacity="0.8" />
+            </g>
+          )}
+        </svg>
+      );
+
+    // =========================================================================
+    // BUFFED BOSS & ANCIENT ENEMIES (古代種レジェンドブンブン・エンシェントサイクロン・古代リス等)
+    // =========================================================================
+    case 'enemy_legend_bunbun':
+      return (
+        <svg width="130" height="130" viewBox="0 0 130 130" className="drop-shadow-2xl">
+          {/* Primordial Ancient Relic Aura & Whirlwinds */}
+          <g className="animate-spin" style={{ transformOrigin: '65px 65px' }}>
+            <circle cx="65" cy="65" r="58" fill="none" stroke="#10b981" strokeWidth="4" strokeDasharray="14,8" />
+            <circle cx="65" cy="65" r="50" fill="none" stroke="#d97706" strokeWidth="3" strokeDasharray="10,6" />
+          </g>
+          {/* Giant Ancient Bun Bun Wings */}
+          <path d="M 30 36 Q 4 10 38 12 Q 52 30 42 50 Z" fill="#065f46" stroke="#047857" strokeWidth="3" />
+          <path d="M 100 36 Q 126 10 92 12 Q 78 30 88 50 Z" fill="#065f46" stroke="#047857" strokeWidth="3" />
+          {/* Muscular Ancient Body */}
+          <ellipse cx="65" cy="68" rx="34" ry="38" fill="#064e3b" stroke="#10b981" strokeWidth="4" />
+          {/* Ancient Glyphs & Armor Lines */}
+          <path d="M 50 60 L 80 60 M 65 60 L 65 92 M 52 76 L 78 76" stroke="#34d399" strokeWidth="3" />
+          {/* Head & Ancient Horns */}
+          <circle cx="65" cy="40" r="22" fill="#047857" stroke="#10b981" strokeWidth="3" />
+          <polygon points="50,28 42,6 56,20" fill="#f59e0b" stroke="#78350f" strokeWidth="2.5" />
+          <polygon points="80,28 88,6 74,20" fill="#f59e0b" stroke="#78350f" strokeWidth="2.5" />
+          {/* Glowing Relic Red Eyes */}
+          <circle cx="56" cy="38" r="4.5" fill="#ef4444" stroke="#7f1d1d" strokeWidth="1.5" />
+          <circle cx="74" cy="38" r="4.5" fill="#ef4444" stroke="#7f1d1d" strokeWidth="1.5" />
+          {/* Blazing Rotating Fists (秒間5.5回の高速回転腕！) */}
+          <g className="animate-spin" style={{ transformOrigin: '28px 75px' }}>
+            <circle cx="28" cy="75" r="16" fill="#047857" stroke="#10b981" strokeWidth="3" />
+            <polygon points="28,60 36,75 20,75" fill="#34d399" />
+          </g>
+          <g className="animate-spin" style={{ transformOrigin: '102px 75px' }}>
+            <circle cx="102" cy="75" r="16" fill="#047857" stroke="#10b981" strokeWidth="3" />
+            <polygon points="102,60 110,75 94,75" fill="#34d399" />
+          </g>
+          {/* 30% Critical / Wave Blast */}
+          {isAttacking && (
+            <g className="animate-ping">
+              <circle cx="65" cy="65" r="54" fill="none" stroke="#ef4444" strokeWidth="6" />
+              <polygon points="65,10 75,40 100,50 75,60 65,90 55,60 30,50 55,40" fill="#fef08a" opacity="0.9" />
+            </g>
+          )}
+        </svg>
+      );
+
+    case 'enemy_ancient_cyclone':
+      return (
+        <svg width="125" height="125" viewBox="0 0 125 125" className="drop-shadow-2xl">
+          {/* Primordial Emerald & Amber Storm Vortex */}
+          <circle cx="62" cy="62" r="56" fill="none" stroke="#10b981" strokeWidth="7" strokeDasharray="18,8" className="animate-spin" />
+          <circle cx="62" cy="62" r="48" fill="none" stroke="#f59e0b" strokeWidth="5" strokeDasharray="12,6" className="animate-spin" />
+          {/* Ancient Whirl Razor Blades */}
+          <path d="M 62 14 Q 92 28 86 62 Q 80 96 62 110 Q 34 96 40 62 Q 46 28 62 14 Z" fill="#065f46" stroke="#047857" strokeWidth="3.5" />
+          <path d="M 14 62 Q 28 34 62 40 Q 96 46 110 62 Q 96 90 62 84 Q 28 78 14 62 Z" fill="#d97706" opacity="0.8" />
+          {/* Ancient Cyclone Core */}
+          <circle cx="62" cy="62" r="28" fill="#064e3b" stroke="#34d399" strokeWidth="4.5" />
+          {/* Cursed All-Seeing Relic Eye */}
+          <circle cx="52" cy="56" r="6" fill="#fde047" stroke="#78350f" strokeWidth="2" />
+          <circle cx="72" cy="56" r="6" fill="#fde047" stroke="#78350f" strokeWidth="2" />
+          <circle cx="52" cy="56" r="3" fill="#ef4444" />
+          <circle cx="72" cy="56" r="3" fill="#ef4444" />
+          {/* Razor Maw */}
+          <polygon points="46,72 52,82 58,72" fill="#ffffff" />
+          <polygon points="58,72 64,82 70,72" fill="#ffffff" />
+          <polygon points="70,72 76,82 82,72" fill="#ffffff" />
+          {/* Hyper-Speed Wind Rush on Attack */}
+          {isAttacking && (
+            <ellipse cx="62" cy="62" rx="60" ry="60" fill="none" stroke="#6ee7b7" strokeWidth="8" className="animate-ping" />
+          )}
+        </svg>
+      );
+
+    case 'enemy_ancient_squirrel':
+    case 'enemy_ancient_relic_squirrel':
+      return (
+        <svg width="72" height="60" viewBox="0 0 72 60" className="drop-shadow-xl">
+          {/* Ancient Relic Squirrel - Super Fast Sprint */}
+          {/* Giant Fossil Tail */}
+          <path d="M 52 38 Q 68 12 56 4 Q 44 8 48 26 Z" fill="#78350f" stroke="#10b981" strokeWidth="2.5" />
+          {/* Body */}
+          <ellipse cx="32" cy="34" rx="18" ry="14" fill="#047857" stroke="#10b981" strokeWidth="2.5" />
+          {/* Head & Ears */}
+          <circle cx="18" cy="24" r="10" fill="#047857" stroke="#10b981" strokeWidth="2" />
+          <polygon points="16,16 12,6 20,12" fill="#f59e0b" stroke="#78350f" strokeWidth="1.5" />
+          <polygon points="22,16 26,6 26,14" fill="#f59e0b" stroke="#78350f" strokeWidth="1.5" />
+          {/* Piercing Red Eye */}
+          <circle cx="15" cy="22" r="2.5" fill="#ef4444" />
+          {/* Giant Acorn / Fossil Weapon */}
+          <ellipse cx="12" cy="36" rx="5" ry="4" fill="#d97706" />
+          {/* Speed Wind Streaks */}
+          <line x1="44" y1="44" x2="68" y2="44" stroke="#34d399" strokeWidth="2" strokeDasharray="4,3" />
+          <line x1="38" y1="48" x2="62" y2="48" stroke="#34d399" strokeWidth="2" strokeDasharray="4,3" />
+          {/* Sprinting Legs */}
+          <ellipse cx={24 + legOffset1 * 2} cy="48" rx="4" ry="6" fill="#047857" stroke="#10b981" strokeWidth="1.5" />
+          <ellipse cx={40 + legOffset2 * 2} cy="48" rx="4" ry="6" fill="#047857" stroke="#10b981" strokeWidth="1.5" />
+        </svg>
+      );
+
+    case 'enemy_ancient_doge':
+      return (
+        <svg width="68" height="60" viewBox="0 0 68 60" className="drop-shadow-lg">
+          {/* Ancient Doge Body with Fossil Armor */}
+          <ellipse cx="34" cy="34" rx="20" ry="15" fill="#065f46" stroke="#10b981" strokeWidth="2.5" />
+          {/* Head & Ears */}
+          <circle cx="20" cy="22" r="12" fill="#065f46" stroke="#10b981" strokeWidth="2.5" />
+          <polygon points="12,14 8,4 18,10" fill="#d97706" stroke="#78350f" strokeWidth="1.5" />
+          <polygon points="24,14 28,4 28,12" fill="#d97706" stroke="#78350f" strokeWidth="1.5" />
+          {/* Cursed Eyes */}
+          <ellipse cx="16" cy="20" rx="2" ry="3" fill="#ef4444" />
+          <ellipse cx="24" cy="20" rx="2" ry="3" fill="#ef4444" />
+          {/* Snout */}
+          <ellipse cx="14" cy="26" rx="4" ry="3" fill="#047857" />
+          <circle cx="12" cy="25" r="1.5" fill="#0f172a" />
+          {/* Legs */}
+          <ellipse cx={22 + legOffset1} cy="48" rx="4" ry="5" fill="#065f46" stroke="#10b981" strokeWidth="2" />
+          <ellipse cx={42 + legOffset2} cy="48" rx="4" ry="5" fill="#065f46" stroke="#10b981" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_ancient_relic_otter':
+      return (
+        <svg width="84" height="74" viewBox="0 0 84 74" className="drop-shadow-xl">
+          {/* Ancient Heavy Otter Body */}
+          <ellipse cx="42" cy="42" rx="28" ry="20" fill="#78350f" stroke="#10b981" strokeWidth="3" />
+          <circle cx="22" cy="30" r="14" fill="#78350f" stroke="#10b981" strokeWidth="2.5" />
+          <circle cx="16" cy="26" r="3" fill="#ef4444" />
+          {/* Huge Fossil Shell in Hands */}
+          <ellipse cx={isAttacking ? 10 : 18} cy={isAttacking ? 36 : 46} rx="12" ry="10" fill="#fde047" stroke="#78350f" strokeWidth="2.5" />
+          {/* Legs */}
+          <ellipse cx={32 + legOffset1} cy="62" rx="6" ry="6" fill="#78350f" stroke="#10b981" strokeWidth="2" />
+          <ellipse cx={56 + legOffset2} cy="62" rx="6" ry="6" fill="#78350f" stroke="#10b981" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_ancient_moth':
+      return (
+        <svg width="88" height="76" viewBox="0 0 88 76" className="drop-shadow-2xl">
+          {/* Ancient Moth Wings with Amber Eyespots */}
+          <ellipse cx="30" cy="34" rx="26" ry="20" fill="#065f46" stroke="#10b981" strokeWidth="2.5" transform={`rotate(${walkCycle * 8} 30 34)`} />
+          <ellipse cx="58" cy="34" rx="26" ry="20" fill="#065f46" stroke="#10b981" strokeWidth="2.5" transform={`rotate(${-walkCycle * 8} 58 34)`} />
+          <circle cx="26" cy="32" r="6" fill="#f59e0b" stroke="#78350f" strokeWidth="2" />
+          <circle cx="62" cy="32" r="6" fill="#f59e0b" stroke="#78350f" strokeWidth="2" />
+          {/* Moth Body */}
+          <ellipse cx="44" cy="42" rx="8" ry="24" fill="#78350f" stroke="#10b981" strokeWidth="2.5" />
+          <circle cx="44" cy="20" r="7" fill="#047857" stroke="#10b981" strokeWidth="2" />
+          <circle cx="41" cy="19" r="2" fill="#ef4444" />
+          <circle cx="47" cy="19" r="2" fill="#ef4444" />
+          {/* Spore Powder on Attack */}
+          {isAttacking && (
+            <circle cx="44" cy="64" r="18" fill="#10b981" opacity="0.6" className="animate-ping" />
+          )}
+        </svg>
+      );
+
+    case 'enemy_ancient_gorilla':
+      return (
+        <svg width="84" height="80" viewBox="0 0 84 80" className="drop-shadow-2xl">
+          {/* Ancient Muscular Gorilla */}
+          <ellipse cx="42" cy="46" rx="28" ry="26" fill="#064e3b" stroke="#10b981" strokeWidth="3.5" />
+          {/* Head & Ancient Crest */}
+          <circle cx="42" cy="24" r="16" fill="#065f46" stroke="#10b981" strokeWidth="2.5" />
+          <polygon points="36,10 42,2 48,10" fill="#d97706" stroke="#78350f" strokeWidth="2" />
+          <ellipse cx="36" cy="22" rx="2.5" ry="3" fill="#ef4444" />
+          <ellipse cx="48" cy="22" rx="2.5" ry="3" fill="#ef4444" />
+          {/* Heavy Arm Slams */}
+          <ellipse cx={18 + legOffset1} cy="56" rx="10" ry="16" fill="#047857" stroke="#10b981" strokeWidth="2.5" />
+          <ellipse cx={66 + legOffset2} cy="56" rx="10" ry="16" fill="#047857" stroke="#10b981" strokeWidth="2.5" />
+        </svg>
+      );
+
+    case 'enemy_ancient_sunfish':
+      return (
+        <svg width="120" height="110" viewBox="0 0 120 110" className="drop-shadow-2xl">
+          {/* Primordial Giant Ocean Sunfish Body */}
+          <ellipse cx="60" cy="55" rx="46" ry="38" fill="#064e3b" stroke="#10b981" strokeWidth="4" />
+          {/* Top & Bottom Ancient Fin Blades */}
+          <polygon points="54,18 64,0 74,18" fill="#d97706" stroke="#78350f" strokeWidth="2.5" />
+          <polygon points="54,92 64,110 74,92" fill="#d97706" stroke="#78350f" strokeWidth="2.5" />
+          {/* Glowing Ancient Relic Eye */}
+          <circle cx="34" cy="46" r="8" fill="#fde047" stroke="#78350f" strokeWidth="2" />
+          <circle cx="34" cy="46" r="4" fill="#ef4444" />
+          {/* Laser Cannon on Attack */}
+          {isAttacking && (
+            <line x1="20" y1="55" x2="-80" y2="55" stroke="#10b981" strokeWidth="8" strokeLinecap="round" className="animate-ping" />
+          )}
         </svg>
       );
 

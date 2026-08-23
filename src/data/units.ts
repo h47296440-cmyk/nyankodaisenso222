@@ -2256,6 +2256,75 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         }
       }
     ]
+  },
+  {
+    id: 'cat_ancient_cyclone_drop',
+    name: 'ネコエンシェント',
+    description: '原初の暴風『エンシェントサイクロン降臨』制覇の証として目覚めた古代の神官。太古の呪いを無効化し、古代種・浮いてる敵に対してめっぽう強くクリティカルを叩き込む！',
+    rarity: 'super_rare',
+    cost: 1650,
+    forms: [
+      {
+        formIndex: 0,
+        name: 'ネコエンシェント',
+        description: '太古の化石石板を携えた神聖なるネコ。古代の英知で古代種にめっぽう強く、高確率でクリティカル！',
+        hp: 38000,
+        attackPower: 9200,
+        attackRange: 240,
+        attackSpeed: 1.2,
+        attackType: 'area',
+        speed: 36,
+        knockbacks: 3,
+        cost: 1650,
+        cooldown: 5.5,
+        scale: 1.2,
+        spriteType: 'cat_ancient_cyclone_drop',
+        abilities: {
+          criticalChance: 0.25,
+          massiveDamage: ['white', 'floating']
+        }
+      },
+      {
+        formIndex: 1,
+        name: '古代神ネコ・プライマル',
+        description: '進化によって始原の神性を解放した古代神。超絶破壊力の琥珀光線を放ち、古代の呪いを寄せ付けない！',
+        hp: 54000,
+        attackPower: 14500,
+        attackRange: 280,
+        attackSpeed: 1.4,
+        attackType: 'area',
+        speed: 40,
+        knockbacks: 4,
+        cost: 1650,
+        cooldown: 5.0,
+        scale: 1.35,
+        spriteType: 'cat_ancient_cyclone_evolved',
+        abilities: {
+          criticalChance: 0.35,
+          massiveDamage: ['white', 'floating']
+        }
+      },
+      {
+        formIndex: 2,
+        name: '覚醒古代神ネコ・ゼウス',
+        description: '第三形態！太古の創世雷を纏いし最高神。秒間2回の超高速連撃と50%クリティカルで全ての古代種と暴風神を屠る！',
+        hp: 76000,
+        attackPower: 21000,
+        attackRange: 320,
+        attackSpeed: 1.8,
+        attackType: 'area',
+        speed: 45,
+        knockbacks: 5,
+        cost: 1650,
+        cooldown: 4.5,
+        scale: 1.45,
+        spriteType: 'cat_ancient_cyclone_evolved',
+        abilities: {
+          criticalChance: 0.50,
+          massiveDamage: ['white', 'floating']
+        }
+      }
+    ]
   }
 ];
 
@@ -4056,76 +4125,158 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
   enemy_legend_bunbun: {
     id: 'enemy_legend_bunbun',
     name: '古代種レジェンドブンブン',
-    description: '【レジェンド完結・太古の力 BOSS / 浮いてる敵 / 古代種 / 範囲超連撃 / 波動Lv1】太古の眠りより覚醒せし神話の巨神ブンブン。体力350万、攻撃力24000の神速鉄拳ラッシュで全てを粉砕する！取り巻きの猛攻を捌きつつ、超壁と妨害キャラで総力戦を挑め！',
-    hp: 3500000,
-    attackPower: 24000,
-    attackRange: 180,
-    attackSpeed: 3.8,
-    attackWindup: 0.1,
-    speed: 34,
-    knockbacks: 5,
+    description: '【レジェンド完結・太古の力 BOSS / 浮いてる敵 / 古代種 / 範囲超連撃 / 30%クリティカル / 波動】太古の眠りより完全覚醒せし神話の真・巨神ブンブン。体力480万、攻撃力32000の神速暴風鉄拳（秒間5.5連打）を叩き込み、30%の確率で即死級クリティカルを炸裂させる！',
+    hp: 4800000,
+    attackPower: 32000,
+    attackRange: 190,
+    attackSpeed: 5.5, // 腕回す速度＆攻撃頻度超絶UP！
+    attackWindup: 0.04,
+    speed: 48, // スピード大幅UP！
+    knockbacks: 6,
     attackType: 'area',
-    rewardMoney: 60000,
-    rewardXp: 150000,
+    rewardMoney: 80000,
+    rewardXp: 200000,
     traits: ['white', 'floating', 'boss'],
     spriteType: 'enemy_legend_bunbun',
-    scale: 3.2,
+    scale: 3.3,
     isBoss: true,
-    waveLevel: 1
+    waveLevel: 2,
+    abilities: {
+      criticalChance: 0.30, // 30%でクリティカル！
+      wave: { level: 2, chance: 0.4 }
+    }
+  },
+  enemy_ancient_cyclone: {
+    id: 'enemy_ancient_cyclone',
+    name: 'エンシェントサイクロン',
+    description: '【降臨BOSS / 古代種 / 浮いてる敵 / クソ強超極悪DPS / 超高速移動】降臨ステージ『原初の暴風 極ムズ』に君臨する始原の神嵐。体力320万、攻撃力16800、秒間8回の超連撃を叩き込みながら俊足で距離を詰めてくる！古代種特効や停止・ふっとばす妨害で迎撃せよ！',
+    hp: 3200000,
+    attackPower: 16800,
+    attackRange: 110,
+    attackSpeed: 8.0,
+    attackWindup: 0.04,
+    speed: 42, // 足が早い！
+    knockbacks: 4,
+    attackType: 'area',
+    rewardMoney: 50000,
+    rewardXp: 120000,
+    traits: ['white', 'floating', 'boss'],
+    spriteType: 'enemy_ancient_cyclone',
+    scale: 2.9,
+    isBoss: true,
+    abilities: {
+      criticalChance: 0.20
+    }
   },
   enemy_ancient_doge: {
     id: 'enemy_ancient_doge',
     name: '古代わんこ',
-    description: '【太古の力・取り巻き】悠久の時を経て化石から蘇った超高倍率のわんこ。体力55000、攻撃力3800で群れを成して突撃してくる！',
-    hp: 55000,
-    attackPower: 3800,
+    description: '【古代種・取り巻き】悠久の時を経て化石から蘇った超高倍率のわんこ。体力65000、攻撃力4800で群れを成して突撃してくる！',
+    hp: 65000,
+    attackPower: 4800,
     attackRange: 70,
-    attackSpeed: 1.5,
-    attackWindup: 0.12,
-    speed: 42,
+    attackSpeed: 1.6,
+    attackWindup: 0.1,
+    speed: 46,
     knockbacks: 3,
     attackType: 'single',
-    rewardMoney: 1200,
-    rewardXp: 1800,
+    rewardMoney: 1500,
+    rewardXp: 2200,
     traits: ['white'],
-    spriteType: 'enemy_doge',
+    spriteType: 'enemy_ancient_doge',
     scale: 1.15
   },
   enemy_ancient_relic_squirrel: {
     id: 'enemy_ancient_relic_squirrel',
     name: '古代リス（太古のリッスントゥミー）',
-    description: '【太古の力・超速取り巻き】神速で駆け抜ける古代リス。秒間4回の高速噛みつきで前線の壁をガリガリ削る！',
-    hp: 28000,
-    attackPower: 2400,
+    description: '【古代種・超速取り巻き】神速で駆け抜ける古代リス。移動速度72、秒間4.5回の高速噛みつきで前線の壁を一瞬で食い破る！',
+    hp: 34000,
+    attackPower: 3200,
     attackRange: 60,
-    attackSpeed: 4.0,
-    attackWindup: 0.05,
-    speed: 68,
+    attackSpeed: 4.5,
+    attackWindup: 0.04,
+    speed: 72, // 足が極めて速い！
     knockbacks: 4,
     attackType: 'single',
-    rewardMoney: 800,
-    rewardXp: 1200,
+    rewardMoney: 950,
+    rewardXp: 1500,
     traits: ['white'],
-    spriteType: 'enemy_snache',
-    scale: 1.05
+    spriteType: 'enemy_ancient_squirrel',
+    scale: 1.1
   },
   enemy_ancient_relic_otter: {
     id: 'enemy_ancient_relic_otter',
     name: '太古のメガオットー',
-    description: '【太古の力 / 範囲攻撃】化石貝殻を両手に持った超タフな古代ラッコ。体力24万、強烈な叩きつけで壁軍団を粉砕！',
-    hp: 240000,
-    attackPower: 11000,
-    attackRange: 130,
-    attackSpeed: 1.2,
-    attackWindup: 0.22,
-    speed: 30,
+    description: '【古代種 / 範囲攻撃】化石貝殻を両手に持った超タフな古代ラッコ。体力32万、強烈な連続叩きつけで壁軍団を粉砕！',
+    hp: 320000,
+    attackPower: 14000,
+    attackRange: 140,
+    attackSpeed: 1.4,
+    attackWindup: 0.18,
+    speed: 32,
     knockbacks: 4,
     attackType: 'area',
-    rewardMoney: 4500,
-    rewardXp: 6500,
+    rewardMoney: 5500,
+    rewardXp: 8000,
     traits: ['white', 'boss'],
-    spriteType: 'enemy_seal',
-    scale: 1.6
+    spriteType: 'enemy_ancient_relic_otter',
+    scale: 1.65
+  },
+  enemy_ancient_moth: {
+    id: 'enemy_ancient_moth',
+    name: '古代ガガガ（始原の巨大蛾）',
+    description: '【古代種 / 浮いてる敵 / 遠距離範囲爆撃】太古の琥珀から羽化した巨蛾。長射程から猛毒の古代鱗粉を降らせる！',
+    hp: 190000,
+    attackPower: 9200,
+    attackRange: 260,
+    attackSpeed: 0.8,
+    attackWindup: 0.35,
+    speed: 36,
+    knockbacks: 4,
+    attackType: 'area',
+    rewardMoney: 8000,
+    rewardXp: 12000,
+    traits: ['floating', 'white'],
+    spriteType: 'enemy_ancient_moth',
+    scale: 1.5
+  },
+  enemy_ancient_gorilla: {
+    id: 'enemy_ancient_gorilla',
+    name: '古代ゴリラ（太古のゴリさん）',
+    description: '【古代種 / 範囲超打撃】強靭な古代筋肉を誇るゴリラ。秒間2.5回の高速ドラミングラッシュで壁を一掃！',
+    hp: 240000,
+    attackPower: 11000,
+    attackRange: 100,
+    attackSpeed: 2.5,
+    attackWindup: 0.08,
+    speed: 44,
+    knockbacks: 4,
+    attackType: 'area',
+    rewardMoney: 6000,
+    rewardXp: 9500,
+    traits: ['white'],
+    spriteType: 'enemy_ancient_gorilla',
+    scale: 1.55
+  },
+  enemy_ancient_sunfish: {
+    id: 'enemy_ancient_sunfish',
+    name: '古代マンボウ（オールド・マンボロス）',
+    description: '【古代種 / 浮いてる敵 / 超長距離範囲砲】太古の海を漂う生きた化石マンボウ。射程550から強力な古代ビームを放つ！',
+    hp: 750000,
+    attackPower: 16500,
+    attackRange: 550,
+    attackSpeed: 0.4,
+    attackWindup: 0.7,
+    speed: 14,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 18000,
+    rewardXp: 28000,
+    traits: ['floating', 'white', 'boss'],
+    spriteType: 'enemy_ancient_sunfish',
+    scale: 2.4,
+    isBoss: true
   }
 };
+
 
