@@ -201,6 +201,10 @@ export default function App() {
         prev.unlockedHannyaDrop ||
         (result.victory && activeStage.id === 'advent_stage_hannya');
 
+      const isCycloneDropUnlocked =
+        prev.unlockedCycloneDrop ||
+        (result.victory && (activeStage.id === 'advent_stage_red_cyclone' || activeStage.id === 'advent_stage_black_cyclone' || activeStage.id === 'advent_stage_alien_cyclone' || activeStage.id === 'advent_stage_zombie_cyclone'));
+
       return {
         ...prev,
         xp: prev.xp + result.xpEarned,
@@ -212,6 +216,7 @@ export default function App() {
         unlockedValkyrieTrueForm: isValkyrieTrueUnlocked,
         unlockedClionelDrop: isClionelDropUnlocked,
         unlockedHannyaDrop: isHannyaDropUnlocked,
+        unlockedCycloneDrop: isCycloneDropUnlocked,
       };
     });
   };
@@ -489,6 +494,7 @@ export default function App() {
           isOpen={showPvpLobbyModal}
           profile={profile}
           onClose={() => setShowPvpLobbyModal(false)}
+          onUpdateProfile={handleUpdateProfile}
           onStartBattle={(payload) => {
             setShowPvpLobbyModal(false);
             setPvpPayload(payload);

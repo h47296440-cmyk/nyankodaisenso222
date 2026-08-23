@@ -3213,6 +3213,277 @@ function renderSpriteSvg(
         </svg>
       );
 
+    // =========================================================================
+    // ADVENT DROPS & CYCLONES & LEGEND BOSSES
+    // =========================================================================
+    case 'cat_clionel_drop':
+      return (
+        <svg width="60" height="60" viewBox="0 0 60 60" className="drop-shadow-md">
+          {/* Angel Wings */}
+          <path d="M 12 24 Q 4 14 18 10 Q 22 18 20 28" fill="#e0f2fe" stroke="#38bdf8" strokeWidth="1.5" />
+          <path d="M 48 24 Q 56 14 42 10 Q 38 18 40 28" fill="#e0f2fe" stroke="#38bdf8" strokeWidth="1.5" />
+          {/* Golden Halo */}
+          <ellipse cx="30" cy="10" rx="14" ry="4" fill="none" stroke="#facc15" strokeWidth="3" />
+          {/* Holy Scales */}
+          <line x1="30" y1="20" x2="30" y2="34" stroke="#ca8a04" strokeWidth="2" />
+          <line x1="20" y1="26" x2="40" y2="26" stroke="#ca8a04" strokeWidth="2" />
+          {/* Cat Head */}
+          <circle cx="30" cy="38" r="14" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <polygon points="20,28 24,20 28,26" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <polygon points="40,28 36,20 32,26" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <circle cx="25" cy="36" r="1.5" fill="#0f172a" />
+          <circle cx="35" cy="36" r="1.5" fill="#0f172a" />
+          <ellipse cx="30" cy="40" rx="2" ry="1.5" fill="#f43f5e" />
+          {/* Legs */}
+          <rect x={24 + legOffset1} y="50" width="4" height="8" rx="2" fill="#ffffff" stroke="#0f172a" strokeWidth="1.5" />
+          <rect x={32 + legOffset2} y="50" width="4" height="8" rx="2" fill="#ffffff" stroke="#0f172a" strokeWidth="1.5" />
+        </svg>
+      );
+
+    case 'cat_clionel_evolved':
+      return (
+        <svg width="70" height="70" viewBox="0 0 70 70" className="drop-shadow-xl">
+          {/* Radiant Halo */}
+          <circle cx="35" cy="12" r="12" fill="none" stroke="#fde047" strokeWidth="3.5" className="animate-pulse" />
+          {/* Glorious Seraph Wings */}
+          <path d="M 8 28 Q 0 8 24 6 Q 28 20 22 36" fill="#bae6fd" stroke="#0284c7" strokeWidth="2" />
+          <path d="M 62 28 Q 70 8 46 6 Q 42 20 48 36" fill="#bae6fd" stroke="#0284c7" strokeWidth="2" />
+          {/* Archangel Robe & Body */}
+          <path d="M 22 32 L 48 32 L 52 58 L 18 58 Z" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" />
+          {/* Archangel Cat Head */}
+          <circle cx="35" cy="30" r="13" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <polygon points="25,20 28,12 33,18" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <polygon points="45,20 42,12 37,18" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <circle cx="30" cy="28" r="2" fill="#38bdf8" />
+          <circle cx="40" cy="28" r="2" fill="#38bdf8" />
+          {/* Staff of Judgement */}
+          <line x1={isAttacking ? 58 : 50} y1="10" x2={isAttacking ? 58 : 50} y2="58" stroke="#ca8a04" strokeWidth="3" />
+          <polygon points={isAttacking ? "58,4 52,10 64,10" : "50,4 44,10 56,10"} fill="#facc15" stroke="#ca8a04" strokeWidth="1" />
+        </svg>
+      );
+
+    case 'cat_hannya_drop':
+      return (
+        <svg width="60" height="60" viewBox="0 0 60 60" className="drop-shadow-md">
+          {/* Buddhist Monk Beads */}
+          <ellipse cx="30" cy="38" rx="14" ry="12" fill="none" stroke="#78350f" strokeWidth="3" strokeDasharray="3,3" />
+          {/* Monk Robe */}
+          <path d="M 20 34 L 40 34 L 44 54 L 16 54 Z" fill="#ea580c" stroke="#7c2d12" strokeWidth="2" />
+          {/* Cat Head with Red Bead Necklace */}
+          <circle cx="30" cy="26" r="13" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <polygon points="20,16 24,8 29,14" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <polygon points="40,16 36,8 31,14" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          <circle cx="26" cy="24" r="1.5" fill="#0f172a" />
+          <circle cx="34" cy="24" r="1.5" fill="#0f172a" />
+          {/* Tin Staff */}
+          <line x1="46" y1="12" x2="46" y2="54" stroke="#d97706" strokeWidth="2.5" />
+          <circle cx="46" cy="12" r="5" fill="none" stroke="#d97706" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_hannya_evolved':
+      return (
+        <svg width="72" height="72" viewBox="0 0 72 72" className="drop-shadow-xl">
+          {/* Crimson Hellfire Aura */}
+          <ellipse cx="36" cy="36" rx="30" ry="28" fill="#fecaca" opacity="0.3" stroke="#ef4444" strokeWidth="2" strokeDasharray="4,4" className="animate-spin" />
+          {/* Ferocious Hannya Mask on Head */}
+          <path d="M 22 14 L 50 14 Q 56 30 50 48 Q 36 56 22 48 Q 16 30 22 14 Z" fill="#b91c1c" stroke="#450a0a" strokeWidth="2.5" />
+          {/* Golden Horns */}
+          <polygon points="20,18 10,6 26,12" fill="#facc15" stroke="#78350f" strokeWidth="2" />
+          <polygon points="52,18 62,6 46,12" fill="#facc15" stroke="#78350f" strokeWidth="2" />
+          {/* Fierce Eyes */}
+          <polygon points="24,28 32,26 28,32" fill="#facc15" />
+          <polygon points="48,28 40,26 44,32" fill="#facc15" />
+          {/* Fangs */}
+          <polygon points="28,42 32,46 36,42" fill="#ffffff" />
+          <polygon points="36,42 40,46 44,42" fill="#ffffff" />
+          {/* Flaming Monk Staff */}
+          <line x1={isAttacking ? 62 : 54} y1="6" x2={isAttacking ? 62 : 54} y2="64" stroke="#b45309" strokeWidth="4" />
+          <polygon points={isAttacking ? "62,2 56,12 68,12" : "54,2 48,12 60,12"} fill="#ef4444" stroke="#991b1b" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'cat_cyclone_drop':
+      return (
+        <svg width="60" height="60" viewBox="0 0 60 60" className="drop-shadow-md">
+          {/* Rugby Helmet */}
+          <circle cx="30" cy="26" r="14" fill="#dc2626" stroke="#991b1b" strokeWidth="2" />
+          <polygon points="20,16 23,8 27,15" fill="#dc2626" stroke="#991b1b" strokeWidth="2" />
+          <polygon points="40,16 37,8 33,15" fill="#dc2626" stroke="#991b1b" strokeWidth="2" />
+          {/* Face Visor */}
+          <rect x="22" y="24" width="16" height="8" rx="2" fill="#ffffff" stroke="#0f172a" strokeWidth="1.5" />
+          <circle cx="26" cy="28" r="1.5" fill="#0f172a" />
+          <circle cx="34" cy="28" r="1.5" fill="#0f172a" />
+          {/* Rugby Ball */}
+          <ellipse cx={isAttacking ? 44 : 38} cy="38" rx="9" ry="6" transform="rotate(-30 38 38)" fill="#78350f" stroke="#451a03" strokeWidth="2" />
+          {/* Legs Sprinting */}
+          <rect x={18 + legOffset1} y="44" width="6" height="12" rx="3" fill="#dc2626" stroke="#0f172a" strokeWidth="1.5" />
+          <rect x={36 + legOffset2} y="44" width="6" height="12" rx="3" fill="#dc2626" stroke="#0f172a" strokeWidth="1.5" />
+        </svg>
+      );
+
+    case 'cat_cyclone_evolved':
+      return (
+        <svg width="75" height="75" viewBox="0 0 75 75" className="drop-shadow-xl">
+          {/* Hurricane Whirlpool Blades */}
+          <circle cx="37" cy="37" rx="32" ry="32" fill="none" stroke="#38bdf8" strokeWidth="4" strokeDasharray="12,6" className="animate-spin" />
+          <path d="M 37 10 Q 55 20 50 37 Q 45 55 37 64 Q 20 50 24 37 Q 28 20 37 10 Z" fill="#bae6fd" opacity="0.7" />
+          {/* Rotating Razor Vacuum Waves */}
+          <polygon points="37,4 44,22 30,22" fill="#0284c7" />
+          <polygon points="70,37 52,44 52,30" fill="#0284c7" />
+          <polygon points="37,70 30,52 44,52" fill="#0284c7" />
+          <polygon points="4,37 22,30 22,44" fill="#0284c7" />
+          {/* Cyclone Cat Core Face */}
+          <circle cx="37" cy="37" r="13" fill="#ffffff" stroke="#0f172a" strokeWidth="2.5" />
+          <circle cx="33" cy="35" r="2" fill="#0f172a" />
+          <circle cx="41" cy="35" r="2" fill="#0f172a" />
+          <ellipse cx="37" cy="39" rx="2" ry="1.5" fill="#f43f5e" />
+        </svg>
+      );
+
+    // =========================================================================
+    // ADVENT BOSS CYCLONES (レッド・ブラック・スペース・アンデッド)
+    // =========================================================================
+    case 'enemy_red_cyclone':
+      return (
+        <svg width="110" height="110" viewBox="0 0 110 110" className="drop-shadow-2xl">
+          {/* Outer Crimson Raging Gale */}
+          <circle cx="55" cy="55" r="50" fill="none" stroke="#ef4444" strokeWidth="6" strokeDasharray="16,8" className="animate-spin" />
+          {/* Razor Whirl Blades */}
+          <path d="M 55 12 Q 80 25 75 55 Q 70 85 55 98 Q 30 85 35 55 Q 40 25 55 12 Z" fill="#991b1b" stroke="#450a0a" strokeWidth="3" />
+          <path d="M 12 55 Q 25 30 55 35 Q 85 40 98 55 Q 85 80 55 75 Q 25 70 12 55 Z" fill="#dc2626" opacity="0.8" />
+          {/* Terrifying Cyclone Core Face */}
+          <circle cx="55" cy="55" r="26" fill="#7f1d1d" stroke="#450a0a" strokeWidth="4" />
+          {/* Piercing Red Eyes */}
+          <circle cx="45" cy="48" r="5" fill="#fef08a" />
+          <circle cx="65" cy="48" r="5" fill="#fef08a" />
+          <circle cx="45" cy="48" r="2.5" fill="#000000" />
+          <circle cx="65" cy="48" r="2.5" fill="#000000" />
+          {/* Gnashing Whirlpool Maw */}
+          <polygon points="40,64 45,72 50,64" fill="#ffffff" />
+          <polygon points="50,64 55,72 60,64" fill="#ffffff" />
+          <polygon points="60,64 65,72 70,64" fill="#ffffff" />
+          {isAttacking && (
+            <ellipse cx="55" cy="55" rx="52" ry="52" fill="none" stroke="#f87171" strokeWidth="8" className="animate-ping" />
+          )}
+        </svg>
+      );
+
+    case 'enemy_black_cyclone':
+      return (
+        <svg width="110" height="110" viewBox="0 0 110 110" className="drop-shadow-2xl">
+          {/* Dark Purple Vortex */}
+          <circle cx="55" cy="55" r="50" fill="none" stroke="#581c87" strokeWidth="6" strokeDasharray="16,8" className="animate-spin" />
+          <path d="M 55 12 Q 80 25 75 55 Q 70 85 55 98 Q 30 85 35 55 Q 40 25 55 12 Z" fill="#18181b" stroke="#09090b" strokeWidth="3" />
+          <path d="M 12 55 Q 25 30 55 35 Q 85 40 98 55 Q 85 80 55 75 Q 25 70 12 55 Z" fill="#3f3f46" opacity="0.8" />
+          {/* Core Face */}
+          <circle cx="55" cy="55" r="26" fill="#09090b" stroke="#a855f7" strokeWidth="4" />
+          <circle cx="45" cy="48" r="5" fill="#c084fc" />
+          <circle cx="65" cy="48" r="5" fill="#c084fc" />
+          <circle cx="45" cy="48" r="2" fill="#ffffff" />
+          <circle cx="65" cy="48" r="2" fill="#ffffff" />
+          <polygon points="40,64 45,72 50,64" fill="#e4e4e7" />
+          <polygon points="50,64 55,72 60,64" fill="#e4e4e7" />
+          <polygon points="60,64 65,72 70,64" fill="#e4e4e7" />
+        </svg>
+      );
+
+    case 'enemy_alien_cyclone':
+      return (
+        <svg width="110" height="110" viewBox="0 0 110 110" className="drop-shadow-2xl">
+          {/* Cyan Alien Orbit Barrier */}
+          <circle cx="55" cy="55" r="50" fill="none" stroke="#0284c7" strokeWidth="6" strokeDasharray="16,8" className="animate-spin" />
+          <path d="M 55 12 Q 80 25 75 55 Q 70 85 55 98 Q 30 85 35 55 Q 40 25 55 12 Z" fill="#0369a1" stroke="#082f49" strokeWidth="3" />
+          <path d="M 12 55 Q 25 30 55 35 Q 85 40 98 55 Q 85 80 55 75 Q 25 70 12 55 Z" fill="#38bdf8" opacity="0.7" />
+          {/* Core Face with Star Forehead */}
+          <circle cx="55" cy="55" r="26" fill="#0c4a6e" stroke="#38bdf8" strokeWidth="4" />
+          <polygon points="55,34 57,39 62,39 58,42 60,47 55,44 50,47 52,42 48,39 53,39" fill="#facc15" />
+          <circle cx="45" cy="50" r="4.5" fill="#38bdf8" />
+          <circle cx="65" cy="50" r="4.5" fill="#38bdf8" />
+          <circle cx="45" cy="50" r="2" fill="#ffffff" />
+          <circle cx="65" cy="50" r="2" fill="#ffffff" />
+        </svg>
+      );
+
+    case 'enemy_zombie_cyclone':
+      return (
+        <svg width="110" height="110" viewBox="0 0 110 110" className="drop-shadow-2xl">
+          {/* Necrotic Green/Purple Miasma */}
+          <circle cx="55" cy="55" r="50" fill="none" stroke="#9333ea" strokeWidth="6" strokeDasharray="16,8" className="animate-spin" />
+          <path d="M 55 12 Q 80 25 75 55 Q 70 85 55 98 Q 30 85 35 55 Q 40 25 55 12 Z" fill="#475569" stroke="#0f172a" strokeWidth="3" />
+          <path d="M 12 55 Q 25 30 55 35 Q 85 40 98 55 Q 85 80 55 75 Q 25 70 12 55 Z" fill="#65a30d" opacity="0.8" />
+          {/* Skull Core Face */}
+          <circle cx="55" cy="55" r="26" fill="#1e293b" stroke="#a855f7" strokeWidth="4" />
+          {/* Red Glowing Dead Eyes */}
+          <circle cx="45" cy="48" r="5" fill="#ef4444" />
+          <circle cx="65" cy="48" r="5" fill="#ef4444" />
+          <circle cx="45" cy="48" r="2" fill="#000000" />
+          <circle cx="65" cy="48" r="2" fill="#000000" />
+          {/* Skeletal Teeth */}
+          <rect x="42" y="62" width="6" height="8" rx="1" fill="#f8fafc" stroke="#0f172a" />
+          <rect x="52" y="62" width="6" height="8" rx="1" fill="#f8fafc" stroke="#0f172a" />
+          <rect x="62" y="62" width="6" height="8" rx="1" fill="#f8fafc" stroke="#0f172a" />
+        </svg>
+      );
+
+    case 'enemy_relic_ape':
+      return (
+        <svg width="85" height="85" viewBox="0 0 85 85" className="drop-shadow-xl">
+          {/* Ancient Relic Armor Plates */}
+          <ellipse cx="42" cy="48" rx="26" ry="22" fill="#78350f" stroke="#451a03" strokeWidth="3" />
+          {/* Mandrill Blue and Red Face */}
+          <circle cx="42" cy="28" r="18" fill="#1e3a8a" stroke="#0f172a" strokeWidth="2.5" />
+          <ellipse cx="42" cy="28" rx="6" ry="12" fill="#dc2626" />
+          <circle cx="34" cy="24" r="3" fill="#facc15" />
+          <circle cx="50" cy="24" r="3" fill="#facc15" />
+          <circle cx="34" cy="24" r="1.5" fill="#000000" />
+          <circle cx="50" cy="24" r="1.5" fill="#000000" />
+          {/* Fangs */}
+          <polygon points="36,36 40,44 44,36" fill="#ffffff" />
+          {/* Arms Banging Ground */}
+          <rect x={12 + legOffset1} y="38" width="10" height="28" rx="4" fill="#451a03" />
+          <rect x={62 + legOffset2} y="38" width="10" height="28" rx="4" fill="#451a03" />
+        </svg>
+      );
+
+    case 'enemy_cosmic_dragon':
+      return (
+        <svg width="100" height="90" viewBox="0 0 100 90" className="drop-shadow-2xl">
+          {/* Cosmic Dragon Wings */}
+          <path d="M 20 40 Q 2 10 38 6 Q 44 26 36 48" fill="#312e81" stroke="#6366f1" strokeWidth="2.5" />
+          <path d="M 70 40 Q 88 10 52 6 Q 46 26 54 48" fill="#312e81" stroke="#6366f1" strokeWidth="2.5" />
+          {/* Dragon Body */}
+          <ellipse cx="45" cy="50" rx="24" ry="18" fill="#1e1b4b" stroke="#818cf8" strokeWidth="3" />
+          {/* Dragon Head with Horns */}
+          <polygon points="32,24 24,10 38,18" fill="#c084fc" stroke="#6b21a8" strokeWidth="2" />
+          <polygon points="58,24 66,10 52,18" fill="#c084fc" stroke="#6b21a8" strokeWidth="2" />
+          <circle cx="45" cy="30" r="14" fill="#312e81" stroke="#818cf8" strokeWidth="2" />
+          <circle cx="40" cy="28" r="3" fill="#38bdf8" />
+          <circle cx="50" cy="28" r="3" fill="#38bdf8" />
+          {/* Tail */}
+          <path d="M 68 52 Q 88 60 92 78" stroke="#6366f1" strokeWidth="5" fill="none" />
+        </svg>
+      );
+
+    case 'enemy_angel_sun':
+      return (
+        <svg width="95" height="95" viewBox="0 0 95 95" className="drop-shadow-2xl">
+          {/* Blazing Sun Rays */}
+          <circle cx="47" cy="47" r="38" fill="none" stroke="#facc15" strokeWidth="4" strokeDasharray="10,6" className="animate-spin" />
+          {/* Golden Sun Core */}
+          <circle cx="47" cy="47" r="28" fill="#fbbf24" stroke="#b45309" strokeWidth="3.5" />
+          {/* Seraphim Feathers */}
+          <polygon points="47,4 53,18 41,18" fill="#fef08a" />
+          <polygon points="90,47 76,53 76,41" fill="#fef08a" />
+          <polygon points="47,90 41,76 53,76" fill="#fef08a" />
+          <polygon points="4,47 18,41 18,53" fill="#fef08a" />
+          {/* Benevolent Divine Face */}
+          <circle cx="40" cy="44" r="3.5" fill="#78350f" />
+          <circle cx="54" cy="44" r="3.5" fill="#78350f" />
+          <path d="M 42 54 Q 47 58 52 54" stroke="#78350f" strokeWidth="2" fill="none" />
+        </svg>
+      );
+
     default:
       return (
         <svg width="50" height="50" viewBox="0 0 50 50">

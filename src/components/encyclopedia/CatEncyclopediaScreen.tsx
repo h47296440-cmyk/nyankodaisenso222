@@ -73,75 +73,146 @@ export const CatEncyclopediaScreen: React.FC<CatEncyclopediaScreenProps> = ({ on
     return true;
   });
 
+  // Helper to format target traits with emojis and clean Japanese
+  const formatTraitNames = (traits?: string[]): string => {
+    if (!traits || traits.length === 0) return '全敵属性';
+    const map: Record<string, string> = {
+      red: '🔴赤い敵',
+      floating: '🕊️浮いてる敵',
+      black: '⚫黒い敵',
+      alien: '👽エイリアン',
+      star_alien: '⭐スターエイリアン',
+      angel: '👼天使',
+      zombie: '🧟ゾンビ',
+      metal: '⚙️メタルな敵',
+      white: '⚪白い敵(無属性)',
+      boss: '👑ボス',
+    };
+    return traits.map((t) => map[t] || t).join('・');
+  };
+
   // Extract human-readable abilities description
   const renderCatAbilitiesSummary = (form: typeof currentCatForm) => {
-    const list: { title: string; color: string; desc: string }[] = [];
+    const list: { title: string; color: string; desc: string; target: string }[] = [];
 
     if (form.traitBonus) {
-      const traitName = form.traitBonus.trait === 'red' ? '赤い敵' : form.traitBonus.trait === 'floating' ? '浮いてる敵' : form.traitBonus.trait === 'black' ? '黒い敵' : form.traitBonus.trait === 'alien' ? 'エイリアン' : form.traitBonus.trait === 'zombie' ? 'ゾンビ' : '対象属性';
+      const traitName = form.traitBonus.trait === 'red' ? '🔴赤い敵' : form.traitBonus.trait === 'floating' ? '🕊️浮いてる敵' : form.traitBonus.trait === 'black' ? '⚫黒い敵' : form.traitBonus.trait === 'alien' ? '👽エイリアン' : form.traitBonus.trait === 'zombie' ? '🧟ゾンビ' : form.traitBonus.trait === 'angel' ? '👼天使' : '対象属性';
       const effectName = form.traitBonus.effect === 'strong' ? 'めっぽう強い' : form.traitBonus.effect === 'massive_damage' ? '超ダメージ' : form.traitBonus.effect === 'resist' ? '打たれ強い' : form.traitBonus.effect === 'freeze' ? '動きを止める' : form.traitBonus.effect === 'slow' ? '動きを遅くする' : form.traitBonus.effect === 'knockback' ? 'ふっとばす' : '特効効果';
 
       list.push({
-        title: `${traitName}に${effectName}`,
-        color: 'bg-rose-950 text-rose-300 border-rose-500/50',
-        desc: `${traitName}に対してダメージ${form.traitBonus.multiplier}倍などの有利効果を発揮します。`,
+        title: `【${traitName}】に${effectName}`,
+        target: traitName,
+        color: 'bg-rose-950/80 text-rose-200 border-rose-500/60',
+        desc: `${traitName}に対してダメージ${form.traitBonus.multiplier}倍などの圧倒的有利効果を発揮！`,
       });
     }
 
     if (form.abilities?.massiveDamage) {
+      const targetStr = formatTraitNames(form.abilities.massiveDamage.traits);
+      const mult = form.abilities.massiveDamage.mult || 3.5;
       list.push({
-        title: '超ダメージ',
-        color: 'bg-amber-950 text-amber-300 border-amber-500/50',
-        desc: '対象の敵に対して与えるダメージが通常の3〜4倍に大幅アップ！',
+        title: `【${targetStr}】に超ダメージ (${mult}倍)`,
+        target: targetStr,
+        color: 'bg-amber-950/80 text-amber-200 border-amber-500/60',
+        desc: `${targetStr}に対して与える攻撃ダメージが通常時の【${mult}倍】に大幅上昇！`,
       });
     }
 
     if (form.abilities?.strong) {
+      const targetStr = formatTraitNames(form.abilities.strong.traits);
+      const mult = form.abilities.strong.mult || 1.8;
       list.push({
-        title: 'めっぽう強い',
-        color: 'bg-emerald-950 text-emerald-300 border-emerald-500/50',
-        desc: '対象の敵に与えるダメージがアップし、受ける被ダメージを大幅軽減します。',
+        title: `【${targetStr}】にめっぽう強い`,
+        target: targetStr,
+        color: 'bg-emerald-950/80 text-emerald-200 border-emerald-500/60',
+        desc: `${targetStr}への与ダメージが約${mult}倍に増加し、受ける被ダメージを約50%軽減（被ダメ半減）！`,
+      });
+    }
+
+    if (form.abilities?.freeze) {
+      const targetStr = formatTraitNames(form.abilities.freeze.traits);
+      const chance = Math.round((form.abilities.freeze.chance ?? 1.0) * 100);
+      const dur = form.abilities.freeze.duration ?? 2.5;
+      list.push({
+        title: `【${targetStr}】の動きを止める (${chance}% / ${dur}秒)`,
+        target: targetStr,
+        color: 'bg-sky-950/80 text-sky-200 border-sky-500/60',
+        desc: `攻撃ヒット時、${chance}%の確率で${targetStr}の行動・攻撃を【${dur}秒間】完全に完全停止・氷結させます！`,
+      });
+    }
+
+    if (form.abilities?.slow) {
+      const targetStr = formatTraitNames(form.abilities.slow.traits);
+      const chance = Math.round((form.abilities.slow.chance ?? 1.0) * 100);
+      const dur = form.abilities.slow.duration ?? 3.0;
+      list.push({
+        title: `【${targetStr}】の動きを遅くする (${chance}% / ${dur}秒)`,
+        target: targetStr,
+        color: 'bg-blue-950/80 text-blue-200 border-blue-500/60',
+        desc: `攻撃ヒット時、${chance}%の確率で${targetStr}の移動速度を【${dur}秒間】激減させて足止めします！`,
+      });
+    }
+
+    if (form.abilities?.knockback) {
+      const targetStr = formatTraitNames(form.abilities.knockback.traits);
+      const chance = Math.round((form.abilities.knockback.chance ?? 1.0) * 100);
+      list.push({
+        title: `【${targetStr}】を必ずふっとばす (${chance}%)`,
+        target: targetStr,
+        color: 'bg-orange-950/80 text-orange-200 border-orange-500/60',
+        desc: `${chance}%の確率で${targetStr}を大きく後方へ強制ノックバックさせ前線を押し上げます！`,
+      });
+    }
+
+    if (form.abilities?.weaken) {
+      const targetStr = formatTraitNames(form.abilities.weaken.traits);
+      const chance = Math.round((form.abilities.weaken.chance ?? 1.0) * 100);
+      const dur = form.abilities.weaken.duration ?? 4.0;
+      const mult = Math.round((form.abilities.weaken.mult ?? 0.5) * 100);
+      list.push({
+        title: `【${targetStr}】の攻撃力を低下 (${chance}% / 攻撃力${mult}%化)`,
+        target: targetStr,
+        color: 'bg-rose-950/80 text-rose-200 border-rose-500/60',
+        desc: `攻撃ヒット時、${chance}%の確率で${targetStr}の攻撃力を【${dur}秒間】${mult}%に半減弱体化！`,
       });
     }
 
     if (form.abilities?.criticalChance) {
+      const pct = Math.round(form.abilities.criticalChance * 100);
       list.push({
-        title: `クリティカル (${Math.round(form.abilities.criticalChance * 100)}%)`,
-        color: 'bg-yellow-950 text-yellow-300 border-yellow-500/50',
-        desc: 'メタル属性の防御力を貫通し、2倍の大ダメージを与える一撃を放ちます。',
+        title: `⚡ クリティカル発動率 (${pct}%)`,
+        target: '⚙️メタルな敵・全敵',
+        color: 'bg-yellow-950/80 text-yellow-200 border-yellow-500/60',
+        desc: `通常ダメージ1しか通らない【メタル属性の敵】の装甲を貫通し、2倍の大ダメージで一撃粉砕！`,
       });
     }
 
     if (form.waveLevel || form.abilities?.wave) {
       const lvl = form.waveLevel || form.abilities?.wave?.level || 1;
+      const chance = Math.round((form.abilities?.wave?.chance ?? 1.0) * 100);
       list.push({
-        title: `波動攻撃 (Lv.${lvl})`,
-        color: 'bg-cyan-950 text-cyan-300 border-cyan-500/50',
-        desc: `攻撃ヒット時に前方を貫通する強力な波動ショックウェーブ(Lv.${lvl})を発生させます。`,
+        title: `🌊 波動ショックウェーブ (Lv.${lvl} / 発生率${chance}%)`,
+        target: '全敵・遠距離一網打尽',
+        color: 'bg-cyan-950/80 text-cyan-200 border-cyan-500/60',
+        desc: `攻撃ヒット時に前方を長距離貫通する波動を発生！遠くの敵や後ろの敵城までまとめて衝撃波で薙ぎ払う！`,
       });
     }
 
     if (form.abilities?.barrierBreaker) {
       list.push({
-        title: 'バリアブレイカー',
-        color: 'bg-purple-950 text-purple-300 border-purple-500/50',
-        desc: 'スターエイリアンなどの宇宙バリアを一撃で破壊します。',
+        title: '🛡️ バリアブレイカー (100%破壊)',
+        target: '⭐スターエイリアン',
+        color: 'bg-purple-950/80 text-purple-200 border-purple-500/60',
+        desc: 'スターエイリアンが展開するいかなる強固な宇宙バリアも一撃で粉砕貫通！',
       });
     }
 
     if (form.abilities?.zombieKiller) {
       list.push({
-        title: 'ゾンビキラー',
-        color: 'bg-indigo-950 text-indigo-300 border-indigo-500/50',
-        desc: 'ゾンビ属性の敵を倒した際、蘇生を完全に封じ込めて昇天させます。',
-      });
-    }
-
-    if (form.abilities?.freeze) {
-      list.push({
-        title: `動きを止める (${form.abilities.freeze.duration}秒)`,
-        color: 'bg-sky-950 text-sky-300 border-sky-500/50',
-        desc: '敵を完全に氷結・静止させて行動を封じます。',
+        title: '⚰️ ゾンビキラー (蘇生完全無効)',
+        target: '🧟ゾンビ',
+        color: 'bg-indigo-950/80 text-indigo-200 border-indigo-500/60',
+        desc: 'ゾンビ属性の敵にトドメを刺した際、地中からの復活・蘇生を完全に封殺して消滅昇天させます！',
       });
     }
 

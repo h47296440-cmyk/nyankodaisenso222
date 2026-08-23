@@ -1938,6 +1938,166 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         }
       }
     ]
+  },
+  // =========================================================================
+  // ADVENT STAGE DROP REWARD CHARACTERS (降臨ステージクリア限定報酬キャラ)
+  // =========================================================================
+  {
+    id: 'cat_clionel_drop',
+    rarity: 'super_rare',
+    unlockedAtStart: false,
+    unlockMethod: 'stage',
+    unlockHint: '降臨ステージ「断罪天使クオリネル降臨『死に際流星群』」クリアで入手！',
+    forms: [
+      {
+        name: 'ネコ神判',
+        jpName: 'ネコ神判',
+        description: '【天使にめっぽう強い＆たまに動きを止める / 範囲攻撃】断罪天使の神力を授かりし審判にゃんこ。聖なる天秤を掲げて天使の罪を断じ、進行を食い止める！',
+        hp: 7600,
+        attackPower: 1850,
+        attackRange: 260,
+        attackSpeed: 0.85,
+        attackWindup: 0.35,
+        speed: 30,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 1050,
+        cooldown: 8.5,
+        scale: 1.25,
+        spriteType: 'cat_clionel_drop',
+        traitBonus: { trait: 'angel', effect: 'strong', multiplier: 2.0 },
+        abilities: {
+          strong: { mult: 2.0, traits: ['angel'] },
+          freeze: { chance: 0.35, duration: 2.5, traits: ['angel'] }
+        }
+      },
+      {
+        name: '大天使ネコ',
+        jpName: '大天使ネコ',
+        description: '【天使に超ダメージ＆動きを止める / 範囲攻撃】神の意志を代行する大天使へと覚醒。神聖な光輪から裁きの光を照射し、天使属性の敵をまとめて討滅する！',
+        hp: 13800,
+        attackPower: 3950,
+        attackRange: 320,
+        attackSpeed: 0.75,
+        attackWindup: 0.4,
+        speed: 34,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 1050,
+        cooldown: 8.0,
+        scale: 1.4,
+        spriteType: 'cat_clionel_evolved',
+        traitBonus: { trait: 'angel', effect: 'massive_damage', multiplier: 3.5 },
+        abilities: {
+          massiveDamage: { mult: 3.5, traits: ['angel'] },
+          freeze: { chance: 0.5, duration: 3.0, traits: ['angel'] }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_hannya_drop',
+    rarity: 'super_rare',
+    unlockedAtStart: false,
+    unlockMethod: 'stage',
+    unlockHint: '降臨ステージ「般若我王降臨『地獄門』」クリアで入手！',
+    forms: [
+      {
+        name: 'ネコ極楽',
+        jpName: 'ネコ極楽',
+        description: '【赤い敵にめっぽう強い＆攻撃力低下 / 範囲攻撃】地獄の業火を鎮める修行僧にゃんこ。錫杖から放つ慈悲の法力で赤い敵の戦意を奪い、攻撃力を半減させる！',
+        hp: 8400,
+        attackPower: 1950,
+        attackRange: 240,
+        attackSpeed: 0.9,
+        attackWindup: 0.3,
+        speed: 28,
+        knockbacks: 2,
+        attackType: 'area',
+        cost: 980,
+        cooldown: 7.5,
+        scale: 1.25,
+        spriteType: 'cat_hannya_drop',
+        traitBonus: { trait: 'red', effect: 'strong', multiplier: 2.0 },
+        abilities: {
+          strong: { mult: 2.0, traits: ['red'] },
+          weaken: { chance: 0.5, duration: 4.0, mult: 0.5, traits: ['red'] }
+        }
+      },
+      {
+        name: '狂乱のネコ極楽',
+        jpName: '狂乱のネコ極楽',
+        description: '【赤い敵と黒い敵に超ダメージ＆攻撃力低下無効 / 範囲攻撃】怒りの鬼面を被り真の破壊僧となった姿。業火を纏った錫杖連打で赤と黒の敵軍を圧倒的火力で消滅させる！',
+        hp: 15200,
+        attackPower: 4200,
+        attackRange: 280,
+        attackSpeed: 0.8,
+        attackWindup: 0.35,
+        speed: 36,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 980,
+        cooldown: 7.0,
+        scale: 1.45,
+        spriteType: 'cat_hannya_evolved',
+        traitBonus: { trait: 'red', effect: 'massive_damage', multiplier: 3.5 },
+        abilities: {
+          massiveDamage: { mult: 3.5, traits: ['red', 'black'] },
+          weaken: { chance: 0.7, duration: 5.0, mult: 0.5, traits: ['red', 'black'] }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_cyclone_drop',
+    rarity: 'super_rare',
+    unlockedAtStart: false,
+    unlockMethod: 'stage',
+    unlockHint: '降臨ステージ「レッドサイクロン降臨『紅のカタストロフ』」クリアで入手！',
+    forms: [
+      {
+        name: 'ネコラガー',
+        jpName: 'ネコラガー',
+        description: '【超高速突撃＆高確率クリティカル / 範囲攻撃】赤いサイクロンを潜り抜けた熱血ラガーにゃんこ。猛ダッシュと鋭いタックルでメタルや浮いてる敵を弾き飛ばす！',
+        hp: 5500,
+        attackPower: 750,
+        attackRange: 160,
+        attackSpeed: 3.5,
+        attackWindup: 0.08,
+        speed: 48,
+        knockbacks: 4,
+        attackType: 'area',
+        cost: 650,
+        cooldown: 4.5,
+        scale: 1.15,
+        spriteType: 'cat_cyclone_drop',
+        abilities: {
+          criticalChance: 0.25,
+          knockback: { chance: 0.4, traits: ['red', 'floating'] }
+        }
+      },
+      {
+        name: 'ネコタイフーン',
+        jpName: 'ネコタイフーン',
+        description: '【超絶連撃（秒間10回攻撃）＆クリティカル / メタル瞬殺 / 範囲攻撃】自らが巨大な竜巻へと進化した暴風にゃんこ。超高速の真空波カッター連打でメタルな敵を瞬時に微粒子レベルで切り刻む！',
+        hp: 9200,
+        attackPower: 450,
+        attackRange: 180,
+        attackSpeed: 6.0,
+        attackWindup: 0.05,
+        speed: 52,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 650,
+        cooldown: 4.0,
+        scale: 1.3,
+        spriteType: 'cat_cyclone_evolved',
+        abilities: {
+          criticalChance: 0.35,
+          knockback: { chance: 0.5, traits: ['red', 'floating', 'metal'] }
+        }
+      }
+    ]
   }
 ];
 
@@ -3582,6 +3742,157 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
       barrier: { hp: 12000 },
       burrow: { count: 1, distance: 400 },
       revive: { count: 1, hpPercent: 100, delaySeconds: 3.0 }
+    }
+  },
+
+  // =========================================================================
+  // CYCLONE & RELIC/LEGEND BOSSES (降臨サイクロン＆新敵キャラクター)
+  // =========================================================================
+  enemy_red_cyclone: {
+    id: 'enemy_red_cyclone',
+    name: 'レッドサイクロン',
+    description: '【降臨BOSS / 赤い敵 / 浮いてる敵 / 超極悪DPS / 超高速攻撃頻度】降臨ステージ『紅のカタストロフ』の赤き暴風神。体力180万、攻撃力9800を秒間8回の超速連打で放ち、一瞬で城すら削り取る！赤い敵・浮き対策の妨害（ふっとばす・動きを止める）で封殺せよ！',
+    hp: 1800000,
+    attackPower: 9800,
+    attackRange: 90,
+    attackSpeed: 8.0, // 超高速攻撃頻度！
+    attackWindup: 0.05,
+    speed: 16,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 35000,
+    rewardXp: 90000,
+    traits: ['red', 'floating', 'boss'],
+    spriteType: 'enemy_red_cyclone',
+    scale: 2.7,
+    isBoss: true,
+  },
+  enemy_black_cyclone: {
+    id: 'enemy_black_cyclone',
+    name: 'ブラックサイクロン',
+    description: '【降臨BOSS / 黒い敵 / 浮いてる敵 / 超高火力連撃】漆黒の闇から生まれた破壊旋風。体力150万、攻撃力11000の暗黒竜巻で前線を粉砕！黒い敵と浮いてる敵への停止妨害が攻略のカギ！',
+    hp: 1500000,
+    attackPower: 11000,
+    attackRange: 95,
+    attackSpeed: 7.0,
+    attackWindup: 0.06,
+    speed: 18,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 35000,
+    rewardXp: 90000,
+    traits: ['black', 'floating', 'boss'],
+    spriteType: 'enemy_black_cyclone',
+    scale: 2.7,
+    isBoss: true,
+  },
+  enemy_alien_cyclone: {
+    id: 'enemy_alien_cyclone',
+    name: 'スペースサイクロン',
+    description: '【降臨BOSS / エイリアン / 浮いてる敵 / バリア】宇宙の重力崩壊によって生じた青き巨大竜巻。25000の強固なスターバリアを纏い、高威力連撃を繰り出す！バリアブレイカーで殻を破れ！',
+    hp: 2000000,
+    attackPower: 10500,
+    attackRange: 100,
+    attackSpeed: 7.0,
+    attackWindup: 0.06,
+    speed: 15,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 40000,
+    rewardXp: 95000,
+    traits: ['alien', 'floating', 'boss'],
+    spriteType: 'enemy_alien_cyclone',
+    scale: 2.7,
+    isBoss: true,
+    abilities: {
+      barrier: { hp: 25000 }
+    }
+  },
+  enemy_zombie_cyclone: {
+    id: 'enemy_zombie_cyclone',
+    name: 'アンデッドサイクロン',
+    description: '【降臨BOSS / ゾンビ / 浮いてる敵 / 地中潜行＆蘇生】冥界の瘴気が凝縮した死霊竜巻。前線を一気に潜行してくぐり抜け、倒されてもHP100%で蘇生する！ゾンビキラーでトドメを刺せ！',
+    hp: 1600000,
+    attackPower: 9500,
+    attackRange: 90,
+    attackSpeed: 6.5,
+    attackWindup: 0.06,
+    speed: 14,
+    knockbacks: 2,
+    attackType: 'area',
+    rewardMoney: 40000,
+    rewardXp: 95000,
+    traits: ['zombie', 'floating', 'boss'],
+    spriteType: 'enemy_zombie_cyclone',
+    scale: 2.7,
+    isBoss: true,
+    abilities: {
+      burrow: { count: 1, distance: 500 },
+      revive: { count: 1, hpPercent: 100, delaySeconds: 3.0 }
+    }
+  },
+  enemy_relic_ape: {
+    id: 'enemy_relic_ape',
+    name: '太古の怪獣マンドリル',
+    description: '【レジェンド深淵 / 範囲攻撃 / 波動Lv3】太古の樹海に君臨する狂乱マンドリル。怒りの咆哮と共に地割れ波動を連続発生させ、遠くの量産壁を一網打尽にする！',
+    hp: 380000,
+    attackPower: 4200,
+    attackRange: 160,
+    attackSpeed: 1.2,
+    attackWindup: 0.25,
+    speed: 38,
+    knockbacks: 5,
+    attackType: 'area',
+    rewardMoney: 8500,
+    rewardXp: 12000,
+    traits: ['boss'],
+    spriteType: 'enemy_relic_ape',
+    scale: 2.2,
+    isBoss: true,
+    waveLevel: 3
+  },
+  enemy_cosmic_dragon: {
+    id: 'enemy_cosmic_dragon',
+    name: '創世龍バハムート・アルファ',
+    description: '【レジェンド頂点 / スターエイリアン / ワープ / 範囲攻撃】宇宙開闢の理を司る原初の竜。口から吐き出す空間跳躍ビームで味方を後方ワープさせ、城へダイレクトアタックを狙う！',
+    hp: 650000,
+    attackPower: 7500,
+    attackRange: 420,
+    attackSpeed: 0.5,
+    attackWindup: 0.6,
+    speed: 22,
+    knockbacks: 4,
+    attackType: 'area',
+    rewardMoney: 18000,
+    rewardXp: 30000,
+    traits: ['star_alien', 'boss'],
+    spriteType: 'enemy_cosmic_dragon',
+    scale: 2.6,
+    isBoss: true,
+    abilities: {
+      warp: { chance: 0.6, distance: 300, duration: 1.5 }
+    }
+  },
+  enemy_angel_sun: {
+    id: 'enemy_angel_sun',
+    name: '太陽神ラー（光輪の巨神）',
+    description: '【天使 / 遠距離停止 / 範囲攻撃】天界の頂に鎮座する太陽神。眩い天光で前線の動きを3秒間完全停止させ、神罰の雷光を落とし続ける！',
+    hp: 520000,
+    attackPower: 5800,
+    attackRange: 460,
+    attackSpeed: 0.4,
+    attackWindup: 0.7,
+    speed: 12,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 15000,
+    rewardXp: 25000,
+    traits: ['angel', 'boss'],
+    spriteType: 'enemy_angel_sun',
+    scale: 2.5,
+    isBoss: true,
+    abilities: {
+      freeze: { chance: 0.8, duration: 3.0, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie', 'white', 'metal'] }
     }
   }
 };

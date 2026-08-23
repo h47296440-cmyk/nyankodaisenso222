@@ -20,11 +20,11 @@ export interface AbilityDefinition {
   weaken?: { chance: number; duration: number; mult: number; traits?: EnemyTrait[] };
   knockback?: { chance: number; traits?: EnemyTrait[] };
   massiveDamage?: { mult: number; traits?: EnemyTrait[] };
-  strong?: { traits?: EnemyTrait[] };
+  strong?: { mult?: number; traits?: EnemyTrait[] };
   resist?: { traits?: EnemyTrait[] };
   zombieKiller?: boolean;
   barrier?: { hp: number }; // スターエイリアンのバリア耐久値 (単発ダメージがこれ以上で破壊)
-  warp?: { chance: number; distance: number }; // ワープ能力 (味方を後方にテレポート)
+  warp?: { chance: number; distance: number; duration?: number }; // ワープ能力 (味方を後方にテレポート)
   barrierBreaker?: { chance: number }; // バリアブレイカー能力 (バリアを即座に粉砕)
   chargeAttack?: { chargeTime: number; isOneHitKill?: boolean }; // フィリバスター等の大溜め即死攻撃
   burrow?: { count: number; distance: number };
@@ -66,7 +66,7 @@ export interface CatDefinition {
   unlockedAtStart?: boolean;
   unlockCostXp?: number;
   unlockCostCatFood?: number;
-  unlockMethod?: 'start' | 'xp' | 'gacha' | 'stage_reward';
+  unlockMethod?: 'start' | 'xp' | 'gacha' | 'stage_reward' | 'stage' | 'code' | 'story';
   requiredStageId?: string;
   unlockHint?: string;
 }
@@ -250,10 +250,19 @@ export type ChapterId =
   | 'legend_14'
   | 'legend_15'
   | 'legend_16'
+  | 'legend_17'
+  | 'legend_18'
+  | 'legend_19'
+  | 'legend_20'
   | 'crazed_event'
   | 'special_event'
   | 'advent_clionel'
   | 'advent_hannya'
+  | 'advent_red_cyclone'
+  | 'advent_black_cyclone'
+  | 'advent_alien_cyclone'
+  | 'advent_zombie_cyclone'
+  | 'challenge_score_attack'
   | 'advent'
   | 'zombie_future'
   | 'zombie_cosmos'
@@ -278,6 +287,7 @@ export interface StageDefinition {
     | 'japan_city'
     | 'japan_volcano'
     | 'japan_zombie'
+    | 'japan_standard'
     | 'future_neon'
     | 'future_space'
     | 'future_zombie'
@@ -292,6 +302,7 @@ export interface StageDefinition {
     | 'legend_ice'
     | 'legend_sky'
     | 'legend_ruins'
+    | 'legend_desert'
     | 'crazed_hell'
     | 'advent_heaven'
     | 'advent_hell';
@@ -457,6 +468,34 @@ export interface PlayerStats {
   totalGamatotoSent: number;
 }
 
+export interface PvpDeckUnitSummary {
+  catId: string;
+  name: string;
+  jpName?: string;
+  level: number;
+  formIndex: number;
+  cost: number;
+  spriteType: string;
+  hp: number;
+  attackPower: number;
+  attackRange: number;
+  attackSpeed: number;
+  speed: number;
+  attackType?: 'single' | 'area';
+  rarity?: string;
+}
+
+export interface PvpFriendRecord {
+  peerId: string;
+  name: string;
+  userRank: number;
+  lastPlayed: number;
+  wins: number;
+  losses: number;
+  scoreAttackHighScore?: number;
+  deck: PvpDeckUnitSummary[];
+}
+
 export interface PlayerProfile {
   xp: number;
   catFood: number;
@@ -481,8 +520,11 @@ export interface PlayerProfile {
   unlockedValkyrieTrueForm?: boolean; // 未来編ゾンビ最終決戦クリアでネコヴァルキリー第3形態解放
   unlockedClionelDrop?: boolean; // 断罪天使クオリネル降臨クリア特典
   unlockedHannyaDrop?: boolean; // 般若我王降臨クリア特典
+  unlockedCycloneDrop?: boolean; // レッドサイクロン降臨クリア特典 (ネコラガー / ネコタイフーン)
+  scoreAttackHighScore?: number; // スコアアタック最高スコア
   pvpWins?: number;
   pvpLosses?: number;
+  pvpFriends?: Record<string, PvpFriendRecord>; // 接続した相手の編成・スコアアタック記録
   devMode?: DevModeSettings;
   redeemedCodes?: Record<string, number>; // code -> redeemedTimestamp
   infiniteEnergyUntil?: number; // timestamp in ms until infinite energy expires

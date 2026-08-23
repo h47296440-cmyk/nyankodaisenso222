@@ -44,8 +44,20 @@ export const GachaScreen: React.FC<GachaScreenProps> = ({
       rarity = 'rare';
     }
 
-    const eligibleCats = CAT_DEFINITIONS.filter((c) => c.rarity === rarity);
-    const selectedCat = eligibleCats[Math.floor(Math.random() * eligibleCats.length)] || CAT_DEFINITIONS[0];
+    // Filter strictly to gacha-obtainable units:
+    // Exclude: crazed units, summer limited (gift code), advent stage drops, story reward units
+    const eligibleCats = CAT_DEFINITIONS.filter((c) => {
+      if (c.rarity !== rarity) return false;
+      if (c.unlockMethod === 'stage' || c.unlockMethod === 'code' || c.unlockMethod === 'story') return false;
+      if (c.id.startsWith('crazed_')) return false;
+      if (c.id === 'summer_cat_2026') return false;
+      if (c.id.includes('drop')) return false;
+      if (c.id === 'cat_valkyrie' || c.id === 'cat_bahamut' || c.id === 'cat_moneko' || c.id === 'cat_filibuster') return false;
+      return true;
+    });
+
+    const pool = eligibleCats.length > 0 ? eligibleCats : CAT_DEFINITIONS.filter(c => c.rarity === rarity);
+    const selectedCat = pool[Math.floor(Math.random() * pool.length)] || CAT_DEFINITIONS[0];
 
     const isAlreadyUnlocked = !!profile.cats[selectedCat.id]?.unlocked;
     const xpBonus = isAlreadyUnlocked
@@ -150,36 +162,36 @@ export const GachaScreen: React.FC<GachaScreenProps> = ({
       </div>
 
       {/* Main Banner */}
-      <div className="flex-1 p-4 md:p-6 overflow-y-auto flex flex-col items-center justify-between max-w-4xl mx-auto w-full">
+      <div className="flex-1 p-2.5 sm:p-4 md:p-6 overflow-y-auto flex flex-col items-center justify-between max-w-4xl mx-auto w-full gap-3 sm:gap-4">
         {/* Banner Art Card */}
-        <div className="w-full bg-gradient-to-r from-purple-950 via-indigo-900 to-amber-950 border-4 border-amber-400 rounded-3xl p-6 shadow-2xl relative overflow-hidden text-center flex flex-col items-center">
-          <div className="absolute top-2 right-4 bg-red-600 text-white text-[10px] font-black px-3 py-0.5 rounded-full border border-yellow-300 animate-pulse">
+        <div className="w-full bg-gradient-to-r from-purple-950 via-indigo-900 to-amber-950 border-2 sm:border-4 border-amber-400 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl relative overflow-hidden text-center flex flex-col items-center shrink-0">
+          <div className="absolute top-2 right-3 sm:right-4 bg-red-600 text-white text-[9px] sm:text-[10px] font-black px-2 sm:px-3 py-0.5 rounded-full border border-yellow-300 animate-pulse">
             超激レア確率UP中！
           </div>
 
-          <div className="text-xs sm:text-sm font-black text-amber-300 tracking-widest uppercase mb-1">
+          <div className="text-[10px] sm:text-xs md:text-sm font-black text-amber-300 tracking-widest uppercase mb-1">
             ★ 超古代勇者 ＆ 伝説の破壊神フェス ★
           </div>
-          <h3 className="text-2xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-400 drop-shadow">
+          <h3 className="text-xl sm:text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-400 drop-shadow">
             超激ダイナマイツ！レアガチャ
           </h3>
-          <p className="text-xs text-stone-300 mt-2 max-w-md">
-            「かさじぞう」「狂乱のネコムート」「ネコヴァルキリー」「皇獣ガオウ」など、最強クラスの範囲攻撃キャラクターが多数参戦！
+          <p className="text-[11px] sm:text-xs text-stone-300 mt-1 sm:mt-2 max-w-md">
+            「かさじぞう」「皇獣ガオウ」「黒獣ダルターニャ」「キャットマンダディ」など、超強力なキャラクターが多数参戦！
           </p>
 
           {/* Featured characters showcase */}
-          <div className="flex justify-center items-center gap-6 my-6">
+          <div className="flex justify-center items-center gap-4 sm:gap-8 my-3 sm:my-6">
             <div className="flex flex-col items-center">
-              <UnitSpriteRenderer spriteType="cat_jizo" isCat={true} state="walk" animTimer={1} scale={1.1} />
+              <UnitSpriteRenderer spriteType="cat_jizo" isCat={true} state="walk" animTimer={1} scale={1.0} />
               <span className="text-[10px] font-black text-amber-300 mt-1">かさじぞう</span>
             </div>
             <div className="flex flex-col items-center">
-              <UnitSpriteRenderer spriteType="cat_bahamut" isCat={true} state="walk" animTimer={1} scale={1.25} />
-              <span className="text-[10px] font-black text-purple-300 mt-1">狂乱のネコムート</span>
+              <UnitSpriteRenderer spriteType="cat_gao" isCat={true} state="walk" animTimer={1} scale={1.1} />
+              <span className="text-[10px] font-black text-yellow-300 mt-1">皇獣ガオウ</span>
             </div>
             <div className="flex flex-col items-center">
-              <UnitSpriteRenderer spriteType="cat_valkyrie" isCat={true} state="walk" animTimer={1} scale={1.15} />
-              <span className="text-[10px] font-black text-cyan-300 mt-1">ネコヴァルキリー</span>
+              <UnitSpriteRenderer spriteType="cat_catman" isCat={true} state="walk" animTimer={1} scale={1.05} />
+              <span className="text-[10px] font-black text-cyan-300 mt-1">キャットマン</span>
             </div>
           </div>
         </div>
