@@ -35,6 +35,8 @@ interface BattleHudProps {
   gamepadConnected?: boolean;
   controllerName?: string;
   selectedSlotIndex?: number;
+  score?: number;
+  isScoreAttack?: boolean;
   children?: React.ReactNode;
 }
 
@@ -64,6 +66,8 @@ export const BattleHud: React.FC<BattleHudProps> = ({
   gamepadConnected = false,
   controllerName = '',
   selectedSlotIndex = 0,
+  score = 0,
+  isScoreAttack = false,
   children,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -137,6 +141,18 @@ export const BattleHud: React.FC<BattleHudProps> = ({
             <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 bg-emerald-950/80 border border-emerald-500/80 rounded-full text-emerald-300 text-[11px] font-black shadow-md animate-pulse whitespace-nowrap">
               <Gamepad2 size={15} />
               <span>Switchコントローラー</span>
+            </div>
+          )}
+
+          {/* Score Attack Live Score Badge */}
+          {isScoreAttack && (
+            <div className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 border-2 border-yellow-300 rounded-full text-stone-950 font-black shadow-[0_0_12px_rgba(234,179,8,0.7)] animate-pulse whitespace-nowrap">
+              <span className="text-[10px] sm:text-xs tracking-tight uppercase bg-black/80 text-yellow-300 px-1.5 py-0.5 rounded-full font-mono">
+                SCORE
+              </span>
+              <span className="text-xs sm:text-base font-mono tracking-wider text-black">
+                {score.toLocaleString()} <span className="text-[10px] sm:text-xs">pt</span>
+              </span>
             </div>
           )}
         </div>

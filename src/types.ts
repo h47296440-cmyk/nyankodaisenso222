@@ -254,6 +254,7 @@ export type ChapterId =
   | 'legend_18'
   | 'legend_19'
   | 'legend_20'
+  | 'legend_21'
   | 'crazed_event'
   | 'special_event'
   | 'advent_clionel'
@@ -497,6 +498,7 @@ export interface PvpFriendRecord {
 }
 
 export interface PlayerProfile {
+  playerName?: string; // プレイヤー名（司令官ネーム）
   xp: number;
   catFood: number;
   energy: number;

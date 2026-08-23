@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PlayerProfile, PvpFriendRecord, PvpDeckUnitSummary } from '../../types';
 import { CAT_DEFINITIONS } from '../../data/units';
+import { TREASURES } from '../../data/stages';
 import { UnitSpriteRenderer } from '../battle/UnitSpriteRenderer';
 import { audio } from '../../utils/audio';
 import Peer, { DataConnection } from 'peerjs';
@@ -159,19 +160,36 @@ export const PvpLobbyModal: React.FC<PvpLobbyModalProps> = ({
       }
     }
 
+    let treasureCatHpMult = 1.0;
+    let treasureCatAtkMult = 1.0;
+
+    Object.entries(profile.treasures || {}).forEach(([stageKey, quality]) => {
+      const tr = TREASURES[stageKey];
+      if (tr && quality !== 'none') {
+        const qMult = quality === 'gold' ? 1.0 : quality === 'silver' ? 0.7 : 0.4;
+        const boost = tr.buffValue * qMult;
+        if (tr.buffType === 'cat_hp') treasureCatHpMult += boost;
+        if (tr.buffType === 'cat_atk') treasureCatAtkMult += boost;
+      }
+    });
+
     const deckUnits: PvpDeckUnitSummary[] = profile.deck.slice(0, 10).map((catId) => {
       const def = CAT_DEFINITIONS.find((c) => c.id === catId) || CAT_DEFINITIONS[0];
       const prog = (profile.cats && profile.cats[catId]) || { level: 1, activeForm: 0, unlocked: true };
       const form = def.forms[prog.activeForm || 0] || def.forms[0];
+      const lvl = prog.level || 1;
+      const levelMult = 1 + (lvl - 1) * 0.1;
+      const hp = Math.round(form.hp * levelMult * treasureCatHpMult);
+      const attackPower = Math.round(form.attackPower * levelMult * treasureCatAtkMult);
       return {
         catId: def.id,
         formIndex: prog.activeForm || 0,
-        level: prog.level || 1,
+        level: lvl,
         name: form.name,
         jpName: form.jpName,
         cost: form.cost,
-        hp: Math.round(form.hp * (1 + (prog.level - 1) * 0.15)),
-        attackPower: Math.round(form.attackPower * (1 + (prog.level - 1) * 0.15)),
+        hp,
+        attackPower,
         attackRange: form.attackRange,
         attackSpeed: form.attackSpeed,
         speed: form.speed,
@@ -182,7 +200,7 @@ export const PvpLobbyModal: React.FC<PvpLobbyModalProps> = ({
     const clearedCount = Object.keys(profile.clearedStages || {}).length;
 
     return {
-      name: 'にゃんこ司令官',
+      name: profile.playerName || 'にゃんこ司令官',
       rank: totalCatLevels,
       scoreAttackHighScore: profile.scoreAttackHighScore || 0,
       clearedStagesCount: clearedCount,

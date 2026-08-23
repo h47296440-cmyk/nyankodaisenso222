@@ -13,6 +13,7 @@ export type BgmTrack =
   | 'epilogue'
   | 'legend_battle'
   | 'crazed_boss'
+  | 'ancient_power'
   | 'none';
 
 type InstrumentType = 'brass' | 'accordion' | 'bass' | 'organ' | 'synth' | 'bell' | 'strings';
@@ -448,9 +449,16 @@ class SoundManager {
   public startBattleBgm(
     chapterIdentifier?: string | number,
     isBoss?: boolean,
-    isFinal?: boolean
+    isFinal?: boolean,
+    stageId?: string
   ) {
     const chapStr = String(chapterIdentifier || '').toLowerCase();
+    const stId = String(stageId || '').toLowerCase();
+
+    if (stId === 'legend_21_2' || stId.includes('ancient_power') || chapStr.includes('legend_21')) {
+      this.switchBgm('ancient_power');
+      return;
+    }
 
     if (chapStr.includes('crazed') || chapStr === 'crazed_event') {
       this.switchBgm('crazed_boss');
@@ -530,7 +538,8 @@ class SoundManager {
     this.nextNoteTime = this.ctx.currentTime + 0.05;
 
     // Tempo mapping
-    if (track === 'crazed_boss') this.tempoBpm = 160;
+    if (track === 'ancient_power') this.tempoBpm = 156;
+    else if (track === 'crazed_boss') this.tempoBpm = 160;
     else if (track === 'boss_final') this.tempoBpm = 152;
     else if (track === 'boss_bunbun') this.tempoBpm = 148;
     else if (track === 'legend_battle') this.tempoBpm = 144;
@@ -1079,6 +1088,77 @@ class SoundManager {
       this.playDrum('hihat', time, 0.35);
       if (step % 16 === 0) this.playDrum('cymbal', time, 0.85);
       if (step === 28 || step === 60) this.playDrum('timpani', time, 0.95);
+    }
+
+    // =========================================================================
+    // 13. ANCIENT POWER (太古の力 - ビッグバン組曲・神話シンフォニー組曲)
+    // =========================================================================
+    if (track === 'ancient_power') {
+      // Big Bang style symphonic progression: Dm -> Bb -> Gm -> A7 -> F -> C -> Bb -> Asus4 -> A
+      const chords = [
+        [N.D4, N.F4, N.A4, N.D5],     // Dm (0-15)
+        [N.Bb3, N.D4, N.F4, N.Bb4],   // Bb (16-31)
+        [N.G3, N.Bb3, N.D4, N.G4],    // Gm (32-47)
+        [N.A3, N.Cs4, N.E4, N.A4],    // A7 (48-63)
+      ];
+
+      // Majestic pipe organ / brass sustained harmony
+      if (step % 8 === 0) {
+        const chordIdx = Math.floor(step / 16) % 4;
+        const currentChord = chords[chordIdx];
+        currentChord.forEach((note) => {
+          this.playInstrumentNote(note, 'organ', dur4 * 2, 0.6, time);
+          this.playInstrumentNote(note, 'strings', dur4 * 2, 0.5, time);
+        });
+      }
+
+      // Heroic orchestral brass melody with celestial bells
+      const melodyAncient: number[] = [
+        // Section A (Grand Fanfare Theme)
+        N.D5, 0, N.F5, 0, N.A5, 0, N.D6, 0,
+        N.C6, N.A5, N.F5, N.A5, N.G5, N.F5, N.E5, 0,
+        // Bar 2 (Bb Majesty)
+        N.F5, 0, N.Bb5, 0, N.D6, 0, N.F6, 0,
+        N.E6, N.D6, N.Bb5, N.D6, N.C6, N.Bb5, N.A5, 0,
+        // Bar 3 (Gm Drama)
+        N.Bb5, 0, N.D6, 0, N.G6, 0, N.F6, 0,
+        N.E6, N.D6, N.Cs6, N.D6, N.E6, N.D6, N.Cs6, 0,
+        // Bar 4 (A7 Climax)
+        N.A5, N.Cs6, N.E6, N.G6, N.F6, N.E6, N.D6, N.Cs6,
+        N.D6, 0, N.A5, 0, N.D5, 0, 0, 0,
+      ];
+
+      const bassAncient: number[] = [
+        N.D2, N.D3, N.A2, N.D3, N.F2, N.D3, N.A2, N.D3,
+        N.D2, N.D3, N.A2, N.D3, N.F2, N.D3, N.E2, N.C3,
+        N.Bb2, N.Bb3, N.F2, N.Bb3, N.D2, N.Bb3, N.F2, N.Bb3,
+        N.Bb2, N.Bb3, N.F2, N.Bb3, N.C3, N.C4, N.G2, N.C3,
+        N.G2, N.G3, N.D3, N.G3, N.Bb2, N.G3, N.D3, N.G3,
+        N.G2, N.G3, N.D3, N.G3, N.A2, N.A3, N.E3, N.A3,
+        N.A2, N.A3, N.E3, N.A3, N.Cs3, N.A3, N.E3, N.A3,
+        N.D2, N.D3, N.A2, N.D3, N.D2, 0, N.D3, 0,
+      ];
+
+      const mNote = melodyAncient[step];
+      if (mNote > 0) {
+        this.playInstrumentNote(mNote, 'brass', dur2, 0.9, time);
+        this.playInstrumentNote(mNote, 'bell', dur1, 0.6, time);
+        this.playInstrumentNote(mNote * 0.5, 'synth', dur2, 0.45, time);
+      }
+
+      const bNote = bassAncient[step];
+      if (bNote > 0) {
+        this.playInstrumentNote(bNote, 'bass', dur1, 0.95, time);
+      }
+
+      // Orchestral percussion with thunderous timpani rolls & crash cymbals
+      if (step % 2 === 0) this.playDrum('kick', time, 0.95);
+      if (step % 4 === 2) this.playDrum('snare', time, 0.9);
+      if (step % 2 === 1) this.playDrum('hihat', time, 0.35);
+      if (step % 16 === 0 || step === 48) this.playDrum('cymbal', time, 0.9);
+      if (step % 8 === 0 || step === 14 || step === 30 || step === 46 || step === 62) {
+        this.playDrum('timpani', time, 0.95);
+      }
     }
   }
 

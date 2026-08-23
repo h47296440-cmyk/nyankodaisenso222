@@ -38,8 +38,10 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
     unlocked: false,
     activeForm: 0,
   };
-  const maxLevel = profile.hasClearedFilibuster ? 25 : 20;
-  const currentForm = selectedCatDef.forms[catProgress.activeForm || 0];
+  const hasClearedAncientPower = !!profile.clearedStages?.['legend_21_2'];
+  const hasUnlockedLv30 = !!profile.hasClearedFilibuster && hasClearedAncientPower;
+  const maxLevel = hasUnlockedLv30 ? 30 : profile.hasClearedFilibuster ? 25 : 20;
+  const currentForm = selectedCatDef.forms[catProgress.activeForm || 0] || selectedCatDef.forms[0];
   const catLevelCost = getCatLevelUpCost(selectedCatDef.rarity, catProgress.level);
   const canLevelUpCat =
     catProgress.unlocked && (isInfiniteXp || profile.xp >= catLevelCost) && catProgress.level < maxLevel;
@@ -127,9 +129,11 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
       if (!canLevelUpCat) {
         if (catProgress.level >= maxLevel) {
           alert(
-            profile.hasClearedFilibuster
-              ? 'このキャラクターは既に最大レベル(Lv.25)だにゃ！'
-              : 'このキャラクターは既に最大レベル(Lv.20)だにゃ！宇宙編3章のフィリバスターを撃破するとLv.25まで強化可能になるにゃ！'
+            hasUnlockedLv30
+              ? 'このキャラクターは既に最大レベル(Lv.30)だにゃ！'
+              : profile.hasClearedFilibuster
+              ? 'このキャラクターは現在Lv.25が上限だにゃ！レジェンド最終章「太古の力」をクリアするとLv.30まで解放されるにゃ！'
+              : 'このキャラクターは現在Lv.20が上限だにゃ！宇宙編3章のフィリバスター撃破＆レジェンド最終章「太古の力」クリアでLv.30まで解放されるにゃ！'
           );
         } else {
           alert('経験値（XP）が足りないにゃ！');
@@ -141,7 +145,9 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
       onUpdateProfile((prev) => {
         const cur = prev.cats[selectedCatId] || { catId: selectedCatId, level: 1, unlocked: true, activeForm: 0 };
         const nextLv = cur.level + 1;
-        const nextForm = cur.level === 9 && nextLv === 10 ? 1 : cur.activeForm;
+        let nextForm = cur.activeForm;
+        if (cur.level === 9 && nextLv === 10) nextForm = 1;
+        if (cur.level === 29 && nextLv === 30 && selectedCatDef.forms.length >= 3) nextForm = 2; // 第3形態へ進化！
         return {
           ...prev,
           xp: isInfiniteXp ? prev.xp : prev.xp - catLevelCost,
@@ -178,22 +184,25 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
     }
   };
 
-  // Form toggle for evolved cats
+  // Form toggle for evolved cats (第1形態 ⇄ 第2形態 ⇄ 第3形態)
   const handleToggleActiveForm = () => {
+    const totalForms = selectedCatDef.forms.length;
     if (catProgress.level < 10) {
       alert('第2形態は Lv.10 以上にパワーアップすると解放されるにゃ！');
       return;
     }
+    const maxAvailableForm = catProgress.level >= 30 && totalForms >= 3 ? totalForms : Math.min(2, totalForms);
     audio.playClick();
     onUpdateProfile((prev) => {
       const cur = prev.cats[selectedCatId];
+      const nextActive = (cur.activeForm + 1) % maxAvailableForm;
       return {
         ...prev,
         cats: {
           ...prev.cats,
           [selectedCatId]: {
             ...cur,
-            activeForm: cur.activeForm === 0 ? 1 : 0,
+            activeForm: nextActive,
           },
         },
       };
@@ -587,7 +596,7 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
             );
           })()}
 
-          {/* Form Toggle Button for Evolved Cats (第1形態 ⇄ 第2形態) */}
+          {/* Form Toggle Button for Evolved Cats (第1形態 ⇄ 第2形態 ⇄ 第3形態) */}
           {category !== 'base_skills' && catProgress.unlocked && (
             <button
               onClick={handleToggleActiveForm}
@@ -597,7 +606,7 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
                   : 'bg-stone-300 text-stone-600 border-stone-400 cursor-not-allowed'
               }`}
             >
-              形態切替（第{catProgress.activeForm === 0 ? '1' : '2'}形態）
+              形態切替（第{(catProgress.activeForm || 0) + 1}形態）
             </button>
           )}
         </div>

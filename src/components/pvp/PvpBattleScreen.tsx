@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PvpConnectionPayload, PvpPlayerInfo } from './PvpLobbyModal';
 import { UnitSpriteRenderer } from '../battle/UnitSpriteRenderer';
 import { audio } from '../../utils/audio';
@@ -51,8 +51,8 @@ interface DamageNumber {
   opacity: number;
 }
 
-const STAGE_WIDTH = 2000;
-const BASE_MAX_HP = 50000;
+const STAGE_WIDTH = 1800;
+const BASE_MAX_HP = 40000;
 
 export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExit }) => {
   const { conn, isHost, localPlayer, remotePlayer } = payload;
@@ -97,6 +97,11 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
   const enemyCastleHpRef = useRef<number>(BASE_MAX_HP);
   const lastTimeRef = useRef<number>(performance.now());
   const animationFrameRef = useRef<number | null>(null);
+
+  // Drag tracking
+  const isDraggingRef = useRef(false);
+  const dragStartXRef = useRef(0);
+  const dragStartCamXRef = useRef(0);
 
   // Keep refs in sync
   unitsRef.current = units;
@@ -150,7 +155,7 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
                   hp: Math.max(1, u.hp - 800),
                   state: 'knockback',
                   knockbackTimer: 0.5,
-                  x: Math.max(120, u.x - 120),
+                  x: Math.max(140, u.x - 100),
                 };
               }
               return u;
@@ -196,7 +201,7 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
 
       // Update timer & economy
       setBattleTimer((prev) => prev + dt);
-      setMoney((prev) => Math.min(maxMoney, prev + (15 + workerLevel * 8) * dt));
+      setMoney((prev) => Math.min(maxMoney, prev + (15 + workerLevel * 10) * dt));
       setCannonCharge((prev) => Math.min(100, prev + 2.5 * dt));
 
       // Decrement deck cooldowns
@@ -241,20 +246,18 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
 
         if (u.isMine) {
           // My Unit: moves right (x increases)
-          // Find closest opponent unit in front of me
           const enemyInFront = currentUnits
             .filter((o) => !o.isMine && o.x > u.x)
             .sort((a, b) => a.x - b.x)[0];
 
           const enemyDistance = enemyInFront ? enemyInFront.x - u.x : 9999;
-          const castleDistance = STAGE_WIDTH - 120 - u.x;
+          const castleDistance = STAGE_WIDTH - 140 - u.x;
 
           if (enemyInFront && enemyDistance <= u.attackRange) {
             // In range of enemy unit
             if (u.attackCooldown <= 0) {
               u.state = 'attack';
-              u.attackCooldown = u.attackSpeed;
-              // Deal damage to enemy
+              u.attackCooldown = Math.max(0.5, u.attackSpeed);
               enemyInFront.hp -= u.attackPower;
               audio.playHit(false, false);
               newDamages.push({
@@ -268,7 +271,7 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
               if (enemyInFront.hp <= enemyInFront.maxHp * 0.4 && enemyInFront.state !== 'knockback') {
                 enemyInFront.state = 'knockback';
                 enemyInFront.knockbackTimer = 0.3;
-                enemyInFront.x = Math.min(STAGE_WIDTH - 120, enemyInFront.x + 40);
+                enemyInFront.x = Math.min(STAGE_WIDTH - 140, enemyInFront.x + 50);
               }
             } else {
               u.state = 'walk';
@@ -277,12 +280,12 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
             // In range of enemy castle
             if (u.attackCooldown <= 0) {
               u.state = 'attack';
-              u.attackCooldown = u.attackSpeed;
+              u.attackCooldown = Math.max(0.5, u.attackSpeed);
               enemyBaseDamageAccum += u.attackPower;
               audio.playHit(true, false);
               newDamages.push({
                 id: `dmg-base-${Date.now()}`,
-                x: STAGE_WIDTH - 120,
+                x: STAGE_WIDTH - 140,
                 y: 200,
                 damage: u.attackPower,
                 opacity: 1,
@@ -291,9 +294,9 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
               u.state = 'walk';
             }
           } else {
-            // Move forward
+            // Move forward (Speed scaled with normal battle physics)
             u.state = 'walk';
-            u.x += u.speed * 40 * dt;
+            u.x += u.speed * 8 * dt;
           }
         } else {
           // Enemy Unit: moves left (x decreases)
@@ -302,12 +305,12 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
             .sort((a, b) => b.x - a.x)[0];
 
           const myUnitDistance = myUnitInFront ? u.x - myUnitInFront.x : 9999;
-          const myCastleDistance = u.x - 120;
+          const myCastleDistance = u.x - 140;
 
           if (myUnitInFront && myUnitDistance <= u.attackRange) {
             if (u.attackCooldown <= 0) {
               u.state = 'attack';
-              u.attackCooldown = u.attackSpeed;
+              u.attackCooldown = Math.max(0.5, u.attackSpeed);
               myUnitInFront.hp -= u.attackPower;
               audio.playHit(false, false);
               newDamages.push({
@@ -321,7 +324,7 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
               if (myUnitInFront.hp <= myUnitInFront.maxHp * 0.4 && myUnitInFront.state !== 'knockback') {
                 myUnitInFront.state = 'knockback';
                 myUnitInFront.knockbackTimer = 0.3;
-                myUnitInFront.x = Math.max(120, myUnitInFront.x - 40);
+                myUnitInFront.x = Math.max(140, myUnitInFront.x - 50);
               }
             } else {
               u.state = 'walk';
@@ -329,12 +332,12 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
           } else if (myCastleDistance <= u.attackRange) {
             if (u.attackCooldown <= 0) {
               u.state = 'attack';
-              u.attackCooldown = u.attackSpeed;
+              u.attackCooldown = Math.max(0.5, u.attackSpeed);
               myBaseDamageAccum += u.attackPower;
               audio.playHit(true, false);
               newDamages.push({
                 id: `dmg-mybase-${Date.now()}`,
-                x: 120,
+                x: 140,
                 y: 200,
                 damage: u.attackPower,
                 opacity: 1,
@@ -344,7 +347,7 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
             }
           } else {
             u.state = 'walk';
-            u.x -= u.speed * 40 * dt;
+            u.x -= u.speed * 8 * dt;
           }
         }
 
@@ -453,47 +456,54 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
       knockbackTimer: 0,
       width: 50,
     };
+
     setUnits((prev) => [...prev, newUnit]);
+  };
+
+  // Worker Cat Level Up
+  const handleWorkerLevelUp = () => {
+    const cost = 100 * workerLevel;
+    if (workerLevel >= 8 || money < cost) return;
+
+    audio.playWorkerUpgrade();
+    setMoney((prev) => prev - cost);
+    setWorkerLevel((prev) => prev + 1);
+    setMaxMoney((prev) => prev + 400);
   };
 
   // Fire Cat Cannon
   const handleFireCannon = () => {
     if (cannonCharge < 100 || isFiringCannon) return;
-    audio.playCannonFire();
-    setCannonCharge(0);
-    setIsFiringCannon(true);
-    setTimeout(() => setIsFiringCannon(false), 1200);
 
-    // Notify opponent
+    audio.playCannonFire();
+    setIsFiringCannon(true);
+    setCannonCharge(0);
+
+    // Send P2P cannon message to opponent
     try {
       conn.send({ type: 'FIRE_CANNON' });
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
 
-    // Damage & knockback enemy units
-    setUnits((prev) =>
-      prev.map((u) => {
-        if (!u.isMine) {
-          return {
-            ...u,
-            hp: Math.max(1, u.hp - 1000),
-            state: 'knockback',
-            knockbackTimer: 0.5,
-            x: Math.min(STAGE_WIDTH - 120, u.x + 120),
-          };
-        }
-        return u;
-      })
-    );
-  };
-
-  // Level up worker cat
-  const handleWorkerLevelUp = () => {
-    const cost = 100 * workerLevel;
-    if (money < cost || workerLevel >= 8) return;
-    audio.playWorkerLevelUp();
-    setMoney((prev) => prev - cost);
-    setWorkerLevel((prev) => prev + 1);
-    setMaxMoney((prev) => prev + 600);
+    // Damage & knockback opponent units
+    setTimeout(() => {
+      setUnits((prev) =>
+        prev.map((u) => {
+          if (!u.isMine) {
+            return {
+              ...u,
+              hp: Math.max(1, u.hp - 800),
+              state: 'knockback',
+              knockbackTimer: 0.5,
+              x: Math.min(STAGE_WIDTH - 140, u.x + 100),
+            };
+          }
+          return u;
+        })
+      );
+      setIsFiringCannon(false);
+    }, 1200);
   };
 
   // Send Emote
@@ -509,25 +519,49 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
 
   // Camera pan handlers
   const handleCameraScroll = (delta: number) => {
-    setCameraX((prev) => Math.max(0, Math.min(STAGE_WIDTH - 800, prev + delta)));
+    const containerW = stageContainerRef.current?.clientWidth || 900;
+    const maxCam = Math.max(0, STAGE_WIDTH - containerW);
+    setCameraX((prev) => Math.max(0, Math.min(maxCam, prev + delta)));
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    isDraggingRef.current = true;
+    dragStartXRef.current = e.clientX;
+    dragStartCamXRef.current = cameraX;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingRef.current) return;
+    const diff = dragStartXRef.current - e.clientX;
+    const containerW = stageContainerRef.current?.clientWidth || 900;
+    const maxCam = Math.max(0, STAGE_WIDTH - containerW);
+    setCameraX(Math.max(0, Math.min(maxCam, dragStartCamXRef.current + diff)));
+  };
+
+  const handleMouseUp = () => {
+    isDraggingRef.current = false;
   };
 
   return (
-    <div className="relative w-full h-[100dvh] bg-stone-950 flex flex-col justify-between overflow-hidden select-none font-sans">
+    <div
+      className="relative w-full h-[100dvh] bg-stone-950 flex flex-col justify-between overflow-hidden select-none font-sans"
+      onMouseUp={handleMouseUp}
+      onTouchEnd={handleMouseUp}
+    >
       {/* Top Status Header */}
-      <div className="relative z-30 bg-stone-950/90 border-b-2 border-stone-800 px-3 sm:px-6 py-2 flex items-center justify-between shadow-md">
+      <div className="relative z-30 bg-gradient-to-b from-[#8a4e1d] via-[#63330f] to-[#432007] border-b-[3px] border-[#291102] px-3 sm:px-6 py-2 flex items-center justify-between shadow-lg">
         {/* Left: My Info & Castle HP */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-2xl bg-amber-500 border-2 border-stone-900 flex items-center justify-center text-xl shadow">
+          <div className="w-10 h-10 rounded-2xl bg-amber-400 border-2 border-stone-900 flex items-center justify-center text-xl shadow">
             🐱
           </div>
           <div>
-            <div className="flex items-center gap-1.5 text-xs font-black text-white">
+            <div className="flex items-center gap-1.5 text-xs font-black text-amber-100 drop-shadow">
               <span>{localPlayer.name} (あなた)</span>
-              <span className="text-[10px] text-amber-400 font-mono">Rank {localPlayer.rank}</span>
+              <span className="text-[10px] text-yellow-300 font-mono">Rank {localPlayer.rank}</span>
             </div>
             {/* My HP Bar */}
-            <div className="w-32 sm:w-48 h-3.5 bg-stone-900 border border-stone-700 rounded-full overflow-hidden flex items-center p-0.5">
+            <div className="w-32 sm:w-48 h-3.5 bg-black/80 border border-amber-600 rounded-full overflow-hidden flex items-center p-0.5 shadow-inner">
               <div
                 className="h-full bg-gradient-to-r from-emerald-500 to-green-400 rounded-full transition-all duration-200"
                 style={{ width: `${(myCastleHp / BASE_MAX_HP) * 100}%` }}
@@ -549,19 +583,19 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
         {/* Right: Opponent Info & Castle HP */}
         <div className="flex items-center gap-3 text-right">
           <div>
-            <div className="flex items-center justify-end gap-1.5 text-xs font-black text-white">
-              <span className="text-[10px] text-rose-400 font-mono">Rank {remotePlayer.rank}</span>
+            <div className="flex items-center justify-end gap-1.5 text-xs font-black text-rose-100 drop-shadow">
+              <span className="text-[10px] text-rose-300 font-mono">Rank {remotePlayer.rank}</span>
               <span>{remotePlayer.name} (対戦相手)</span>
             </div>
             {/* Enemy HP Bar */}
-            <div className="w-32 sm:w-48 h-3.5 bg-stone-900 border border-stone-700 rounded-full overflow-hidden flex items-center justify-end p-0.5">
+            <div className="w-32 sm:w-48 h-3.5 bg-black/80 border border-red-700 rounded-full overflow-hidden flex items-center justify-end p-0.5 shadow-inner">
               <div
                 className="h-full bg-gradient-to-l from-rose-500 to-red-400 rounded-full transition-all duration-200"
                 style={{ width: `${(enemyCastleHp / BASE_MAX_HP) * 100}%` }}
               />
             </div>
           </div>
-          <div className="w-9 h-9 rounded-2xl bg-rose-600 border-2 border-stone-900 flex items-center justify-center text-xl shadow">
+          <div className="w-10 h-10 rounded-2xl bg-rose-600 border-2 border-stone-900 flex items-center justify-center text-xl shadow">
             ⚔️
           </div>
         </div>
@@ -572,6 +606,8 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
         ref={stageContainerRef}
         className="relative flex-1 bg-gradient-to-b from-[#87ceeb] via-[#e0f6ff] to-[#7fb77e] overflow-hidden cursor-grab active:cursor-grabbing"
         onWheel={(e) => handleCameraScroll(e.deltaY || e.deltaX)}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
       >
         {/* Sky / Clouds / Hills background */}
         <div
@@ -687,13 +723,13 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
 
         {/* Camera Pan Controls (Left & Right Overlay Buttons) */}
         <button
-          onClick={() => handleCameraScroll(-300)}
+          onClick={() => handleCameraScroll(-350)}
           className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-14 bg-black/40 hover:bg-black/70 text-white rounded-r-2xl flex items-center justify-center text-xl z-20 active:scale-95"
         >
           ◀
         </button>
         <button
-          onClick={() => handleCameraScroll(300)}
+          onClick={() => handleCameraScroll(350)}
           className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-14 bg-black/40 hover:bg-black/70 text-white rounded-l-2xl flex items-center justify-center text-xl z-20 active:scale-95"
         >
           ▶
@@ -701,11 +737,11 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
       </div>
 
       {/* Bottom Production Dashboard & Controls */}
-      <div className="relative z-30 bg-[#29170a] border-t-[3px] border-[#4a2b15] p-2 sm:p-3 flex flex-col gap-2">
+      <div className="relative z-30 bg-gradient-to-b from-[#8a4e1d] via-[#63330f] to-[#432007] border-t-[3px] border-[#291102] p-2 sm:p-3 flex flex-col gap-2 shadow-2xl">
         {/* Top bar of Dashboard: Money, Worker Level, Cannon, Emotes */}
         <div className="flex items-center justify-between gap-2 px-1 text-xs">
           {/* Money Display */}
-          <div className="flex items-center gap-2 bg-black/70 border-2 border-amber-500/80 rounded-xl px-3 py-1 text-amber-300 font-mono font-black shadow-inner">
+          <div className="flex items-center gap-2 bg-black/80 border-2 border-amber-500/80 rounded-xl px-3 py-1 text-amber-300 font-mono font-black shadow-inner">
             <span className="text-sm">🪙</span>
             <span className="text-base sm:text-lg">
               ¥{Math.floor(money).toLocaleString()} / {maxMoney.toLocaleString()}
@@ -790,8 +826,13 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
                     : 'bg-stone-950 border-stone-800 text-stone-500 opacity-70'
                 }`}
               >
+                {/* Level badge */}
+                <div className="absolute top-0.5 left-1 text-[8px] font-mono font-bold text-amber-300">
+                  Lv.{cat.level}
+                </div>
+
                 {/* Sprite Preview */}
-                <div className="h-7 flex items-center justify-center scale-75">
+                <div className="h-7 flex items-center justify-center scale-75 mt-1">
                   <UnitSpriteRenderer
                     spriteType={cat.spriteType}
                     isCat={true}
@@ -809,7 +850,7 @@ export const PvpBattleScreen: React.FC<PvpBattleScreenProps> = ({ payload, onExi
 
                 {/* Cooldown Overlay */}
                 {cd > 0 && (
-                  <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-xs font-mono font-bold text-yellow-300">
+                  <div className="absolute inset-0 bg-black/75 flex items-center justify-center text-xs font-mono font-bold text-yellow-300">
                     {cd.toFixed(1)}s
                   </div>
                 )}

@@ -5,6 +5,7 @@ import { audio } from '../../utils/audio';
 
 interface CatBaseScreenProps {
   profile: PlayerProfile;
+  onUpdateProfile?: (updater: (prev: PlayerProfile) => PlayerProfile) => void;
   onStartBattle: () => void;
   onOpenPowerUp: () => void;
   onOpenDeckFormation: () => void;
@@ -35,6 +36,7 @@ const CAT_TIPS = [
 
 export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
   profile,
+  onUpdateProfile,
   onStartBattle,
   onOpenPowerUp,
   onOpenDeckFormation,
@@ -53,6 +55,8 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
 }) => {
   const [tipIndex, setTipIndex] = useState(0);
   const [isCatClicked, setIsCatClicked] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [inputPlayerName, setInputPlayerName] = useState(profile.playerName || 'にゃんこ司令官');
 
   const userRank = calculateUserRank(profile);
   const isInfiniteXp = !!profile.devMode?.infiniteXp;
@@ -60,6 +64,18 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
 
   const displayXp = isInfiniteXp ? 99999999 : profile.xp;
   const displayCatFood = isInfiniteCatFood ? 99999 : profile.catFood;
+
+  const handleSavePlayerName = () => {
+    const trimmed = inputPlayerName.trim().slice(0, 12) || 'にゃんこ司令官';
+    audio.playClick();
+    if (onUpdateProfile) {
+      onUpdateProfile((prev) => ({
+        ...prev,
+        playerName: trimmed,
+      }));
+    }
+    setIsEditingName(false);
+  };
 
   const handleCatClick = () => {
     audio.playCatSpawn(1.2);
@@ -164,48 +180,72 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
           MAIN BODY AREA
          ======================================================== */}
       <div className="relative z-10 flex-1 flex flex-col justify-between p-3 sm:p-6">
-        {/* TOP ROW: User Rank Plaque & Quick Status */}
-        <div className="flex items-start justify-between">
-          {/* ユーザーランク Plaque (Level Sum) */}
-          <div
-            id="btn-user-rank"
-            onClick={() => {
-              audio.playClick();
-              onOpenUserRankRewards();
-            }}
-            className="group flex items-center bg-gradient-to-r from-[#5a3212] to-[#381c07] border-2 border-amber-500/80 rounded-xl p-1 sm:p-1.5 shadow-2xl cursor-pointer hover:scale-105 transition-transform"
-          >
-            {/* Left label capsule */}
-            <div className="bg-[#1f1005] border border-amber-600/60 rounded-lg px-2 py-0.5 flex flex-col items-center justify-center mr-1.5">
-              <span className="text-[10px] font-black text-amber-200 leading-tight">ユーザー</span>
-              <span className="text-[11px] font-black text-amber-100 leading-tight">ランク</span>
-            </div>
+        {/* TOP ROW: User Rank Plaque & Commander Name & Quick Status */}
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
+            {/* ユーザーランク Plaque (Level Sum) */}
+            <div
+              id="btn-user-rank"
+              onClick={() => {
+                audio.playClick();
+                onOpenUserRankRewards();
+              }}
+              className="group flex items-center bg-gradient-to-r from-[#5a3212] to-[#381c07] border-2 border-amber-500/80 rounded-xl p-1 sm:p-1.5 shadow-2xl cursor-pointer hover:scale-105 transition-transform"
+            >
+              {/* Left label capsule */}
+              <div className="bg-[#1f1005] border border-amber-600/60 rounded-lg px-2 py-0.5 flex flex-col items-center justify-center mr-1.5">
+                <span className="text-[10px] font-black text-amber-200 leading-tight">ユーザー</span>
+                <span className="text-[11px] font-black text-amber-100 leading-tight">ランク</span>
+              </div>
 
-            {/* User Rank Digital Number */}
-            <div className="bg-black/85 border border-amber-700/80 rounded-md px-3 py-0.5 mx-1 flex items-center justify-center">
-              <span
-                className="text-yellow-400 text-lg sm:text-2xl font-black tracking-wider"
-                style={{
-                  fontFamily: '"Courier New", Courier, monospace',
-                  textShadow: '2px 2px 0px #000, -1px -1px 0px #000',
-                }}
-              >
-                {userRank}
-              </span>
-            </div>
+              {/* User Rank Digital Number */}
+              <div className="bg-black/85 border border-amber-700/80 rounded-md px-3 py-0.5 mx-1 flex items-center justify-center">
+                <span
+                  className="text-yellow-400 text-lg sm:text-2xl font-black tracking-wider"
+                  style={{
+                    fontFamily: '"Courier New", Courier, monospace',
+                    textShadow: '2px 2px 0px #000, -1px -1px 0px #000',
+                  }}
+                >
+                  {userRank}
+                </span>
+              </div>
 
-            {/* Info (i) Icon */}
-            <div className="w-5 h-5 rounded-full bg-amber-500 text-[#1f1005] font-black text-[11px] flex items-center justify-center ml-1 shadow">
-              i
-            </div>
+              {/* Info (i) Icon */}
+              <div className="w-5 h-5 rounded-full bg-amber-500 text-[#1f1005] font-black text-[11px] flex items-center justify-center ml-1 shadow">
+                i
+              </div>
 
-            {/* Scroll Certificate with Red Stamp */}
-            <div className="ml-1.5 bg-amber-100 border border-amber-800 rounded px-1 py-0.5 flex items-center shadow">
-              <div className="w-4 h-5 bg-stone-100 border-x border-amber-800 relative flex items-center justify-center">
-                <div className="w-2.5 h-2.5 rounded-full border border-rose-600 bg-rose-600/20 flex items-center justify-center">
-                  <span className="text-[6px] text-rose-600 font-black">済</span>
+              {/* Scroll Certificate with Red Stamp */}
+              <div className="ml-1.5 bg-amber-100 border border-amber-800 rounded px-1 py-0.5 flex items-center shadow">
+                <div className="w-4 h-5 bg-stone-100 border-x border-amber-800 relative flex items-center justify-center">
+                  <div className="w-2.5 h-2.5 rounded-full border border-rose-600 bg-rose-600/20 flex items-center justify-center">
+                    <span className="text-[6px] text-rose-600 font-black">済</span>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* 司令官 Name Plaque */}
+            <div
+              id="btn-edit-player-name"
+              onClick={() => {
+                audio.playClick();
+                setInputPlayerName(profile.playerName || 'にゃんこ司令官');
+                setIsEditingName(true);
+              }}
+              className="group flex items-center bg-gradient-to-r from-[#3e240e] to-[#241306] border-2 border-amber-500/70 rounded-xl px-2.5 py-1.5 shadow-xl cursor-pointer hover:border-yellow-400 hover:scale-105 transition-all"
+            >
+              <span className="text-xs mr-1.5">🎖️</span>
+              <div className="flex flex-col">
+                <span className="text-[9px] font-bold text-amber-400 leading-none">司令官名</span>
+                <span className="text-xs sm:text-sm font-black text-amber-100 leading-tight drop-shadow truncate max-w-[100px] sm:max-w-[130px]">
+                  {profile.playerName || 'にゃんこ司令官'}
+                </span>
+              </div>
+              <span className="ml-1.5 text-[10px] bg-amber-600/60 group-hover:bg-amber-500 text-white rounded px-1 py-0.5 font-bold transition-colors">
+                変更
+              </span>
             </div>
           </div>
         </div>
@@ -578,6 +618,56 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Name Edit Modal */}
+      {isEditingName && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+          <div className="w-full max-w-sm bg-gradient-to-b from-[#3a200a] to-[#1e1005] border-4 border-amber-500 rounded-3xl p-5 shadow-2xl flex flex-col items-center space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-amber-400 border-2 border-stone-950 flex items-center justify-center text-3xl shadow-lg">
+              🐱
+            </div>
+
+            <div className="text-center">
+              <h3 className="text-lg font-black text-amber-200">司令官名の変更</h3>
+              <p className="text-xs text-amber-400/80 mt-0.5">
+                P2P対戦やスコアアタックで表示される名前だにゃ！（最大12文字）
+              </p>
+            </div>
+
+            <div className="w-full">
+              <input
+                type="text"
+                maxLength={12}
+                value={inputPlayerName}
+                onChange={(e) => setInputPlayerName(e.target.value)}
+                placeholder="司令官名を入力..."
+                className="w-full px-4 py-2.5 rounded-xl bg-black/70 border-2 border-amber-500 text-amber-100 placeholder-stone-500 font-black text-center text-base focus:outline-none focus:border-yellow-300 shadow-inner"
+              />
+              <div className="text-right text-[10px] text-amber-400/70 mt-1 font-mono">
+                {inputPlayerName.length}/12文字
+              </div>
+            </div>
+
+            <div className="flex gap-2 w-full">
+              <button
+                onClick={() => {
+                  audio.playClick();
+                  setIsEditingName(false);
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 font-black text-sm border border-stone-600 active:scale-95 transition-all"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleSavePlayerName}
+                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-stone-950 font-black text-sm border-2 border-yellow-200 shadow-lg active:scale-95 transition-all"
+              >
+                決定！
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

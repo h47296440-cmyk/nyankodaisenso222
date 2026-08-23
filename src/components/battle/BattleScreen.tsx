@@ -26,6 +26,7 @@ interface BattleScreenProps {
     xpEarned: number;
     catFoodEarned: number;
     treasureQuality?: TreasureQuality;
+    scoreAttackScore?: number;
   }) => void;
   onExit: () => void;
   onNextStage?: () => void;
@@ -48,6 +49,12 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const cannonPowerLevel = profile.upgrades?.cannonPower || 1;
   const cannonChargeLevel = profile.upgrades?.cannonCharge || 1;
   const researchLevel = profile.upgrades?.researchSpeed || 1;
+
+  // Score Attack flags
+  const isScoreAttack =
+    stage.chapterId === 'challenge_score_attack' ||
+    stage.id?.includes('score_attack') ||
+    stage.difficultyLabel?.includes('スコアアタック');
 
   // Treasure bonuses
   let treasureMoneyRateMult = 1.0;
@@ -86,6 +93,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   // Timers & Waves tracking
   const battleTimeRef = useRef(0);
   const sniperTimerRef = useRef(0);
+  const defeatedEnemiesCountRef = useRef(0);
   const spawnedWaveIndicesRef = useRef<Set<number>>(new Set());
   const spawnedThresholdWavesRef = useRef<Set<number>>(new Set());
   const isTerminatedRef = useRef(false);
@@ -114,6 +122,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const [isAutoBattle, setIsAutoBattle] = useState(!!activeItems.catCpu);
   const [cameraX, setCameraX] = useState(0); // Start showing player base on the left
   const [bossAlert, setBossAlert] = useState<string | null>(null);
+  const [currentScore, setCurrentScore] = useState(700000);
 
   // Entities & visual fx for UI
   const [cats, setCats] = useState<ActiveEntity[]>([]);
@@ -166,12 +175,12 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   // Start Battle Music on Mount
   useEffect(() => {
     audio.unlockAudio();
-    audio.startBattleBgm(stage.chapter, false, stage.isFinalBossStage);
+    audio.startBattleBgm(stage.chapter, false, stage.isFinalBossStage, stage.id);
 
     return () => {
       audio.stopBattleBgm();
     };
-  }, [stage.chapter, stage.isFinalBossStage]);
+  }, [stage.chapter, stage.isFinalBossStage, stage.id]);
 
   // Main 60FPS Game Loop
   useEffect(() => {
@@ -212,7 +221,9 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
             spawnEnemy(wave.enemyId, wave.boss);
             if (wave.boss) {
               audio.playBossAppear();
-              if (stage.isFinalBossStage) {
+              if (stage.id === 'legend_21_2' || stage.id?.includes('ancient_power') || stage.chapterId?.includes('legend_21')) {
+                audio.switchBgm('ancient_power');
+              } else if (stage.isFinalBossStage) {
                 audio.startFinalBossBgm();
               } else {
                 audio.startBossBgm();
@@ -231,7 +242,9 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
               spawnEnemy(wave.enemyId, wave.boss);
               if (wave.boss) {
                 audio.playBossAppear();
-                if (stage.isFinalBossStage) {
+                if (stage.id === 'legend_21_2' || stage.id?.includes('ancient_power') || stage.chapterId?.includes('legend_21')) {
+                  audio.switchBgm('ancient_power');
+                } else if (stage.isFinalBossStage) {
                   audio.startFinalBossBgm();
                 } else {
                   audio.startBossBgm();
@@ -247,6 +260,16 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
         // 5. Update Active Units Physics & Attacks
         updateEntities(dt);
+
+        // 5b. Live Score Attack Calculation
+        if (isScoreAttack) {
+          const timePenalty = Math.floor(battleTimeRef.current * 750);
+          const killBonus = defeatedEnemiesCountRef.current * 4500;
+          const castleDamage = Math.max(0, stage.castleHp - enemyCastleHpRef.current);
+          const castleBonus = Math.floor((castleDamage / stage.castleHp) * 300000);
+          const liveScore = Math.max(100, Math.min(999999, 700000 - timePenalty + killBonus + castleBonus));
+          setCurrentScore(liveScore);
+        }
 
         // 6. Update Visual Effects & Damage Numbers
         damageNumbersRef.current = damageNumbersRef.current
@@ -950,6 +973,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           const shouldKb = currentKBs > (e.knockbackCount || 0);
 
           if (willDie) {
+            defeatedEnemiesCountRef.current += 1;
             const def = ENEMY_DEFINITIONS[e.defId];
             if (def) {
               moneyRef.current = Math.min(maxMoney, moneyRef.current + def.rewardMoney);
@@ -1029,6 +1053,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         const shouldKb = currentKBs > (target.knockbackCount || 0);
 
         if (willDie) {
+          defeatedEnemiesCountRef.current += 1;
           const def = ENEMY_DEFINITIONS[target.defId];
           if (def) {
             moneyRef.current = Math.min(maxMoney, moneyRef.current + def.rewardMoney);
@@ -1274,11 +1299,16 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       treasureDropped: treasureDrop,
     });
 
+    const scoreAttackScore = isScoreAttack && victory
+      ? Math.max(100, Math.min(999999, 700000 - Math.floor(battleTimeRef.current * 750) + defeatedEnemiesCountRef.current * 4500 + 300000))
+      : undefined;
+
     onBattleEnd({
       victory,
       xpEarned,
       catFoodEarned,
       treasureQuality,
+      scoreAttackScore,
     });
   };
 
@@ -1294,8 +1324,8 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const handleTestSound = useCallback(() => {
     audio.unlockAudio();
     audio.playTestTone();
-    audio.startBattleBgm(stage.chapter, false, stage.isFinalBossStage);
-  }, [stage.chapter, stage.isFinalBossStage]);
+    audio.startBattleBgm(stage.chapter, false, stage.isFinalBossStage, stage.id);
+  }, [stage.chapter, stage.isFinalBossStage, stage.id]);
 
   // Controller / Switch bindings
   const handleDeploySlotByIndex = useCallback(
@@ -1355,6 +1385,8 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         gamepadConnected={gamepadState.isConnected}
         controllerName={gamepadState.controllerName}
         selectedSlotIndex={selectedSlotIndex}
+        score={currentScore}
+        isScoreAttack={isScoreAttack}
       >
         <BattleCanvas
           stage={stage}

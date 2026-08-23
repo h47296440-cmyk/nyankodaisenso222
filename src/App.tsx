@@ -129,6 +129,7 @@ export default function App() {
     xpEarned: number;
     catFoodEarned: number;
     treasureQuality?: TreasureQuality;
+    scoreAttackScore?: number;
   }) => {
     if (!activeStage) return;
 
@@ -205,6 +206,16 @@ export default function App() {
         prev.unlockedCycloneDrop ||
         (result.victory && (activeStage.id === 'advent_stage_red_cyclone' || activeStage.id === 'advent_stage_black_cyclone' || activeStage.id === 'advent_stage_alien_cyclone' || activeStage.id === 'advent_stage_zombie_cyclone'));
 
+      const isScoreAttack =
+        activeStage.chapterId === 'challenge_score_attack' ||
+        activeStage.id?.includes('score_attack') ||
+        activeStage.difficultyLabel?.includes('スコアアタック');
+
+      let nextScoreAttackHighScore = prev.scoreAttackHighScore || 0;
+      if (isScoreAttack && result.victory && result.scoreAttackScore) {
+        nextScoreAttackHighScore = Math.max(nextScoreAttackHighScore, result.scoreAttackScore);
+      }
+
       return {
         ...prev,
         xp: prev.xp + result.xpEarned,
@@ -217,6 +228,7 @@ export default function App() {
         unlockedClionelDrop: isClionelDropUnlocked,
         unlockedHannyaDrop: isHannyaDropUnlocked,
         unlockedCycloneDrop: isCycloneDropUnlocked,
+        scoreAttackHighScore: nextScoreAttackHighScore,
       };
     });
   };
@@ -286,6 +298,7 @@ export default function App() {
             {currentView === 'base' && (
               <CatBaseScreen
                 profile={profile}
+                onUpdateProfile={handleUpdateProfile}
                 onStartBattle={() => setCurrentView('map')}
                 onOpenPowerUp={() => setCurrentView('upgrade')}
                 onOpenDeckFormation={() => setShowDeckFormationModal(true)}
