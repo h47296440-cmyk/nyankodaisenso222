@@ -50,6 +50,17 @@ export const StorySelectModal: React.FC<StorySelectModalProps> = ({
     !!profile.clearedStages['cosmos_3'] ||
     !!profile.clearedStages['cosmos_2'];
 
+  const isLegendOpeningUnlocked = isDevUnlocked || isJapanEndingUnlocked;
+
+  const isLegendEndingUnlocked =
+    isDevUnlocked ||
+    !!profile.clearedStages['legend_49_1'] ||
+    !!profile.clearedStages['legend_48_1'] ||
+    !!profile.clearedStages['legend_12_1'];
+
+  const isRealLegendOpeningUnlocked = isDevUnlocked || isLegendEndingUnlocked;
+  const isAkuOpeningUnlocked = isDevUnlocked || isJapanEndingUnlocked;
+
   const storyItems = [
     {
       key: 'japan_opening',
@@ -98,6 +109,38 @@ export const StorySelectModal: React.FC<StorySelectModalProps> = ({
       unlocked: isCosmosEndingUnlocked,
       condition: '宇宙編 ビッグバンクリアで解放',
       badgeColor: 'from-purple-700 to-pink-700',
+    },
+    {
+      key: 'legend_opening',
+      chapter: 'レジェンドストーリー',
+      type: 'オープニング (OP)',
+      unlocked: isLegendOpeningUnlocked,
+      condition: '日本編クリアで解放',
+      badgeColor: 'from-amber-800 to-orange-700',
+    },
+    {
+      key: 'legend_ending',
+      chapter: 'レジェンドストーリー',
+      type: 'エンディング (ED)',
+      unlocked: isLegendEndingUnlocked,
+      condition: 'レジェンドストーリー最終章クリアで解放',
+      badgeColor: 'from-yellow-700 to-amber-900',
+    },
+    {
+      key: 'real_legend_opening',
+      chapter: '真・レジェンドストーリー',
+      type: 'オープニング (OP)',
+      unlocked: isRealLegendOpeningUnlocked,
+      condition: 'レジェンドストーリー終結で解放',
+      badgeColor: 'from-emerald-700 to-teal-800',
+    },
+    {
+      key: 'aku_opening',
+      chapter: '魔界編',
+      type: 'オープニング (OP)',
+      unlocked: isAkuOpeningUnlocked,
+      condition: '日本編クリアで解放',
+      badgeColor: 'from-red-800 to-purple-900',
     },
   ];
 

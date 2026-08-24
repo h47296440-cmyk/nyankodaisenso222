@@ -2281,7 +2281,7 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         spriteType: 'cat_ancient_cyclone_drop',
         abilities: {
           criticalChance: 0.25,
-          massiveDamage: ['white', 'floating']
+          massiveDamage: { mult: 3.0, traits: ['white', 'floating'] }
         }
       },
       {
@@ -2301,7 +2301,7 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         spriteType: 'cat_ancient_cyclone_evolved',
         abilities: {
           criticalChance: 0.35,
-          massiveDamage: ['white', 'floating']
+          massiveDamage: { mult: 3.5, traits: ['white', 'floating'] }
         }
       },
       {
@@ -2321,7 +2321,7 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         spriteType: 'cat_ancient_cyclone_evolved',
         abilities: {
           criticalChance: 0.50,
-          massiveDamage: ['white', 'floating']
+          massiveDamage: { mult: 4.0, traits: ['white', 'floating'] }
         }
       }
     ]
@@ -4275,6 +4275,325 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     traits: ['floating', 'white', 'boss'],
     spriteType: 'enemy_ancient_sunfish',
     scale: 2.4,
+    isBoss: true
+  },
+  // ==========================================
+  // 悪魔編（AKU REALM）新敵シリーズ (計10種)
+  // ==========================================
+  enemy_aku_doge: {
+    id: 'enemy_aku_doge',
+    name: 'デビルワンコ',
+    description: '【悪魔 / 悪魔シールド】魔界から召喚された漆黒の角を持つわんこ。強固な悪魔シールドを張り、ダメージを無効化する！',
+    hp: 45000,
+    attackPower: 4500,
+    attackRange: 80,
+    attackSpeed: 1.0,
+    attackWindup: 0.1,
+    speed: 28,
+    knockbacks: 1,
+    attackType: 'single',
+    rewardMoney: 1200,
+    rewardXp: 2000,
+    traits: ['aku'],
+    spriteType: 'enemy_aku_doge',
+    scale: 1.1,
+    abilities: {
+      shield: { hp: 30000 }
+    }
+  },
+  enemy_aku_squirrel: {
+    id: 'enemy_aku_squirrel',
+    name: 'デビルリス（悪魔リス）',
+    description: '【悪魔 / 超絶神速突撃 / 悪魔シールド】古代リスの5倍の速度（速度360）で戦場を瞬間移動する凶悪リス！壁を突破し城へ突撃する！',
+    hp: 60000,
+    attackPower: 9500,
+    attackRange: 60,
+    attackSpeed: 3.0,
+    attackWindup: 0.02,
+    speed: 360, // 古代リス(72)の5倍！
+    knockbacks: 2,
+    attackType: 'single',
+    rewardMoney: 2500,
+    rewardXp: 4000,
+    traits: ['aku'],
+    spriteType: 'enemy_aku_squirrel',
+    scale: 1.0,
+    abilities: {
+      shield: { hp: 40000 }
+    }
+  },
+  enemy_hell_gorilla: {
+    id: 'enemy_hell_gorilla',
+    name: 'ヘルゴリラー',
+    description: '【悪魔 / 悪魔シールド / 50%渾身の一撃】地獄の業火を宿した凶暴悪魔ゴリラ！50%の確率で赤い衝撃波を放ち【攻撃力3倍（渾身の一撃）】の超絶破壊打撃を叩き込む！',
+    hp: 380000,
+    attackPower: 14000, // 渾身の一撃時は42,000ダメージ！
+    attackRange: 120,
+    attackSpeed: 2.2,
+    attackWindup: 0.1,
+    speed: 48,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 8000,
+    rewardXp: 12000,
+    traits: ['aku'],
+    spriteType: 'enemy_hell_gorilla',
+    scale: 1.6,
+    abilities: {
+      shield: { hp: 150000 },
+      savageBlow: { chance: 0.5, mult: 3.0 }
+    }
+  },
+  enemy_guilty_peng: {
+    id: 'enemy_guilty_peng',
+    name: 'ギルティ・ペン',
+    description: '【悪魔 / 遺志の烈波 / 悪魔シールド】魔界の刑罰を背負ったペンギン。倒されると怨念の烈波Lv.2を放ち、周囲の味方を巻き込む！',
+    hp: 180000,
+    attackPower: 8000,
+    attackRange: 140,
+    attackSpeed: 1.2,
+    attackWindup: 0.15,
+    speed: 32,
+    knockbacks: 2,
+    attackType: 'area',
+    rewardMoney: 4000,
+    rewardXp: 6500,
+    traits: ['aku'],
+    spriteType: 'enemy_guilty_peng',
+    scale: 1.25,
+    abilities: {
+      shield: { hp: 80000 },
+      deathSurge: { level: 2, chance: 1.0 }
+    }
+  },
+  enemy_mamomo: {
+    id: 'enemy_mamomo',
+    name: '魔衛門（マモモ）',
+    description: '【悪魔 / 超高耐久シールド / 範囲攻撃】魔界の重装甲門番。鉄壁の悪魔シールドで前線を完全に封鎖する！',
+    hp: 650000,
+    attackPower: 12000,
+    attackRange: 180,
+    attackSpeed: 0.8,
+    attackWindup: 0.3,
+    speed: 18,
+    knockbacks: 2,
+    attackType: 'area',
+    rewardMoney: 9000,
+    rewardXp: 15000,
+    traits: ['aku'],
+    spriteType: 'enemy_mamomo',
+    scale: 1.8,
+    abilities: {
+      shield: { hp: 350000 }
+    }
+  },
+  enemy_sister_cassis: {
+    id: 'enemy_sister_cassis',
+    name: 'シスターカシス',
+    description: '【悪魔 / 呪い＆波動 / 悪魔シールド】魔界の禁断の祈祷を捧げる修道女。遠方から禍々しい闇の波動と悪魔シールドを操る！',
+    hp: 420000,
+    attackPower: 16000,
+    attackRange: 380,
+    attackSpeed: 0.6,
+    attackWindup: 0.5,
+    speed: 16,
+    knockbacks: 4,
+    attackType: 'area',
+    rewardMoney: 12000,
+    rewardXp: 20000,
+    traits: ['aku'],
+    spriteType: 'enemy_sister_cassis',
+    scale: 1.65,
+    abilities: {
+      shield: { hp: 200000 },
+      wave: { level: 3, chance: 0.5 }
+    }
+  },
+  enemy_midnight_nyandar: {
+    id: 'enemy_midnight_nyandar',
+    name: 'ミッドナイト・ニャンダー',
+    description: '【悪魔 / 超遠方範囲魔術 / 烈波】魔界貴族のニャンダー伯爵。射程480から紅蓮の魔炎弾と烈波を連射する！',
+    hp: 880000,
+    attackPower: 24000,
+    attackRange: 480,
+    attackSpeed: 0.45,
+    attackWindup: 0.6,
+    speed: 12,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 20000,
+    rewardXp: 35000,
+    traits: ['aku', 'boss'],
+    spriteType: 'enemy_midnight_nyandar',
+    scale: 2.2,
+    isBoss: true,
+    abilities: {
+      shield: { hp: 400000 },
+      surge: { level: 3, chance: 0.4 }
+    }
+  },
+  enemy_aku_cyclone: {
+    id: 'enemy_aku_cyclone',
+    name: 'デビルサイクロン（悪魔の暴風神）',
+    description: '【悪魔 / 浮いてる敵 / 秒間8回超絶高火力 / 超高耐久シールド】魔界の底から吹き荒れる混沌の暴風神！シールドを破らねば前線は数秒で蒸発する！',
+    hp: 2800000,
+    attackPower: 38000,
+    attackRange: 90,
+    attackSpeed: 8.0,
+    attackWindup: 0.02,
+    speed: 22,
+    knockbacks: 1,
+    attackType: 'area',
+    rewardMoney: 35000,
+    rewardXp: 60000,
+    traits: ['aku', 'floating', 'boss'],
+    spriteType: 'enemy_aku_cyclone',
+    scale: 2.6,
+    isBoss: true,
+    abilities: {
+      shield: { hp: 1200000 },
+      deathSurge: { level: 4, chance: 1.0 }
+    }
+  },
+  enemy_demon_lord_jagi: {
+    id: 'enemy_demon_lord_jagi',
+    name: '魔王ジャギ（魔界の覇王）',
+    description: '【魔界編 最終ボス / 悪魔 / 超悪魔シールド / 連続烈波】魔界を統べる闇の魔王。HP4,200,000＆シールド2,000,000を誇り、踏み込む猫軍団を暗黒の烈波で殲滅する！',
+    hp: 4200000,
+    attackPower: 45000,
+    attackRange: 320,
+    attackSpeed: 0.7,
+    attackWindup: 0.4,
+    speed: 15,
+    knockbacks: 5,
+    attackType: 'area',
+    rewardMoney: 50000,
+    rewardXp: 100000,
+    traits: ['aku', 'boss'],
+    spriteType: 'enemy_demon_lord_jagi',
+    scale: 2.8,
+    isBoss: true,
+    abilities: {
+      shield: { hp: 2000000 },
+      surge: { level: 4, chance: 0.6 }
+    }
+  },
+  enemy_aku_koryu: {
+    id: 'enemy_aku_koryu',
+    name: 'ヘルコアラッキョ',
+    description: '【悪魔 / 悪魔シールド / 100%波動Lv.4】魔界の悪夢を喰らうコアラ。一撃ごとに強烈な漆黒の波動を放ち後衛を殲滅！',
+    hp: 520000,
+    attackPower: 18000,
+    attackRange: 160,
+    attackSpeed: 0.9,
+    attackWindup: 0.25,
+    speed: 26,
+    knockbacks: 2,
+    attackType: 'area',
+    rewardMoney: 15000,
+    rewardXp: 25000,
+    traits: ['aku'],
+    spriteType: 'enemy_aku_koryu',
+    scale: 1.6,
+    abilities: {
+      shield: { hp: 250000 },
+      wave: { level: 4, chance: 1.0 }
+    }
+  },
+  // ==========================================
+  // 真・レジェンド＆強化新敵シリーズ (計5種)
+  // ==========================================
+  enemy_real_ancient_hippo: {
+    id: 'enemy_real_ancient_hippo',
+    name: '古代超カバちゃん（プライマル・ヒポポ）',
+    description: '【真レジェンド / 古代種 / 超高倍率強化】原始の魔力を浴びてHP1,200,000へと巨大進化した始原カバ。強固な肉壁として立ち塞がる！',
+    hp: 1200000,
+    attackPower: 22000,
+    attackRange: 140,
+    attackSpeed: 1.1,
+    attackWindup: 0.15,
+    speed: 24,
+    knockbacks: 4,
+    attackType: 'area',
+    rewardMoney: 12000,
+    rewardXp: 22000,
+    traits: ['white', 'boss'],
+    spriteType: 'enemy_real_ancient_hippo',
+    scale: 2.1
+  },
+  enemy_real_ancient_elephant: {
+    id: 'enemy_real_ancient_elephant',
+    name: '古代超パオちゃん（原始巨象メガテリウム）',
+    description: '【真レジェンド / 古代種 / 射程440範囲砲】始原の大地を踏み鳴らす超巨大象。射程440から繰り出される古代鼻息砲は破壊力絶大！',
+    hp: 1600000,
+    attackPower: 32000,
+    attackRange: 440,
+    attackSpeed: 0.5,
+    attackWindup: 0.5,
+    speed: 10,
+    knockbacks: 2,
+    attackType: 'area',
+    rewardMoney: 24000,
+    rewardXp: 40000,
+    traits: ['white', 'boss'],
+    spriteType: 'enemy_real_ancient_elephant',
+    scale: 2.5,
+    isBoss: true
+  },
+  enemy_real_ancient_master_a: {
+    id: 'enemy_real_ancient_master_a',
+    name: '古代超師匠（太古の老師アリクイ）',
+    description: '【真レジェンド / 古代種 / 射程500超速舌撃】数千万年の瞑想を経て神速の舌撃を極めた老師。射程500から秒間3回の超猛連撃を浴びせる！',
+    hp: 950000,
+    attackPower: 15000,
+    attackRange: 500,
+    attackSpeed: 3.0,
+    attackWindup: 0.05,
+    speed: 15,
+    knockbacks: 5,
+    attackType: 'single',
+    rewardMoney: 18000,
+    rewardXp: 32000,
+    traits: ['white'],
+    spriteType: 'enemy_real_ancient_master_a',
+    scale: 1.9
+  },
+  enemy_real_ancient_bore: {
+    id: 'enemy_real_ancient_bore',
+    name: '古代猪（始原獣イノシャシ）',
+    description: '【真レジェンド / 古代種 / 神速突進 / 超ラッシュ】原始の山野を駆け抜ける狂乱の猪。速度45と秒間3.5回の超打撃で前線を一気に食い破る！',
+    hp: 1800000,
+    attackPower: 26000,
+    attackRange: 130,
+    attackSpeed: 3.5,
+    attackWindup: 0.05,
+    speed: 45,
+    knockbacks: 2,
+    attackType: 'area',
+    rewardMoney: 28000,
+    rewardXp: 50000,
+    traits: ['white', 'boss'],
+    spriteType: 'enemy_real_ancient_bore',
+    scale: 2.0,
+    isBoss: true
+  },
+  enemy_real_ancient_sloth: {
+    id: 'enemy_real_ancient_sloth',
+    name: '古代ナマケモノ（始原巨樹メガロニクス）',
+    description: '【真レジェンド / 古代種 / 射程520一撃粉砕】悠久の時を生きる超巨大ナマケモノ。射程520から振り下ろす爪は一撃85,000の超破壊力！',
+    hp: 2200000,
+    attackPower: 85000,
+    attackRange: 520,
+    attackSpeed: 0.25,
+    attackWindup: 1.1,
+    speed: 8,
+    knockbacks: 1,
+    attackType: 'area',
+    rewardMoney: 32000,
+    rewardXp: 60000,
+    traits: ['white', 'boss'],
+    spriteType: 'enemy_real_ancient_sloth',
+    scale: 2.6,
     isBoss: true
   }
 };

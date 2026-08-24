@@ -455,6 +455,17 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
               </div>
             ) : null}
 
+            {/* Aku Shield Aura (悪魔シールド) */}
+            {enemy.shieldHp && enemy.shieldHp > 0 ? (
+              <div className="absolute inset-0 -m-3 pointer-events-none flex items-center justify-center">
+                <div className="w-20 sm:w-24 h-20 sm:h-24 rounded-full border-2 border-purple-500 bg-purple-900/30 shadow-[0_0_18px_rgba(168,85,247,0.8)] animate-pulse" />
+                <div className="absolute -top-6 bg-purple-950/90 text-purple-200 border border-purple-400 rounded px-1.5 py-0.5 text-[9px] font-black tracking-tighter flex items-center gap-1 shadow">
+                  <span>😈 シールド</span>
+                  <span className="font-mono">{enemy.shieldHp.toLocaleString()}</span>
+                </div>
+              </div>
+            ) : null}
+
             {/* Boss Filibuster Mega Attack Charge Bar */}
             {enemy.isCharging && enemy.chargeTimer !== undefined && (
               <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-36 flex flex-col items-center pointer-events-none z-30">
@@ -615,6 +626,37 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
                   <div className="w-36 h-36 rounded-full border-4 border-cyan-300 bg-cyan-400/40 blur-md animate-ping" />
                   <span className="font-black text-sm text-cyan-200 uppercase tracking-wider drop-shadow-[0_0_12px_rgba(6,182,212,1)]">
                     💥 バリアブレイク!!
+                  </span>
+                </div>
+              )}
+              {fx.type === 'shield_break' && (
+                <div className="relative flex flex-col items-center justify-center pointer-events-none">
+                  <div className="w-36 h-36 rounded-full border-4 border-purple-400 bg-purple-600/40 blur-md animate-ping" />
+                  <span className="font-black text-sm text-purple-200 uppercase tracking-wider drop-shadow-[0_0_15px_rgba(168,85,247,1)]">
+                    ⚡ シールドブレイク!!
+                  </span>
+                </div>
+              )}
+              {fx.type === 'shield_hit' && (
+                <div className="relative flex flex-col items-center justify-center pointer-events-none">
+                  <div className="w-16 h-16 rounded-full border-2 border-purple-300 bg-purple-500/30 blur-xs animate-ping" />
+                  <span className="font-black text-[10px] text-purple-200 drop-shadow">シールドガード!</span>
+                </div>
+              )}
+              {fx.type === 'savage_blow' && (
+                <div className="relative flex flex-col items-center justify-center pointer-events-none">
+                  <div className="w-32 h-32 rounded-full border-4 border-red-600 bg-red-600/30 blur-sm animate-ping" />
+                  <div className="absolute font-black text-base text-red-400 uppercase tracking-widest drop-shadow-[0_0_15px_rgba(239,68,68,1)]">
+                    💥 渾身の一撃!!
+                  </div>
+                </div>
+              )}
+              {fx.type === 'surge_burst' && (
+                <div className="relative flex flex-col items-center justify-center pointer-events-none">
+                  <div className="w-16 h-96 bg-gradient-to-t from-purple-900 via-indigo-500 to-transparent blur-sm opacity-90 animate-pulse rounded-t-full" />
+                  <div className="absolute bottom-0 w-24 h-24 rounded-full border-2 border-indigo-400 bg-indigo-500/40 animate-ping" />
+                  <span className="absolute top-12 font-black text-xs text-indigo-200 uppercase tracking-widest drop-shadow-[0_0_12px_rgba(99,102,241,1)]">
+                    ⚡ 烈波 ⚡
                   </span>
                 </div>
               )}

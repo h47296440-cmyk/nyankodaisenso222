@@ -22,6 +22,7 @@ import { MenuModal } from './components/base/MenuModal';
 import { DeckFormationModal } from './components/upgrade/DeckFormationModal';
 import { GiftCodeModal } from './components/gift/GiftCodeModal';
 import { MissionsAchievementsModal } from './components/missions/MissionsAchievementsModal';
+import { AnnouncementsModal } from './components/announcements/AnnouncementsModal';
 import { PvpLobbyModal, PvpConnectionPayload } from './components/pvp/PvpLobbyModal';
 import { PvpBattleScreen } from './components/pvp/PvpBattleScreen';
 import { audio } from './utils/audio';
@@ -33,6 +34,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState<AppView>('title');
   const [activeStage, setActiveStage] = useState<StageDefinition | null>(null);
   const [battleActiveItems, setBattleActiveItems] = useState<BattleActiveItems>({});
+  const [showAnnouncementsModal, setShowAnnouncementsModal] = useState(false);
   const [showUpdateHistory, setShowUpdateHistory] = useState(false);
   const [showDevModal, setShowDevModal] = useState(false);
   const [showStorySelectModal, setShowStorySelectModal] = useState(false);
@@ -312,6 +314,7 @@ export default function App() {
                 onOpenStorage={() => setShowStorageModal(true)}
                 onOpenMissions={() => setShowMissionsModal(true)}
                 onOpenGiftCode={() => setShowGiftCodeModal(true)}
+                onOpenAnnouncements={() => setShowAnnouncementsModal(true)}
                 onOpenMenu={() => setShowMenuModal(true)}
                 onBackToTitle={() => setCurrentView('title')}
               />
@@ -444,6 +447,10 @@ export default function App() {
         <MenuModal
           isOpen={showMenuModal}
           onClose={() => setShowMenuModal(false)}
+          onOpenAnnouncements={() => {
+            setShowMenuModal(false);
+            setShowAnnouncementsModal(true);
+          }}
           onOpenMissions={() => {
             setShowMenuModal(false);
             setShowMissionsModal(true);
@@ -476,6 +483,12 @@ export default function App() {
             setShowMenuModal(false);
             setCurrentView('title');
           }}
+        />
+
+        {/* Announcements / News Modal */}
+        <AnnouncementsModal
+          isOpen={showAnnouncementsModal}
+          onClose={() => setShowAnnouncementsModal(false)}
         />
 
         {/* Character Deck Formation Modal */}

@@ -30,6 +30,7 @@ export interface PvpPlayerInfo {
   clearedStagesCount: number;
   peerId?: string;
   deck: PvpDeckUnitSummary[];
+  profile?: PlayerProfile;
 }
 
 export interface PvpConnectionPayload {
@@ -206,6 +207,7 @@ export const PvpLobbyModal: React.FC<PvpLobbyModalProps> = ({
       clearedStagesCount: clearedCount,
       peerId: myPeerId,
       deck: deckUnits,
+      profile: profile,
     };
   };
 
@@ -258,29 +260,58 @@ export const PvpLobbyModal: React.FC<PvpLobbyModalProps> = ({
         connRef.current = conn;
         setStatusText('対戦相手が参加しました！デッキ＆スコア情報同期中...');
 
-        conn.on('open', () => {
+        let hasStarted = false;
+        let syncInterval: number | null = null;
+
+        const launchBattle = (remotePlayerInfo: PvpPlayerInfo) => {
+          if (hasStarted) return;
+          hasStarted = true;
+          if (syncInterval) clearInterval(syncInterval);
+          saveRivalRecord(remotePlayerInfo, conn.peer);
           const localInfo = buildLocalPlayerInfo(peer.id);
-          conn.send({ type: 'PLAYER_INFO', data: localInfo });
-        });
+          try {
+            conn.send({ type: 'START_MATCH', data: localInfo });
+          } catch (e) {}
+          audio.playVictory();
+          onStartBattle({
+            peer,
+            conn,
+            isHost: true,
+            localPlayer: localInfo,
+            remotePlayer: remotePlayerInfo,
+          });
+        };
+
+        const sendLocalInfo = () => {
+          try {
+            const localInfo = buildLocalPlayerInfo(peer.id);
+            conn.send({ type: 'PLAYER_INFO', data: localInfo });
+          } catch (e) {}
+        };
+
+        if (conn.open) {
+          sendLocalInfo();
+        } else {
+          conn.on('open', sendLocalInfo);
+        }
+
+        // 定期的にハートビート送信して確実に同期
+        syncInterval = window.setInterval(() => {
+          if (!hasStarted && conn.open) {
+            sendLocalInfo();
+          }
+        }, 600);
 
         conn.on('data', (data: any) => {
-          if (data && data.type === 'PLAYER_INFO') {
-            audio.playVictory();
+          if (!data) return;
+          if (data.type === 'PLAYER_INFO' || data.type === 'PLAYER_INFO_ACK' || data.type === 'START_MATCH') {
             const remoteInfo = data.data as PvpPlayerInfo;
-            saveRivalRecord(remoteInfo, conn.peer);
-
-            const localInfo = buildLocalPlayerInfo(peer.id);
-            onStartBattle({
-              peer,
-              conn,
-              isHost: true,
-              localPlayer: localInfo,
-              remotePlayer: remoteInfo,
-            });
+            launchBattle(remoteInfo);
           }
         });
 
         conn.on('error', (err) => {
+          if (syncInterval) clearInterval(syncInterval);
           setErrorMessage(`通信エラー: ${err?.message || '接続が切断されました'}`);
         });
       });
@@ -338,32 +369,57 @@ export const PvpLobbyModal: React.FC<PvpLobbyModalProps> = ({
         });
         connRef.current = conn;
 
-        conn.on('open', () => {
+        let hasStarted = false;
+        let guestSyncInterval: number | null = null;
+
+        const launchGuestBattle = (remoteInfo: PvpPlayerInfo) => {
+          if (hasStarted) return;
+          hasStarted = true;
           if (connectionTimeoutRef.current) clearTimeout(connectionTimeoutRef.current);
-          setStatusText('ホストに接続成功！編成＆スコア情報を交換中...');
+          if (guestSyncInterval) clearInterval(guestSyncInterval);
+          saveRivalRecord(remoteInfo, targetId);
           const localInfo = buildLocalPlayerInfo(peer.id);
-          conn.send({ type: 'PLAYER_INFO', data: localInfo });
+          try {
+            conn.send({ type: 'PLAYER_INFO_ACK', data: localInfo });
+          } catch (e) {}
+          audio.playVictory();
+          onStartBattle({
+            peer,
+            conn,
+            isHost: false,
+            localPlayer: localInfo,
+            remotePlayer: remoteInfo,
+          });
+        };
+
+        const sendGuestInfo = () => {
+          try {
+            const localInfo = buildLocalPlayerInfo(peer.id);
+            conn.send({ type: 'PLAYER_INFO', data: localInfo });
+          } catch (e) {}
+        };
+
+        conn.on('open', () => {
+          setStatusText('ホストに接続成功！編成＆スコア情報を交換中...');
+          sendGuestInfo();
+          guestSyncInterval = window.setInterval(() => {
+            if (!hasStarted && conn.open) {
+              sendGuestInfo();
+            }
+          }, 600);
         });
 
         conn.on('data', (data: any) => {
-          if (data && data.type === 'PLAYER_INFO') {
-            audio.playVictory();
+          if (!data) return;
+          if (data.type === 'PLAYER_INFO' || data.type === 'PLAYER_INFO_ACK' || data.type === 'START_MATCH') {
             const remoteInfo = data.data as PvpPlayerInfo;
-            saveRivalRecord(remoteInfo, targetId);
-
-            const localInfo = buildLocalPlayerInfo(peer.id);
-            onStartBattle({
-              peer,
-              conn,
-              isHost: false,
-              localPlayer: localInfo,
-              remotePlayer: remoteInfo,
-            });
+            launchGuestBattle(remoteInfo);
           }
         });
 
         conn.on('error', (err) => {
           if (connectionTimeoutRef.current) clearTimeout(connectionTimeoutRef.current);
+          if (guestSyncInterval) clearInterval(guestSyncInterval);
           setIsConnecting(false);
           setErrorMessage(`接続エラー: ${err.message || '相手の部屋が見つからないか、満員です'}`);
         });

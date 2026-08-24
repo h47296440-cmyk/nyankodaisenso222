@@ -4,12 +4,12 @@ export interface StoryParagraph {
 }
 
 export interface ChapterStory {
-  chapterId: 'japan' | 'future' | 'cosmos';
+  chapterId: string;
   type: 'opening' | 'ending';
   title: string;
   subtitle: string;
   chapterName: string;
-  bgType: 'japan' | 'future' | 'cosmos';
+  bgType: 'japan' | 'future' | 'cosmos' | 'legend' | 'aku';
   paragraphs: string[];
   bannerBadge: string;
 }
@@ -139,6 +139,81 @@ export const CHAPTER_STORIES: Record<string, ChapterStory> = {
       '美味しい猫缶とマタタビがある限り、彼らの進撃は永遠に続くのだ…！',
       '『すべての戦士たちへ、心からの感謝を！ にゃんこよ永遠なれ！』',
       '―― 全章完全制覇！ ――',
+    ],
+  },
+  legend_opening: {
+    chapterId: 'legend',
+    type: 'opening',
+    chapterName: 'レジェンドストーリー',
+    title: 'レジェンドストーリー - オープニング',
+    subtitle: '古の島々と古代遺跡を巡る壮大なる叙事詩',
+    bannerBadge: 'Legend - 伝説の幕開け',
+    bgType: 'legend',
+    paragraphs: [
+      '世界の果てに浮かぶ、地図にも記されていない無数の秘島群――。',
+      'そこは「レジェンドアイランド」。',
+      '数多の古代兵器、伝説の魔獣たち、そしていにしえの神々が眠る地。',
+      '幾千もの冒険者たちが富と名声を求めて挑み、',
+      '誰一人として生きて戻らなかったという伝説の領域に、',
+      '白き猛者「にゃんこ軍団」が上陸した！',
+      '伝説のネコ「ネコウルルン」「コニャンダム」「宮木武蔵」らを従え、',
+      '古代の神殿「古代研究所」を目指す旅が、今始まる――！',
+    ],
+  },
+  legend_ending: {
+    chapterId: 'legend',
+    type: 'ending',
+    chapterName: 'レジェンドストーリー',
+    title: 'レジェンドストーリー - エンディング',
+    subtitle: '終結 - 古代研究所の制覇と伝説の完結',
+    bannerBadge: 'Legend End - 終結',
+    bgType: 'legend',
+    paragraphs: [
+      '全49章に及ぶ過酷なる島々の試練を越え、',
+      'ついに最深部「古代研究所」にて古代神レジェンドぶんぶんを打ち倒したにゃんこ軍団。',
+      '崩れ落ちる古代遺跡の彼方に、',
+      'かつてない原始の光が射し込む。',
+      'レジェンドストーリーはここに堂々の終結を迎えた。',
+      'しかし――古代の扉が開かれたことにより、',
+      'さらに遥かなる太古の時代「真・レジェンドストーリー」、',
+      'そして異界の深淵「魔界」への道が開かれたのだ…！',
+      '―― レジェンドストーリー 完結 ――',
+    ],
+  },
+  real_legend_opening: {
+    chapterId: 'real_legend',
+    type: 'opening',
+    chapterName: '真・レジェンドストーリー',
+    title: '真・レジェンドストーリー - オープニング',
+    subtitle: '太古の記憶 - はじまりの場所へ',
+    bannerBadge: 'Real Legend - 原始の胎動',
+    bgType: 'legend',
+    paragraphs: [
+      '古代研究所の奥底に眠っていた時空のゲート――。',
+      'その先に広がっていたのは、人類の歴史以前、',
+      '凶暴なる古代種たちが支配する原始の世界「真・レジェンド」であった！',
+      '俊足の「オールド・リー」、空を覆う「古我王」、',
+      'そして超絶猛威を振るう「エンシェントサイクロン」！',
+      '古代の呪いが吹き荒れる原始の大地で、',
+      'にゃんこ軍団の究極のサバイバルが幕を開ける！',
+    ],
+  },
+  aku_opening: {
+    chapterId: 'aku',
+    type: 'opening',
+    chapterName: '魔界編',
+    title: '魔界編 - オープニング',
+    subtitle: '封印されし深淵の魔界、悪魔の軍勢が覚醒！',
+    bannerBadge: 'Aku Realm - 魔界降臨',
+    bgType: 'aku',
+    paragraphs: [
+      '世界の裏側に封印されていた深紅と漆黒の異界「魔界」。',
+      '長き封印が解かれ、強固な悪魔シールドと恐るべき渾身の一撃、',
+      'そして死してなお炸裂する「遺志の烈波」を操る悪魔軍団が姿を現した！',
+      '圧倒的膂力を誇る「ヘルゴリラー」、',
+      '超光速で突撃する悪魔リス「デビル・ワン」、',
+      'そして魔界の支配者「ギルティ・ペン」！',
+      'シールドブレイカーを携え、にゃんこ軍団よ、魔界の深淵を浄化せよ！',
     ],
   },
 };

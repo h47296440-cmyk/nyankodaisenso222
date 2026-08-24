@@ -19,6 +19,7 @@ interface CatBaseScreenProps {
   onOpenStorage: () => void;
   onOpenMissions: () => void;
   onOpenGiftCode: () => void;
+  onOpenAnnouncements?: () => void;
   onOpenMenu: () => void;
   onBackToTitle: () => void;
 }
@@ -50,6 +51,7 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
   onOpenStorage,
   onOpenMissions,
   onOpenGiftCode,
+  onOpenAnnouncements,
   onOpenMenu,
   onBackToTitle,
 }) => {
@@ -317,8 +319,29 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
               </span>
             </button>
 
-            {/* Bottom-Left Quick Icons: メニュー, ミッション, プレゼント, ガマトト, ネコ道場 */}
+            {/* Bottom-Left Quick Icons: お知らせ, メニュー, ミッション, プレゼント, ガマトト, ネコ道場 */}
             <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 pt-1.5">
+              {/* お知らせ (Announcements / News) with Red 'NEW' badge */}
+              <button
+                id="btn-sub-announcements"
+                onClick={() => {
+                  audio.playClick();
+                  if (onOpenAnnouncements) onOpenAnnouncements();
+                }}
+                className="relative flex flex-col items-center justify-center p-0.5 hover:scale-110 transition-transform group"
+              >
+                <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-b from-amber-100 to-amber-300 border-2 border-amber-800 shadow-md flex items-center justify-center">
+                  <span className="text-xl sm:text-2xl animate-bounce">🔔</span>
+                  {/* Red 'NEW' badge */}
+                  <div className="absolute -top-1.5 -right-1.5 px-1 py-0.2 rounded-full bg-red-600 border border-white text-white text-[8px] font-black shadow animate-pulse">
+                    特報
+                  </div>
+                </div>
+                <span className="text-[9px] sm:text-[10px] font-black text-amber-100 tracking-tighter mt-0.5 drop-shadow">
+                  お知らせ
+                </span>
+              </button>
+
               {/* メニュー (Menu) with Orange '!' badge */}
               <button
                 id="btn-sub-menu"

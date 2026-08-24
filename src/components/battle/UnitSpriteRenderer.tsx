@@ -3907,6 +3907,325 @@ function renderSpriteSvg(
         </svg>
       );
 
+    // ==========================================
+    // 悪魔編（AKU REALM）新敵スプライト
+    // ==========================================
+    case 'enemy_aku_doge':
+      return (
+        <svg width="70" height="65" viewBox="0 0 70 65" className="drop-shadow-xl">
+          {/* Aku Doge Body - Dark Obsidian */}
+          <ellipse cx="35" cy="38" rx="22" ry="16" fill="#1e1b4b" stroke="#7c3aed" strokeWidth="2.5" />
+          {/* Aku Horns */}
+          <path d="M 22 18 Q 14 6 12 2 Q 18 10 24 16 Z" fill="#9333ea" stroke="#c084fc" strokeWidth="1.5" />
+          <path d="M 32 18 Q 38 6 42 2 Q 36 10 30 16 Z" fill="#9333ea" stroke="#c084fc" strokeWidth="1.5" />
+          {/* Head */}
+          <circle cx="24" cy="26" r="14" fill="#1e1b4b" stroke="#7c3aed" strokeWidth="2.5" />
+          {/* Glowing Red Devil Eyes */}
+          <ellipse cx="18" cy="24" rx="2.5" ry="3.5" fill="#ef4444" />
+          <ellipse cx="26" cy="24" rx="2.5" ry="3.5" fill="#ef4444" />
+          {/* Snout */}
+          <ellipse cx="14" cy="30" rx="4" ry="3" fill="#312e81" />
+          <polygon points="12,29 16,29 14,32" fill="#ef4444" />
+          {/* Legs */}
+          <ellipse cx={22 + legOffset1} cy="52" rx="5" ry="6" fill="#1e1b4b" stroke="#7c3aed" strokeWidth="2" />
+          <ellipse cx={44 + legOffset2} cy="52" rx="5" ry="6" fill="#1e1b4b" stroke="#7c3aed" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_aku_squirrel':
+      return (
+        <svg width="80" height="60" viewBox="0 0 80 60" className="drop-shadow-2xl">
+          {/* Speed Distortion Trail */}
+          <path d="M 50 36 Q 74 12 60 2 Q 46 6 50 24 Z" fill="#581c87" stroke="#a855f7" strokeWidth="2.5" />
+          <line x1="48" y1="42" x2="80" y2="42" stroke="#c084fc" strokeWidth="3" strokeDasharray="6,4" />
+          <line x1="42" y1="48" x2="76" y2="48" stroke="#ef4444" strokeWidth="2.5" strokeDasharray="4,4" />
+          {/* Aku Body */}
+          <ellipse cx="32" cy="34" rx="18" ry="13" fill="#1e1b4b" stroke="#a855f7" strokeWidth="2.5" />
+          {/* Devil Horns */}
+          <polygon points="14,14 10,2 18,10" fill="#dc2626" stroke="#991b1b" strokeWidth="1.5" />
+          <polygon points="22,14 26,2 26,12" fill="#dc2626" stroke="#991b1b" strokeWidth="1.5" />
+          {/* Head & Red Eye */}
+          <circle cx="18" cy="24" r="10" fill="#1e1b4b" stroke="#a855f7" strokeWidth="2" />
+          <circle cx="14" cy="22" r="3" fill="#ef4444" className="animate-pulse" />
+          {/* Sprinting Legs */}
+          <ellipse cx={22 + legOffset1 * 2.5} cy="46" rx="4" ry="6" fill="#1e1b4b" stroke="#a855f7" strokeWidth="2" />
+          <ellipse cx={40 + legOffset2 * 2.5} cy="46" rx="4" ry="6" fill="#1e1b4b" stroke="#a855f7" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_hell_gorilla':
+      return (
+        <svg width="95" height="90" viewBox="0 0 95 90" className="drop-shadow-2xl">
+          {/* Flaming Crimson Savage Blow Aura (50% Chance) */}
+          <circle cx="48" cy="48" r="42" fill="#dc2626" opacity={isAttacking ? 0.45 : 0.15} className="animate-pulse" />
+          {/* Hell Gorilla Muscular Obsidian Torso */}
+          <ellipse cx="48" cy="50" rx="32" ry="28" fill="#18181b" stroke="#dc2626" strokeWidth="4" />
+          {/* Demon Horns */}
+          <path d="M 32 20 Q 20 8 16 0 Q 26 8 36 18 Z" fill="#ef4444" stroke="#7f1d1d" strokeWidth="2" />
+          <path d="M 64 20 Q 76 8 80 0 Q 70 8 60 18 Z" fill="#ef4444" stroke="#7f1d1d" strokeWidth="2" />
+          {/* Gorilla Demon Head */}
+          <circle cx="48" cy="28" r="18" fill="#18181b" stroke="#dc2626" strokeWidth="3" />
+          {/* Burning Yellow/Red Eyes */}
+          <circle cx="40" cy="26" r="4" fill="#fbbf24" stroke="#dc2626" strokeWidth="1.5" />
+          <circle cx="56" cy="26" r="4" fill="#fbbf24" stroke="#dc2626" strokeWidth="1.5" />
+          <circle cx="40" cy="26" r="2" fill="#ef4444" />
+          <circle cx="56" cy="26" r="2" fill="#ef4444" />
+          {/* Hellfire Fangs */}
+          <polygon points="44,36 48,42 52,36" fill="#f8fafc" />
+          {/* Giant Burning Fist Slams */}
+          <g transform={`rotate(${isAttacking ? -35 : 0} 20 58)`}>
+            <ellipse cx={20 + legOffset1} cy="60" rx="13" ry="18" fill="#991b1b" stroke="#ef4444" strokeWidth="3" />
+            <circle cx="16" cy="70" r="5" fill="#f59e0b" />
+          </g>
+          <g transform={`rotate(${isAttacking ? 35 : 0} 76 58)`}>
+            <ellipse cx={76 + legOffset2} cy="60" rx="13" ry="18" fill="#991b1b" stroke="#ef4444" strokeWidth="3" />
+            <circle cx="80" cy="70" r="5" fill="#f59e0b" />
+          </g>
+        </svg>
+      );
+
+    case 'enemy_guilty_peng':
+      return (
+        <svg width="75" height="70" viewBox="0 0 75 70" className="drop-shadow-xl">
+          {/* Aku Penguin Body */}
+          <ellipse cx="38" cy="38" rx="22" ry="24" fill="#1e1b4b" stroke="#7c3aed" strokeWidth="3" />
+          <ellipse cx="36" cy="40" rx="14" ry="16" fill="#f3e8ff" />
+          {/* Head & Demon Beak */}
+          <circle cx="34" cy="20" r="14" fill="#1e1b4b" stroke="#7c3aed" strokeWidth="2.5" />
+          <polygon points="18,22 8,24 18,28" fill="#ef4444" stroke="#7f1d1d" strokeWidth="1.5" />
+          <circle cx="28" cy="18" r="3" fill="#ef4444" />
+          {/* Demon Horn */}
+          <polygon points="32,8 36,0 40,8" fill="#a855f7" />
+          {/* Feet */}
+          <ellipse cx={28 + legOffset1} cy="62" rx="6" ry="4" fill="#ef4444" />
+          <ellipse cx={46 + legOffset2} cy="62" rx="6" ry="4" fill="#ef4444" />
+        </svg>
+      );
+
+    case 'enemy_mamomo':
+      return (
+        <svg width="105" height="100" viewBox="0 0 105 100" className="drop-shadow-2xl">
+          {/* Heavy Demon Gatekeeper Armored Body */}
+          <ellipse cx="52" cy="55" rx="38" ry="34" fill="#311042" stroke="#a855f7" strokeWidth="4" />
+          {/* Iron Horns */}
+          <polygon points="30,24 18,6 38,18" fill="#7e22ce" stroke="#c084fc" strokeWidth="2" />
+          <polygon points="74,24 86,6 66,18" fill="#7e22ce" stroke="#c084fc" strokeWidth="2" />
+          {/* Face Plate */}
+          <circle cx="52" cy="34" r="20" fill="#18181b" stroke="#a855f7" strokeWidth="3" />
+          <circle cx="44" cy="32" r="4" fill="#ef4444" />
+          <circle cx="60" cy="32" r="4" fill="#ef4444" />
+          {/* Giant Spiked Demon Club */}
+          <g transform={`rotate(${isAttacking ? 60 : -20} 80 50)`}>
+            <rect x="74" y="20" width="12" height="60" rx="3" fill="#0f172a" stroke="#a855f7" strokeWidth="2" />
+            <polygon points="70,30 64,32 70,36" fill="#ef4444" />
+            <polygon points="90,30 96,32 90,36" fill="#ef4444" />
+            <polygon points="70,45 64,47 70,51" fill="#ef4444" />
+          </g>
+          <ellipse cx={36 + legOffset1} cy="88" rx="10" ry="8" fill="#18181b" stroke="#a855f7" strokeWidth="2" />
+          <ellipse cx={68 + legOffset2} cy="88" rx="10" ry="8" fill="#18181b" stroke="#a855f7" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_sister_cassis':
+      return (
+        <svg width="90" height="95" viewBox="0 0 90 95" className="drop-shadow-2xl">
+          {/* Black Nun Veil & Robe */}
+          <path d="M 45 10 Q 15 35 20 85 L 70 85 Q 75 35 45 10 Z" fill="#0f172a" stroke="#9333ea" strokeWidth="3" />
+          {/* White Habit Collar */}
+          <ellipse cx="45" cy="40" rx="18" ry="8" fill="#f1f5f9" stroke="#9333ea" strokeWidth="2" />
+          {/* Pale Cursed Face */}
+          <circle cx="45" cy="30" r="14" fill="#e2e8f0" stroke="#0f172a" strokeWidth="2" />
+          <ellipse cx="39" cy="28" rx="2.5" ry="3" fill="#7e22ce" />
+          <ellipse cx="51" cy="28" rx="2.5" ry="3" fill="#7e22ce" />
+          {/* Inverted Demon Rosary Cross */}
+          <g transform={`rotate(${isAttacking ? 180 : 0} 45 65)`}>
+            <line x1="45" y1="50" x2="45" y2="78" stroke="#ef4444" strokeWidth="3.5" />
+            <line x1="34" y1="68" x2="56" y2="68" stroke="#ef4444" strokeWidth="3.5" />
+          </g>
+        </svg>
+      );
+
+    case 'enemy_midnight_nyandar':
+      return (
+        <svg width="120" height="110" viewBox="0 0 120 110" className="drop-shadow-2xl">
+          {/* Demon Cat Noble Cape */}
+          <path d="M 60 25 Q 10 60 25 95 L 95 95 Q 110 60 60 25 Z" fill="#4c0519" stroke="#be123c" strokeWidth="3.5" />
+          {/* Vampire Demon Cat Body */}
+          <ellipse cx="60" cy="58" rx="28" ry="24" fill="#18181b" stroke="#7c3aed" strokeWidth="3" />
+          {/* Demon Bat Wings */}
+          <path d="M 32 45 Q 8 20 2 38 Q 12 55 32 50 Z" fill="#581c87" stroke="#a855f7" strokeWidth="2" />
+          <path d="M 88 45 Q 112 20 118 38 Q 108 55 88 50 Z" fill="#581c87" stroke="#a855f7" strokeWidth="2" />
+          {/* Cat Noble Head */}
+          <circle cx="60" cy="34" r="18" fill="#18181b" stroke="#7c3aed" strokeWidth="2.5" />
+          <polygon points="46,20 40,6 52,14" fill="#be123c" />
+          <polygon points="74,20 80,6 68,14" fill="#be123c" />
+          <circle cx="52" cy="32" r="3.5" fill="#f43f5e" />
+          <circle cx="68" cy="32" r="3.5" fill="#f43f5e" />
+          {/* Magic Orb on Attack */}
+          {isAttacking && (
+            <circle cx="20" cy="40" r="14" fill="#be123c" opacity="0.8" className="animate-ping" />
+          )}
+        </svg>
+      );
+
+    case 'enemy_aku_cyclone':
+      return (
+        <svg width="135" height="135" viewBox="0 0 135 135" className="drop-shadow-2xl">
+          {/* Chaos Spinning Dark Vortex */}
+          <g transform={`rotate(${walkCycle * 70} 67 67)`}>
+            <circle cx="67" cy="67" r="58" fill="#18181b" stroke="#7c3aed" strokeWidth="6" strokeDasharray="16,8" />
+            <circle cx="67" cy="67" r="44" fill="#4c0519" stroke="#e11d48" strokeWidth="5" strokeDasharray="12,6" />
+            <circle cx="67" cy="67" r="30" fill="#2e1065" stroke="#a855f7" strokeWidth="4" />
+          </g>
+          {/* Center Demon Core Eye & Fangs */}
+          <circle cx="67" cy="67" r="18" fill="#000000" stroke="#f43f5e" strokeWidth="3" />
+          <ellipse cx="67" cy="67" rx="8" ry="12" fill="#ef4444" />
+          <circle cx="67" cy="67" r="4" fill="#fbbf24" />
+          {/* Devil Horns extending outward */}
+          <polygon points="50,18 42,2 58,10" fill="#9333ea" />
+          <polygon points="85,18 93,2 77,10" fill="#9333ea" />
+        </svg>
+      );
+
+    case 'enemy_demon_lord_jagi':
+      return (
+        <svg width="150" height="145" viewBox="0 0 150 145" className="drop-shadow-2xl">
+          {/* Lord Jagi - Demon Throne Aura */}
+          <circle cx="75" cy="72" r="68" fill="#581c87" opacity="0.35" className="animate-pulse" />
+          {/* Massive Demonic Overlord Armor */}
+          <ellipse cx="75" cy="80" rx="46" ry="40" fill="#09090b" stroke="#7c3aed" strokeWidth="5" />
+          {/* Grand Demon Horns Crown */}
+          <path d="M 40 35 Q 15 10 10 0 Q 30 15 50 30 Z" fill="#9333ea" stroke="#e879f9" strokeWidth="3" />
+          <path d="M 110 35 Q 135 10 140 0 Q 120 15 100 30 Z" fill="#9333ea" stroke="#e879f9" strokeWidth="3" />
+          {/* Skull Helm */}
+          <circle cx="75" cy="45" r="26" fill="#18181b" stroke="#dc2626" strokeWidth="4" />
+          {/* Piercing Demon Soul Eyes */}
+          <circle cx="64" cy="42" r="6" fill="#ef4444" stroke="#fbbf24" strokeWidth="2" />
+          <circle cx="86" cy="42" r="6" fill="#ef4444" stroke="#fbbf24" strokeWidth="2" />
+          {/* Demonic Greatsword */}
+          <g transform={`rotate(${isAttacking ? 50 : -25} 115 80)`}>
+            <rect x="110" y="20" width="10" height="85" rx="3" fill="#be123c" stroke="#f43f5e" strokeWidth="3" />
+            <polygon points="105,25 115,5 125,25" fill="#f59e0b" />
+          </g>
+          <ellipse cx={52 + legOffset1} cy="120" rx="14" ry="10" fill="#09090b" stroke="#7c3aed" strokeWidth="3" />
+          <ellipse cx={98 + legOffset2} cy="120" rx="14" ry="10" fill="#09090b" stroke="#7c3aed" strokeWidth="3" />
+        </svg>
+      );
+
+    case 'enemy_aku_koryu':
+      return (
+        <svg width="85" height="80" viewBox="0 0 85 80" className="drop-shadow-2xl">
+          {/* Demon Koala Body */}
+          <ellipse cx="42" cy="44" rx="28" ry="24" fill="#3b0764" stroke="#9333ea" strokeWidth="3" />
+          {/* Giant Fluffy Demon Ears with Horns */}
+          <circle cx="20" cy="22" r="14" fill="#581c87" stroke="#a855f7" strokeWidth="2" />
+          <circle cx="64" cy="22" r="14" fill="#581c87" stroke="#a855f7" strokeWidth="2" />
+          <polygon points="20,10 16,0 26,6" fill="#ef4444" />
+          <polygon points="64,10 68,0 58,6" fill="#ef4444" />
+          {/* Head & Demon Nose */}
+          <circle cx="42" cy="30" r="18" fill="#3b0764" stroke="#9333ea" strokeWidth="2.5" />
+          <ellipse cx="42" cy="30" rx="8" ry="11" fill="#0f172a" />
+          <circle cx="32" cy="24" r="3" fill="#ef4444" />
+          <circle cx="52" cy="24" r="3" fill="#ef4444" />
+          {/* Legs */}
+          <ellipse cx={30 + legOffset1} cy="68" rx="6" ry="7" fill="#3b0764" stroke="#9333ea" strokeWidth="2" />
+          <ellipse cx={54 + legOffset2} cy="68" rx="6" ry="7" fill="#3b0764" stroke="#9333ea" strokeWidth="2" />
+        </svg>
+      );
+
+    // ==========================================
+    // 真レジェンド 強化新敵スプライト
+    // ==========================================
+    case 'enemy_real_ancient_hippo':
+      return (
+        <svg width="105" height="85" viewBox="0 0 105 85" className="drop-shadow-2xl">
+          {/* Primeval Super Hippo */}
+          <ellipse cx="56" cy="48" rx="38" ry="28" fill="#047857" stroke="#34d399" strokeWidth="3.5" />
+          {/* Fossil Shell Crest */}
+          <path d="M 40 22 Q 60 10 80 22" fill="none" stroke="#f59e0b" strokeWidth="4" />
+          {/* Giant Hippo Snout */}
+          <ellipse cx="28" cy="48" rx="22" ry="18" fill="#065f46" stroke="#34d399" strokeWidth="3" />
+          <circle cx="20" cy="40" r="4" fill="#047857" />
+          <circle cx="38" cy="32" r="4" fill="#ef4444" />
+          {/* Massive Primitive Tusks */}
+          <polygon points="16,56 12,68 22,58" fill="#fef08a" stroke="#78350f" strokeWidth="1.5" />
+          <polygon points="34,56 38,68 28,58" fill="#fef08a" stroke="#78350f" strokeWidth="1.5" />
+          <ellipse cx={40 + legOffset1} cy="74" rx="8" ry="8" fill="#047857" stroke="#34d399" strokeWidth="2" />
+          <ellipse cx={74 + legOffset2} cy="74" rx="8" ry="8" fill="#047857" stroke="#34d399" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_real_ancient_elephant':
+      return (
+        <svg width="125" height="110" viewBox="0 0 125 110" className="drop-shadow-2xl">
+          {/* Primeval Mammoth Elephant Body */}
+          <ellipse cx="68" cy="60" rx="44" ry="36" fill="#064e3b" stroke="#10b981" strokeWidth="4" />
+          {/* Mammoth Tusks */}
+          <path d="M 32 60 Q 6 70 8 40" fill="none" stroke="#fef08a" strokeWidth="6" strokeLinecap="round" />
+          {/* Elephant Trunk */}
+          <path d={`M 36 48 Q ${isAttacking ? 10 : 22} 75 ${isAttacking ? 0 : 28} 95`} fill="none" stroke="#047857" strokeWidth="10" strokeLinecap="round" />
+          {/* Head & Ear */}
+          <circle cx="44" cy="42" r="22" fill="#064e3b" stroke="#10b981" strokeWidth="3" />
+          <ellipse cx="58" cy="38" rx="16" ry="20" fill="#047857" stroke="#10b981" strokeWidth="2" />
+          <circle cx="34" cy="36" r="4" fill="#ef4444" />
+          <ellipse cx={48 + legOffset1} cy="96" rx="10" ry="10" fill="#064e3b" stroke="#10b981" strokeWidth="2.5" />
+          <ellipse cx={88 + legOffset2} cy="96" rx="10" ry="10" fill="#064e3b" stroke="#10b981" strokeWidth="2.5" />
+        </svg>
+      );
+
+    case 'enemy_real_ancient_master_a':
+      return (
+        <svg width="95" height="75" viewBox="0 0 95 75" className="drop-shadow-xl">
+          {/* Ancient Master Anteater Body */}
+          <ellipse cx="55" cy="42" rx="30" ry="20" fill="#065f46" stroke="#34d399" strokeWidth="3" />
+          {/* Long Snout */}
+          <polygon points="32,36 4,40 32,46" fill="#047857" stroke="#34d399" strokeWidth="2" />
+          {/* Rapid Anteater Tongue on Attack */}
+          {isAttacking && (
+            <line x1="4" y1="40" x2="-60" y2="40" stroke="#f43f5e" strokeWidth="4" strokeLinecap="round" />
+          )}
+          {/* Ancient Beard & Eye */}
+          <path d="M 28 46 Q 24 60 18 64" fill="none" stroke="#f8fafc" strokeWidth="3" />
+          <circle cx="28" cy="34" r="3" fill="#ef4444" />
+          <ellipse cx={46 + legOffset1} cy="62" rx="6" ry="6" fill="#065f46" stroke="#34d399" strokeWidth="2" />
+          <ellipse cx={70 + legOffset2} cy="62" rx="6" ry="6" fill="#065f46" stroke="#34d399" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_real_ancient_bore':
+      return (
+        <svg width="100" height="75" viewBox="0 0 100 75" className="drop-shadow-2xl">
+          {/* Primeval Boar Body */}
+          <ellipse cx="50" cy="42" rx="34" ry="24" fill="#78350f" stroke="#f59e0b" strokeWidth="3.5" />
+          {/* Spiky Ancient Bristles */}
+          <path d="M 30 20 L 38 8 L 46 20 L 54 6 L 62 20 L 70 8 L 78 20" fill="#047857" stroke="#10b981" strokeWidth="2" />
+          {/* Boar Head & Huge Horns */}
+          <polygon points="26,30 4,42 26,52" fill="#78350f" stroke="#f59e0b" strokeWidth="2.5" />
+          <polygon points="12,46 4,32 18,42" fill="#fef08a" stroke="#78350f" strokeWidth="2" />
+          <circle cx="22" cy="34" r="3.5" fill="#ef4444" />
+          <ellipse cx={36 + legOffset1 * 2} cy="64" rx="7" ry="8" fill="#78350f" stroke="#f59e0b" strokeWidth="2" />
+          <ellipse cx={68 + legOffset2 * 2} cy="64" rx="7" ry="8" fill="#78350f" stroke="#f59e0b" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_real_ancient_sloth':
+      return (
+        <svg width="125" height="115" viewBox="0 0 125 115" className="drop-shadow-2xl">
+          {/* Ancient Giant Megalonyx Sloth Body */}
+          <ellipse cx="65" cy="62" rx="46" ry="38" fill="#064e3b" stroke="#10b981" strokeWidth="4" />
+          {/* Huge Primeval Sloth Head */}
+          <circle cx="34" cy="40" r="20" fill="#065f46" stroke="#10b981" strokeWidth="3" />
+          <circle cx="26" cy="36" r="4" fill="#ef4444" />
+          {/* Giant Razor Claws */}
+          <g transform={`rotate(${isAttacking ? 75 : -15} 30 65)`}>
+            <path d="M 30 65 Q 10 90 0 110" fill="none" stroke="#fef08a" strokeWidth="6" strokeLinecap="round" />
+            <path d="M 36 65 Q 20 95 12 115" fill="none" stroke="#fef08a" strokeWidth="6" strokeLinecap="round" />
+          </g>
+          <ellipse cx={52 + legOffset1} cy="98" rx="10" ry="10" fill="#064e3b" stroke="#10b981" strokeWidth="2.5" />
+          <ellipse cx={92 + legOffset2} cy="98" rx="10" ry="10" fill="#064e3b" stroke="#10b981" strokeWidth="2.5" />
+        </svg>
+      );
+
     default:
       return (
         <svg width="50" height="50" viewBox="0 0 50 50">

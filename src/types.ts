@@ -13,6 +13,7 @@ export type EnemyTrait =
   | 'metal'
   | 'zombie'
   | 'ancient'
+  | 'aku'
   | 'boss';
 
 export interface AbilityDefinition {
@@ -27,6 +28,11 @@ export interface AbilityDefinition {
   barrier?: { hp: number }; // スターエイリアンのバリア耐久値 (単発ダメージがこれ以上で破壊)
   warp?: { chance: number; distance: number; duration?: number }; // ワープ能力 (味方を後方にテレポート)
   barrierBreaker?: { chance: number }; // バリアブレイカー能力 (バリアを即座に粉砕)
+  shield?: { hp: number }; // 悪魔シールド (耐久値分のダメージを完全に無効化＆破壊時ノックバック)
+  shieldPiercer?: { chance: number }; // シールドブレイカー能力 (悪魔シールドを即座に破壊)
+  savageBlow?: { chance: number; mult: number }; // 渾身の一撃 (確率で3倍などの超大ダメージ+赤エフェクト)
+  surge?: { level: number; chance?: number }; // 烈波 (足元に立ち上る連続ダメージ柱)
+  deathSurge?: { level: number; chance?: number }; // 遺志の烈波 (撃破時に烈波発生)
   chargeAttack?: { chargeTime: number; isOneHitKill?: boolean }; // フィリバスター等の大溜め即死攻撃
   burrow?: { count: number; distance: number };
   revive?: { count: number; hpPercent: number; delaySeconds: number };
@@ -147,6 +153,10 @@ export interface ActiveEntity {
   isWarping?: boolean; // ワープ移動中フラグ
   warpDistanceLeft?: number;
 
+  // 悪魔シールド (Aku Shield) mechanics
+  shieldHp?: number; // 残り悪魔シールド耐久値 (ダメージをシールドが肩代わり。0になると破壊)
+  maxShieldHp?: number;
+
   // Animation states
   state: 'walk' | 'attack' | 'knockback' | 'die' | 'burrow' | 'revive' | 'charge';
   animTimer: number;
@@ -192,6 +202,10 @@ export interface VisualEffect {
     | 'zombie_killer_fx'
     | 'barrier_hit'
     | 'barrier_break'
+    | 'shield_hit'
+    | 'shield_break'
+    | 'savage_blow'
+    | 'surge_burst'
     | 'warp_portal'
     | 'warp_fx'
     | 'filibuster_charge'
@@ -221,6 +235,7 @@ export interface StageWave {
   enemyId: string;
   count: number;
   interval: number;
+  multiplier?: number; // 敵の強化倍率 (1.0 = 100%, 3.0 = 300%)
   castleHpThreshold?: number; // spawns when enemy castle HP drops below this %
   boss?: boolean;
 }
@@ -257,6 +272,13 @@ export type ChapterId =
   | 'legend_20'
   | 'legend_21'
   | 'real_legend_1'
+  | 'real_legend_2'
+  | 'real_legend_3'
+  | 'real_legend_4'
+  | 'real_legend_5'
+  | 'aku_realm'
+  | 'aku_realm_1'
+  | 'aku_realm_2'
   | 'crazed_event'
   | 'special_event'
   | 'advent_clionel'
@@ -266,6 +288,7 @@ export type ChapterId =
   | 'advent_alien_cyclone'
   | 'advent_zombie_cyclone'
   | 'advent_ancient_cyclone'
+  | 'advent_aku_cyclone'
   | 'challenge_score_attack'
   | 'advent'
   | 'zombie_future'
@@ -310,7 +333,9 @@ export interface StageDefinition {
     | 'legend_desert'
     | 'crazed_hell'
     | 'advent_heaven'
-    | 'advent_hell';
+    | 'advent_hell'
+    | 'aku_dimension'
+    | 'aku_volcano';
   battlefieldWidth: number;
   baseRewardXp: number;
   baseRewardCatFood: number;

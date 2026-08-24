@@ -218,7 +218,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
         stage.waves.forEach((wave, idx) => {
           if (wave.timeSeconds > 0 && battleTimeRef.current >= wave.timeSeconds && !spawnedWaveIndicesRef.current.has(idx)) {
             spawnedWaveIndicesRef.current.add(idx);
-            spawnEnemy(wave.enemyId, wave.boss);
+            spawnEnemy(wave.enemyId, wave.boss, wave.multiplier);
             if (wave.boss) {
               audio.playBossAppear();
               if (stage.id === 'legend_21_2' || stage.id?.includes('ancient_power') || stage.chapterId?.includes('legend_21')) {
@@ -239,7 +239,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
             const hpPercent = (enemyCastleHpRef.current / stage.castleHp) * 100;
             if (hpPercent <= wave.castleHpThreshold) {
               spawnedThresholdWavesRef.current.add(idx);
-              spawnEnemy(wave.enemyId, wave.boss);
+              spawnEnemy(wave.enemyId, wave.boss, wave.multiplier);
               if (wave.boss) {
                 audio.playBossAppear();
                 if (stage.id === 'legend_21_2' || stage.id?.includes('ancient_power') || stage.chapterId?.includes('legend_21')) {
@@ -408,9 +408,44 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   };
 
   // Spawn Enemy Helper (Spawns at enemyCastleX on the Right)
-  const spawnEnemy = (enemyId: string, isBoss: boolean = false) => {
+  const spawnEnemy = (enemyId: string, isBoss: boolean = false, customMultiplier?: number) => {
     const def = ENEMY_DEFINITIONS[enemyId] || ENEMY_DEFINITIONS.enemy_doge;
     const isBossEntity = isBoss || def.isBoss;
+
+    // Calculate stage multiplier (真レジェンドや魔界編では昔の敵のステータス倍率が大幅に上昇)
+    let multiplier = customMultiplier || 1.0;
+    if (!customMultiplier) {
+      const isRealLegend = stage.chapterId?.startsWith('real_legend');
+      const isAkuRealm = stage.chapterId?.startsWith('aku_realm');
+      const isLateLegend = stage.chapterId?.startsWith('legend_') && parseInt(stage.chapterId.replace('legend_', ''), 10) >= 10;
+      
+      const isAncientEnemy = def.traits?.includes('relic');
+      const isAkuEnemy = def.traits?.includes('aku');
+
+      if (isRealLegend) {
+        // 真レジェンド: 昔の敵(非古代種)は 300%〜600% 倍率
+        if (!isAncientEnemy) {
+          multiplier = 4.0;
+        } else {
+          multiplier = 1.2;
+        }
+      } else if (isAkuRealm) {
+        // 魔界編: 昔の敵は 300% 倍率
+        if (!isAkuEnemy) {
+          multiplier = 3.0;
+        } else {
+          multiplier = 1.0;
+        }
+      } else if (isLateLegend) {
+        // 後半レジェンド
+        multiplier = 1.8;
+      }
+    }
+
+    const calculatedHp = Math.round(def.hp * multiplier);
+    const calculatedAtk = Math.round(def.attackPower * multiplier);
+    const calculatedBarrier = def.abilities?.barrier?.hp ? Math.round(def.abilities.barrier.hp * multiplier) : undefined;
+    const calculatedShield = def.abilities?.shield?.hp ? Math.round(def.abilities.shield.hp * multiplier) : undefined;
 
     const newEnemy: ActiveEntity = {
       instanceId: `enemy_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
@@ -419,9 +454,9 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       isCat: false,
       x: enemyCastleX,
       y: 0,
-      hp: def.hp,
-      maxHp: def.hp,
-      attackPower: def.attackPower,
+      hp: calculatedHp,
+      maxHp: calculatedHp,
+      attackPower: calculatedAtk,
       attackRange: def.attackRange,
       attackInterval: 1 / def.attackSpeed,
       attackTimer: 0,
@@ -440,8 +475,10 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       abilities: def.abilities,
       burrowRemaining: def.abilities?.burrow?.count,
       reviveCountRemaining: def.abilities?.revive?.count,
-      barrierHp: def.abilities?.barrier?.hp,
-      maxBarrierHp: def.abilities?.barrier?.hp,
+      barrierHp: calculatedBarrier,
+      maxBarrierHp: calculatedBarrier,
+      shieldHp: calculatedShield,
+      maxShieldHp: calculatedShield,
       isCharging: false,
       chargeTimer: def.abilities?.chargeAttack?.chargeTime,
       maxChargeTime: def.abilities?.chargeAttack?.chargeTime,
@@ -824,6 +861,28 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           spawnFx(e.x, 20, 'zombie_revive');
         } else {
           spawnFx(e.x, 25, 'aoe_burst');
+
+          // 遺志の烈波 (Death Surge) Trigger
+          if (e.abilities?.deathSurge && Math.random() < e.abilities.deathSurge.chance) {
+            const deathSurgeLvl = e.abilities.deathSurge.level || 2;
+            const surgeX = Math.max(playerCastleX, e.x - 30);
+            audio.playSurge();
+            spawnFx(surgeX, 50, 'surge_burst');
+
+            // Surge damage to cats in area over time
+            const surgeCats = catsRef.current.filter(
+              (c) => c.hp > 0 && Math.abs(c.x - surgeX) <= 130
+            );
+            surgeCats.forEach((c) => {
+              const surgeDmg = Math.round(e.attackPower * (deathSurgeLvl * 0.8));
+              c.hp = Math.max(0, c.hp - surgeDmg);
+              spawnDamageNum(c.x, 40, surgeDmg, false, false);
+              c.state = 'knockback';
+              c.knockbackVelocityX = 160;
+              c.knockbackTimer = 0.35;
+              c.x = Math.max(playerCastleX, c.x - 50);
+            });
+          }
         }
       }
     });
@@ -957,6 +1016,29 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
             }
           }
 
+          // Aku Shield (悪魔シールド) Logic
+          if (e.shieldHp && e.shieldHp > 0) {
+            const hasPiercer = cat.abilities?.shieldPiercer && Math.random() < cat.abilities.shieldPiercer.chance;
+            if (hasPiercer) {
+              // Shield pierced and destroyed instantly!
+              e.shieldHp = 0;
+              spawnFx(e.x, 35, 'shield_break');
+              audio.playShieldBreak();
+            } else if (actualDmg >= e.shieldHp) {
+              // Shield absorbs part of damage, then breaks
+              actualDmg -= e.shieldHp;
+              e.shieldHp = 0;
+              spawnFx(e.x, 35, 'shield_break');
+              audio.playShieldBreak();
+            } else {
+              // Damage entirely absorbed by shield
+              e.shieldHp -= actualDmg;
+              actualDmg = 0;
+              spawnFx(e.x, 30, 'shield_hit');
+              audio.playHit(false, true);
+            }
+          }
+
           const nextHp = Math.max(0, e.hp - actualDmg);
           const willDie = nextHp <= 0;
 
@@ -1037,6 +1119,26 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           }
         }
 
+        // Aku Shield (悪魔シールド) Logic (Single Target)
+        if (target.shieldHp && target.shieldHp > 0) {
+          const hasPiercer = cat.abilities?.shieldPiercer && Math.random() < cat.abilities.shieldPiercer.chance;
+          if (hasPiercer) {
+            target.shieldHp = 0;
+            spawnFx(target.x, 35, 'shield_break');
+            audio.playShieldBreak();
+          } else if (actualDmg >= target.shieldHp) {
+            actualDmg -= target.shieldHp;
+            target.shieldHp = 0;
+            spawnFx(target.x, 35, 'shield_break');
+            audio.playShieldBreak();
+          } else {
+            target.shieldHp -= actualDmg;
+            actualDmg = 0;
+            spawnFx(target.x, 30, 'shield_hit');
+            audio.playHit(false, true);
+          }
+        }
+
         const nextHp = Math.max(0, target.hp - actualDmg);
         const willDie = nextHp <= 0;
 
@@ -1093,7 +1195,18 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const executeEnemyAttack = (enemy: ActiveEntity) => {
     const isArea = enemy.attackType === 'area';
     const weakenMult = (enemy.weakenTimer && enemy.weakenTimer > 0) ? (enemy.weakenMultiplier || 0.5) : 1.0;
-    const dmg = Math.round(enemy.attackPower * weakenMult);
+
+    // Savage Blow (渾身の一撃 - e.g. Hell Gorilla 50% 3x Damage)
+    let isSavage = false;
+    let savageMult = 1.0;
+    if (enemy.abilities?.savageBlow && Math.random() < enemy.abilities.savageBlow.chance) {
+      isSavage = true;
+      savageMult = enemy.abilities.savageBlow.mult || 3.0;
+      audio.playSavageBlow();
+      spawnFx(enemy.x - 30, 40, 'savage_blow');
+    }
+
+    const dmg = Math.round(enemy.attackPower * weakenMult * savageMult);
 
     // Cats within reach to the left of enemy
     const catsInReach = catsRef.current.filter(
@@ -1137,14 +1250,14 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
 
     if (catsInReach.length > 0) {
       if (isArea) {
-        audio.playHit(false, true);
-        spawnFx(enemy.x - enemy.attackRange * 0.5, 20, 'aoe_burst');
+        audio.playHit(isSavage, true);
+        spawnFx(enemy.x - enemy.attackRange * 0.5, 20, isSavage ? 'savage_blow' : 'aoe_burst');
 
         catsInReach.forEach((c) => {
           applyEnemyAbilitiesToCat(c);
           const nextHp = Math.max(0, c.hp - dmg);
           c.hp = nextHp;
-          spawnDamageNum(c.x, 25, dmg, false, false);
+          spawnDamageNum(c.x, 25, dmg, isSavage, false);
 
           const maxKbs = Math.max(1, c.maxKnockbacks || 1);
           const kbThreshold = c.maxHp / maxKbs;
@@ -1162,12 +1275,12 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           }
         });
       } else {
-        audio.playHit(false, false);
+        audio.playHit(isSavage, false);
         // Frontmost cat is closest to enemy (largest x)
         const target = [...catsInReach].sort((a, b) => b.x - a.x)[0];
-        spawnFx(target.x, 20, 'hit');
+        spawnFx(target.x, 20, isSavage ? 'savage_blow' : 'hit');
         applyEnemyAbilitiesToCat(target);
-        spawnDamageNum(target.x, 25, dmg, false, false);
+        spawnDamageNum(target.x, 25, dmg, isSavage, false);
 
         const nextHp = Math.max(0, target.hp - dmg);
         target.hp = nextHp;
@@ -1186,6 +1299,30 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           target.x = Math.max(playerCastleX, target.x - 60);
           target.isWindupActive = false;
         }
+      }
+
+      // Surge (烈波) Mechanics
+      if (enemy.abilities?.surge && Math.random() < enemy.abilities.surge.chance) {
+        const surgeLvl = enemy.abilities.surge.level || 2;
+        const minSpawnX = Math.max(playerCastleX, enemy.x - (enemy.abilities.surge.maxDistance || 500));
+        const maxSpawnX = Math.max(playerCastleX, enemy.x - (enemy.abilities.surge.minDistance || 200));
+        const surgeX = minSpawnX + Math.random() * (maxSpawnX - minSpawnX);
+        audio.playSurge();
+        spawnFx(surgeX, 55, 'surge_burst');
+
+        const surgeHitCats = catsRef.current.filter(
+          (c) => c.hp > 0 && Math.abs(c.x - surgeX) <= 120
+        );
+        surgeHitCats.forEach((c) => {
+          applyEnemyAbilitiesToCat(c);
+          const surgeDmg = Math.round(enemy.attackPower * surgeLvl * 0.75);
+          c.hp = Math.max(0, c.hp - surgeDmg);
+          spawnDamageNum(c.x, 35, surgeDmg, false, false);
+          c.state = 'knockback';
+          c.knockbackVelocityX = 160;
+          c.knockbackTimer = 0.35;
+          c.x = Math.max(playerCastleX, c.x - 50);
+        });
       }
 
       // Wave Attack Mechanics

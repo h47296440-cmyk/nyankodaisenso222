@@ -5,6 +5,7 @@ import { X, BookOpen, Volume2, Wrench, History, Compass, Trophy, Gift, Target } 
 interface MenuModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenAnnouncements?: () => void;
   onOpenTreasures: () => void;
   onOpenEncyclopedia: () => void;
   onOpenStorySelect: () => void;
@@ -18,6 +19,7 @@ interface MenuModalProps {
 export const MenuModal: React.FC<MenuModalProps> = ({
   isOpen,
   onClose,
+  onOpenAnnouncements,
   onOpenTreasures,
   onOpenEncyclopedia,
   onOpenStorySelect,
@@ -48,6 +50,22 @@ export const MenuModal: React.FC<MenuModalProps> = ({
 
         {/* Buttons List */}
         <div className="p-4 space-y-2.5 max-h-[75vh] overflow-y-auto">
+          {/* お知らせ (NEWS) */}
+          <button
+            id="menu-btn-announcements"
+            onClick={() => {
+              onClose();
+              if (onOpenAnnouncements) onOpenAnnouncements();
+            }}
+            className="w-full bg-gradient-to-r from-red-800 via-amber-800 to-yellow-800 hover:brightness-110 border-2 border-yellow-400 p-3 rounded-2xl flex items-center justify-between text-left shadow text-white font-black text-sm"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xl animate-bounce">🔔</span>
+              <span>🔔 お知らせ (レジェンド終結＆魔界編)</span>
+            </div>
+            <span className="text-xs bg-red-600 px-2 py-0.5 rounded-full font-black">特報 →</span>
+          </button>
+
           {/* ミッション＆実績 */}
           <button
             id="menu-btn-missions"
