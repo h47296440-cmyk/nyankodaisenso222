@@ -96,6 +96,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const defeatedEnemiesCountRef = useRef(0);
   const spawnedWaveIndicesRef = useRef<Set<number>>(new Set());
   const spawnedThresholdWavesRef = useRef<Set<number>>(new Set());
+  const secretBossSpawnedRef = useRef(false);
   const isTerminatedRef = useRef(false);
 
   // Authoritative Simulation Refs
@@ -175,12 +176,12 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   // Start Battle Music on Mount
   useEffect(() => {
     audio.unlockAudio();
-    audio.startBattleBgm(stage.chapter, false, stage.isFinalBossStage, stage.id);
+    audio.startBattleBgm(stage.chapterId || stage.chapter, false, stage.isFinalBossStage, stage.id, stage.bgType);
 
     return () => {
       audio.stopBattleBgm();
     };
-  }, [stage.chapter, stage.isFinalBossStage, stage.id]);
+  }, [stage.chapter, stage.chapterId, stage.isFinalBossStage, stage.id, stage.bgType]);
 
   // Main 60FPS Game Loop
   useEffect(() => {
@@ -257,6 +258,24 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
             }
           }
         });
+
+        // 4b. Extreme Secret Boss Trigger (太古の力 エクストリーム裏ボス降臨)
+        const isExtremeAncientPower =
+          (stage.id === 'legend_21_2' && stage.isExtreme) ||
+          (stage.chapterId === 'legend_21' && stage.isExtreme && stage.stageNumber === 2) ||
+          stage.extremeBossTrigger;
+
+        if (isExtremeAncientPower && !secretBossSpawnedRef.current) {
+          const castleHpPercent = (enemyCastleHpRef.current / stage.castleHp) * 100;
+          if (castleHpPercent <= 80 || battleTimeRef.current >= 45) {
+            secretBossSpawnedRef.current = true;
+            spawnEnemy('enemy_ancient_zero', true, 1.0);
+            audio.playBossAppear();
+            audio.switchBgm('boss_secret_god');
+            setBossAlert('⚠️ EXTREME SECRET BOSS ⚠️ 太古の絶対支配者【真・古代神エンシェント・ゼロ】降臨！');
+            setTimeout(() => setBossAlert(null), 6000);
+          }
+        }
 
         // 5. Update Active Units Physics & Attacks
         updateEntities(dt);
@@ -457,6 +476,11 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
           multiplier = 1.8;
         }
       }
+    }
+
+    // エクストリームモード: 全敵倍率 1.5倍！
+    if (stage.isExtreme) {
+      multiplier *= 1.5;
     }
 
     const calculatedHp = Math.round(def.hp * multiplier);
@@ -1442,8 +1466,11 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     if (activeItems.catJobs && victory) {
       baseXp = Math.round(baseXp * 1.5);
     }
+    if (stage.isExtreme && victory) {
+      baseXp = Math.round(baseXp * 1.5);
+    }
     const xpEarned = baseXp;
-    const catFoodEarned = victory ? stage.baseRewardCatFood : 0;
+    const catFoodEarned = victory ? (stage.isExtreme ? stage.baseRewardCatFood + 10 : stage.baseRewardCatFood) : 0;
 
     setBattleResult({
       ended: true,
@@ -1478,8 +1505,8 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const handleTestSound = useCallback(() => {
     audio.unlockAudio();
     audio.playTestTone();
-    audio.startBattleBgm(stage.chapter, false, stage.isFinalBossStage, stage.id);
-  }, [stage.chapter, stage.isFinalBossStage, stage.id]);
+    audio.startBattleBgm(stage.chapterId || stage.chapter, false, stage.isFinalBossStage, stage.id, stage.bgType);
+  }, [stage.chapter, stage.chapterId, stage.isFinalBossStage, stage.id, stage.bgType]);
 
   // Controller / Switch bindings
   const handleDeploySlotByIndex = useCallback(

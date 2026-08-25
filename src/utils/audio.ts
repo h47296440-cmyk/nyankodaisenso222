@@ -6,9 +6,14 @@ export type BgmTrack =
   | 'battle_japan'
   | 'battle_future'
   | 'battle_cosmos'
+  | 'battle_aku'
+  | 'battle_volcano'
+  | 'battle_real_legend'
+  | 'battle_squirrel_panic'
   | 'boss_normal'
   | 'boss_bunbun'
   | 'boss_final'
+  | 'boss_secret_god'
   | 'opening'
   | 'epilogue'
   | 'legend_battle'
@@ -450,11 +455,54 @@ class SoundManager {
     chapterIdentifier?: string | number,
     isBoss?: boolean,
     isFinal?: boolean,
-    stageId?: string
+    stageId?: string,
+    bgType?: string
   ) {
     const chapStr = String(chapterIdentifier || '').toLowerCase();
     const stId = String(stageId || '').toLowerCase();
+    const bgStr = String(bgType || '').toLowerCase();
 
+    // 1. Squirrel Panic Stages
+    if (stId.includes('squirrel') || stId.includes('panic') || bgStr.includes('squirrel')) {
+      this.switchBgm('battle_squirrel_panic');
+      return;
+    }
+
+    // 2. Aku Realm / Demon Stages
+    if (chapStr.includes('aku') || stId.includes('aku') || bgStr.includes('aku')) {
+      if (isFinal || isBoss) {
+        this.switchBgm('boss_bunbun');
+      } else {
+        this.switchBgm('battle_aku');
+      }
+      return;
+    }
+
+    // 3. Volcano Stages
+    if (bgStr.includes('volcano') || stId.includes('volcano')) {
+      if (isFinal) {
+        this.switchBgm('boss_final');
+      } else if (isBoss) {
+        this.switchBgm('boss_bunbun');
+      } else {
+        this.switchBgm('battle_volcano');
+      }
+      return;
+    }
+
+    // 4. Real Legend Story Stages
+    if (chapStr.includes('real_legend') || stId.includes('real_legend')) {
+      if (isFinal) {
+        this.switchBgm('ancient_power');
+      } else if (isBoss) {
+        this.switchBgm('boss_bunbun');
+      } else {
+        this.switchBgm('battle_real_legend');
+      }
+      return;
+    }
+
+    // 5. Ancient Power / Final Legend
     if (stId === 'legend_21_2' || stId.includes('ancient_power') || chapStr.includes('legend_21')) {
       this.switchBgm('ancient_power');
       return;
@@ -538,10 +586,15 @@ class SoundManager {
     this.nextNoteTime = this.ctx.currentTime + 0.05;
 
     // Tempo mapping
-    if (track === 'ancient_power') this.tempoBpm = 156;
+    if (track === 'battle_squirrel_panic') this.tempoBpm = 182;
+    else if (track === 'boss_secret_god') this.tempoBpm = 164;
     else if (track === 'crazed_boss') this.tempoBpm = 160;
+    else if (track === 'ancient_power') this.tempoBpm = 156;
+    else if (track === 'battle_volcano') this.tempoBpm = 154;
     else if (track === 'boss_final') this.tempoBpm = 152;
+    else if (track === 'battle_real_legend') this.tempoBpm = 148;
     else if (track === 'boss_bunbun') this.tempoBpm = 148;
+    else if (track === 'battle_aku') this.tempoBpm = 146;
     else if (track === 'legend_battle') this.tempoBpm = 144;
     else if (track === 'boss_normal') this.tempoBpm = 142;
     else if (track === 'battle_cosmos') this.tempoBpm = 138;
@@ -578,12 +631,13 @@ class SoundManager {
 
   // Musical Note Frequencies
   private readonly NOTE = {
+    C1: 32.70, Cs1: 34.65, D1: 36.71, Ds1: 38.89, E1: 41.20, F1: 43.65, Fs1: 46.25, G1: 49.00, Gs1: 51.91, A1: 55.00, As1: 58.27, Bb1: 58.27, B1: 61.74,
     C2: 65.41, Cs2: 69.30, D2: 73.42, Ds2: 77.78, E2: 82.41, F2: 87.31, Fs2: 92.50, G2: 98.0, Gs2: 103.83, A2: 110.0, As2: 116.54, Bb2: 116.54, B2: 123.47,
     C3: 130.81, Cs3: 138.59, D3: 146.83, Ds3: 155.56, E3: 164.81, F3: 174.61, Fs3: 185.0, G3: 196.0, Gs3: 207.65, A3: 220.0, As3: 233.08, Bb3: 233.08, B3: 246.94,
     C4: 261.63, Cs4: 277.18, D4: 293.66, Ds4: 311.13, E4: 329.63, F4: 349.23, Fs4: 369.99, G4: 392.0, Gs4: 415.3, A4: 440.0, As4: 466.16, Bb4: 466.16, B4: 493.88,
     C5: 523.25, Cs5: 554.37, D5: 587.33, Ds5: 622.25, E5: 659.25, F5: 698.46, Fs5: 739.99, G5: 783.99, Gs5: 830.61, A5: 880.0, As5: 932.33, Bb5: 932.33, B5: 987.77,
     C6: 1046.5, Cs6: 1108.73, D6: 1174.66, Ds6: 1244.51, E6: 1318.51, F6: 1396.91, Fs6: 1479.98, G6: 1567.98, Gs6: 1661.22, A6: 1760.0, As6: 1864.66, Bb6: 1864.66, B6: 1975.53,
-    C7: 2093.0,
+    C7: 2093.0, Cs7: 2217.46, D7: 2349.32, Ds7: 2489.02, E7: 2637.02, F7: 2793.83, Fs7: 2959.96, G7: 3135.96, Gs7: 3322.44, A7: 3520.0, As7: 3729.31, Bb7: 3729.31, B7: 3951.07,
   };
 
   private scheduleStep(track: BgmTrack, step: number, time: number, stepSec: number) {
@@ -1158,6 +1212,259 @@ class SoundManager {
       if (step % 16 === 0 || step === 48) this.playDrum('cymbal', time, 0.9);
       if (step % 8 === 0 || step === 14 || step === 30 || step === 46 || step === 62) {
         this.playDrum('timpani', time, 0.95);
+      }
+    }
+
+    // =========================================================================
+    // 14. AKU REALM BATTLE (魔界編 戦闘テーマ - Heavy Dark Aku Metal)
+    // =========================================================================
+    if (track === 'battle_aku') {
+      const akuMelody: number[] = [
+        N.C5, 0, N.Ds5, 0, N.Fs5, 0, N.G5, 0,
+        N.Fs5, N.Ds5, N.C5, N.Ds5, N.C5, 0, N.B4, 0,
+        N.C5, 0, N.Ds5, 0, N.Fs5, 0, N.G5, N.Gs5,
+        N.G5, N.Fs5, N.Ds5, N.Fs5, N.Ds5, N.C5, N.Ds5, 0,
+        N.G5, 0, N.Fs5, 0, N.F5, 0, N.E5, 0,
+        N.Ds5, N.D5, N.C5, N.D5, N.Ds5, 0, N.D5, 0,
+        N.C5, N.Ds5, N.Fs5, N.G5, N.C6, N.B5, N.Gs5, N.G5,
+        N.Fs5, N.Ds5, N.D5, N.B4, N.C5, 0, 0, 0,
+      ];
+
+      const akuBass: number[] = [
+        N.C2, N.C2, N.G2, N.C2, N.Fs2, N.C2, N.Ds2, N.C2,
+        N.C2, N.C2, N.G2, N.C2, N.Fs2, N.C2, N.B1, N.C2,
+        N.C2, N.C2, N.G2, N.C2, N.Fs2, N.C2, N.Ds2, N.C2,
+        N.C2, N.C2, N.G2, N.C2, N.Gs2, N.G2, N.Fs2, N.Ds2,
+        N.Ds2, N.Ds2, N.As2, N.Ds2, N.D2, N.D2, N.A2, N.D2,
+        N.Cs2, N.Cs2, N.Gs2, N.Cs2, N.C2, N.C2, N.G2, N.C2,
+        N.Gs1, N.Gs2, N.G1, N.G2, N.Fs1, N.Fs2, N.F1, N.F2,
+        N.E1, N.E2, N.Ds1, N.Ds2, N.C2, 0, N.C3, 0,
+      ];
+
+      if (step % 8 === 0) {
+        const chord = [N.C3, N.Ds3, N.Fs3, N.G3];
+        chord.forEach((note) => {
+          this.playInstrumentNote(note, 'organ', dur4 * 1.5, 0.5, time);
+        });
+      }
+
+      const m = akuMelody[step];
+      if (m > 0) {
+        this.playInstrumentNote(m, 'synth', dur2, 0.85, time);
+        this.playInstrumentNote(m * 0.5, 'brass', dur2, 0.6, time);
+      }
+      const b = akuBass[step];
+      if (b > 0) {
+        this.playInstrumentNote(b, 'bass', dur1, 0.95, time);
+      }
+
+      if (step % 2 === 0) this.playDrum('kick', time, 0.9);
+      if (step % 4 === 2) this.playDrum('snare', time, 0.85);
+      if (step % 2 === 1) this.playDrum('hihat', time, 0.4);
+      if (step % 16 === 0) this.playDrum('cymbal', time, 0.8);
+    }
+
+    // =========================================================================
+    // 15. VOLCANO BATTLE (灼熱火山 戦闘テーマ - Magma Inferno)
+    // =========================================================================
+    if (track === 'battle_volcano') {
+      const volMelody: number[] = [
+        N.E5, N.G5, N.A5, N.B5, N.D6, N.B5, N.A5, N.G5,
+        N.E5, 0, N.G5, 0, N.E5, N.D5, N.E5, 0,
+        N.E5, N.G5, N.A5, N.B5, N.D6, N.E6, N.D6, N.B5,
+        N.D6, 0, N.B5, 0, N.A5, N.G5, N.A5, 0,
+        N.B5, N.D6, N.E6, 0, N.G6, N.E6, N.D6, N.B5,
+        N.A5, N.B5, N.D6, N.B5, N.A5, N.G5, N.E5, 0,
+        N.G5, N.A5, N.B5, N.D6, N.E6, N.D6, N.B5, N.A5,
+        N.G5, N.E5, N.D5, N.B4, N.E5, 0, 0, 0,
+      ];
+
+      const volBass: number[] = [
+        N.E2, N.E3, N.B2, N.E3, N.G2, N.E3, N.B2, N.E3,
+        N.E2, N.E3, N.B2, N.E3, N.D2, N.D3, N.A2, N.D3,
+        N.E2, N.E3, N.B2, N.E3, N.G2, N.E3, N.B2, N.E3,
+        N.C3, N.C4, N.G2, N.C3, N.D3, N.D4, N.A2, N.D3,
+        N.E2, N.E3, N.B2, N.E3, N.G2, N.E3, N.B2, N.E3,
+        N.C3, N.C4, N.G2, N.C3, N.D3, N.D4, N.A2, N.D3,
+        N.A2, N.A3, N.E3, N.A3, N.B2, N.B3, N.Fs3, N.B3,
+        N.E2, N.E3, N.B2, N.E3, N.E2, 0, N.E3, 0,
+      ];
+
+      const m = volMelody[step];
+      if (m > 0) {
+        this.playInstrumentNote(m, 'brass', dur1 * 1.4, 0.9, time);
+        this.playInstrumentNote(m * 0.5, 'synth', dur1 * 1.4, 0.5, time);
+      }
+      const b = volBass[step];
+      if (b > 0) {
+        this.playInstrumentNote(b, 'bass', dur1, 0.9, time);
+      }
+
+      if (step % 2 === 0) this.playDrum('kick', time, 0.95);
+      if (step % 4 === 2) this.playDrum('snare', time, 0.9);
+      if (step % 2 === 1) this.playDrum('hihat', time, 0.4);
+      if (step % 8 === 4) this.playDrum('timpani', time, 0.8);
+      if (step % 16 === 0) this.playDrum('cymbal', time, 0.85);
+    }
+
+    // =========================================================================
+    // 16. REAL LEGEND BATTLE (真レジェンド 戦闘テーマ - Primal Awakening)
+    // =========================================================================
+    if (track === 'battle_real_legend') {
+      const realMelody: number[] = [
+        N.A4, N.C5, N.D5, N.E5, N.G5, N.E5, N.D5, N.C5,
+        N.D5, 0, N.E5, 0, N.A4, 0, 0, 0,
+        N.A4, N.C5, N.D5, N.E5, N.G5, N.A5, N.G5, N.E5,
+        N.G5, 0, N.E5, 0, N.D5, N.C5, N.D5, 0,
+        N.E5, N.G5, N.A5, N.C6, N.B5, N.G5, N.A5, 0,
+        N.E5, N.G5, N.A5, N.G5, N.E5, N.D5, N.C5, 0,
+        N.D5, N.E5, N.G5, N.A5, N.C6, N.D6, N.C6, N.A5,
+        N.G5, N.E5, N.D5, N.C5, N.A4, 0, 0, 0,
+      ];
+
+      const realBass: number[] = [
+        N.A2, N.A2, N.E3, N.A2, N.G2, N.A2, N.E3, N.A2,
+        N.D3, N.D3, N.A2, N.D3, N.A2, N.A2, N.E3, N.A2,
+        N.A2, N.A2, N.E3, N.A2, N.G2, N.A2, N.E3, N.A2,
+        N.C3, N.C3, N.G2, N.C3, N.D3, N.D3, N.A2, N.D3,
+        N.A2, N.A2, N.E3, N.A2, N.G2, N.A2, N.E3, N.A2,
+        N.F2, N.F2, N.C3, N.F2, N.G2, N.G2, N.D3, N.G2,
+        N.D3, N.D3, N.A2, N.D3, N.E3, N.E3, N.B2, N.E3,
+        N.A2, N.A2, N.E3, N.A2, N.A2, 0, N.A3, 0,
+      ];
+
+      if (step % 8 === 0) {
+        const chords = [
+          [N.A3, N.C4, N.E4],
+          [N.G3, N.B3, N.D4],
+          [N.F3, N.A3, N.C4],
+          [N.E3, N.Gs3, N.B3]
+        ];
+        const c = chords[Math.floor(step / 16) % 4];
+        c.forEach(n => this.playInstrumentNote(n, 'strings', dur4 * 1.5, 0.45, time));
+      }
+
+      const m = realMelody[step];
+      if (m > 0) {
+        this.playInstrumentNote(m, 'bell', dur2, 0.7, time);
+        this.playInstrumentNote(m, 'brass', dur2, 0.8, time);
+      }
+      const b = realBass[step];
+      if (b > 0) {
+        this.playInstrumentNote(b, 'bass', dur1, 0.9, time);
+      }
+
+      if (step % 2 === 0) this.playDrum('kick', time, 0.9);
+      if (step % 4 === 2) this.playDrum('snare', time, 0.85);
+      if (step % 2 === 1) this.playDrum('hihat', time, 0.35);
+      if (step % 8 === 0) this.playDrum('timpani', time, 0.8);
+      if (step % 16 === 0) this.playDrum('cymbal', time, 0.8);
+    }
+
+    // =========================================================================
+    // 17. SQUIRREL PANIC (リスパニック超速戦闘 - Hyper Fast Comical Chaos)
+    // =========================================================================
+    if (track === 'battle_squirrel_panic') {
+      const sqMelody: number[] = [
+        N.F5, N.A5, N.C6, N.A5, N.F5, N.G5, N.A5, N.G5,
+        N.F5, N.D5, N.F5, N.D5, N.C5, N.D5, N.F5, 0,
+        N.F5, N.A5, N.C6, N.D6, N.C6, N.A5, N.F5, N.G5,
+        N.A5, N.C6, N.A5, N.G5, N.F5, 0, N.F5, 0,
+        N.D6, N.D6, N.C6, N.A5, N.F5, N.G5, N.A5, N.F5,
+        N.G5, N.G5, N.F5, N.D5, N.C5, N.D5, N.F5, N.G5,
+        N.A5, N.A5, N.C6, N.D6, N.F6, N.D6, N.C6, N.A5,
+        N.G5, N.A5, N.G5, N.E5, N.F5, 0, N.F5, 0,
+      ];
+
+      const sqBass: number[] = [
+        N.F2, N.F3, N.C3, N.F3, N.F2, N.F3, N.C3, N.F3,
+        N.D2, N.D3, N.A2, N.D3, N.Bb2, N.Bb3, N.F2, N.Bb3,
+        N.F2, N.F3, N.C3, N.F3, N.F2, N.F3, N.C3, N.F3,
+        N.G2, N.G3, N.D3, N.G3, N.C3, N.C4, N.G2, N.C3,
+        N.Bb2, N.Bb3, N.F2, N.Bb3, N.F2, N.F3, N.C3, N.F3,
+        N.G2, N.G3, N.D3, N.G3, N.C3, N.C4, N.G2, N.C3,
+        N.D2, N.D3, N.A2, N.D3, N.Bb2, N.Bb3, N.F2, N.Bb3,
+        N.C3, N.C4, N.G2, N.C3, N.F2, 0, N.F3, 0,
+      ];
+
+      const m = sqMelody[step];
+      if (m > 0) {
+        this.playInstrumentNote(m, 'synth', dur1, 0.95, time);
+        this.playInstrumentNote(m * 0.5, 'accordion', dur1, 0.65, time);
+      }
+      const b = sqBass[step];
+      if (b > 0) {
+        this.playInstrumentNote(b, 'bass', dur1, 0.9, time);
+      }
+
+      // Ultra-rapid frantic rhythm
+      this.playDrum('kick', time, (step % 2 === 0) ? 0.95 : 0.4);
+      if (step % 2 === 1) this.playDrum('snare', time, 0.85);
+      this.playDrum('hihat', time, 0.45);
+      if (step % 8 === 0) this.playDrum('cymbal', time, 0.75);
+    }
+
+    // =========================================================================
+    // 18. EXTREME SECRET BOSS: ANCIENT GOD ZERO (太古の力 裏ボス降臨 - God of Creation & Oblivion)
+    // =========================================================================
+    if (track === 'boss_secret_god') {
+      const zeroMelody: number[] = [
+        N.D5, N.F5, N.A5, N.D6, N.F6, N.E6, N.D6, N.Cs6,
+        N.D6, 0, N.A5, 0, N.F5, N.G5, N.A5, 0,
+        N.Bb5, N.D6, N.F6, N.G6, N.F6, N.E6, N.D6, N.C6,
+        N.D6, 0, N.Bb5, 0, N.G5, N.A5, N.Bb5, 0,
+        N.G5, N.Bb5, N.D6, N.F6, N.E6, N.D6, N.Cs6, N.B5,
+        N.Cs6, 0, N.A5, 0, N.E5, N.F5, N.G5, 0,
+        N.A5, N.Cs6, N.E6, N.G6, N.F6, N.E6, N.D6, N.Cs6,
+        N.D6, N.F6, N.A6, N.D7, N.D6, 0, 0, 0,
+      ];
+
+      const zeroBass: number[] = [
+        N.D2, N.D3, N.A2, N.D3, N.F2, N.D3, N.A2, N.D3,
+        N.D2, N.D3, N.A2, N.D3, N.F2, N.D3, N.Cs3, N.A2,
+        N.Bb2, N.Bb3, N.F2, N.Bb3, N.D2, N.Bb3, N.F2, N.Bb3,
+        N.Bb2, N.Bb3, N.F2, N.Bb3, N.C3, N.C4, N.G2, N.C3,
+        N.G2, N.G3, N.D3, N.G3, N.Bb2, N.G3, N.D3, N.G3,
+        N.A2, N.A3, N.E3, N.A3, N.Cs3, N.A3, N.E3, N.A3,
+        N.A2, N.A3, N.E3, N.A3, N.Cs3, N.A3, N.E3, N.A3,
+        N.D2, N.D3, N.A2, N.D3, N.D2, 0, N.D3, 0,
+      ];
+
+      // Massive dark pipe organ layers
+      if (step % 8 === 0) {
+        const chords = [
+          [N.D3, N.F3, N.A3, N.D4],
+          [N.Bb2, N.D3, N.F3, N.Bb3],
+          [N.G2, N.Bb2, N.D3, N.G3],
+          [N.A2, N.Cs3, N.E3, N.A3],
+        ];
+        const c = chords[Math.floor(step / 16) % 4];
+        c.forEach(n => {
+          this.playInstrumentNote(n, 'organ', dur4 * 2, 0.7, time);
+          this.playInstrumentNote(n, 'strings', dur4 * 2, 0.6, time);
+        });
+      }
+
+      const m = zeroMelody[step];
+      if (m > 0) {
+        this.playInstrumentNote(m, 'brass', dur2, 0.95, time);
+        this.playInstrumentNote(m, 'bell', dur1, 0.8, time);
+        this.playInstrumentNote(m * 0.5, 'synth', dur2, 0.5, time);
+      }
+      const b = zeroBass[step];
+      if (b > 0) {
+        this.playInstrumentNote(b, 'bass', dur1, 1.0, time);
+      }
+
+      // Thunderous boss drums
+      if (step % 2 === 0) this.playDrum('kick', time, 1.0);
+      if (step % 4 === 2) this.playDrum('snare', time, 0.95);
+      if (step % 2 === 1) this.playDrum('hihat', time, 0.4);
+      if (step % 8 === 0 || step === 14 || step === 30 || step === 46 || step === 62) {
+        this.playDrum('timpani', time, 1.0);
+      }
+      if (step % 16 === 0 || step === 48) {
+        this.playDrum('cymbal', time, 1.0);
       }
     }
   }

@@ -276,6 +276,9 @@ export type ChapterId =
   | 'real_legend_3'
   | 'real_legend_4'
   | 'real_legend_5'
+  | 'real_legend_6'
+  | 'real_legend_7'
+  | 'real_legend_8'
   | 'aku_realm'
   | 'aku_realm_1'
   | 'aku_realm_2'
@@ -337,7 +340,15 @@ export interface StageDefinition {
     | 'advent_heaven'
     | 'advent_hell'
     | 'aku_dimension'
-    | 'aku_volcano';
+    | 'aku_volcano'
+    | 'aku_realm'
+    | 'aku_inferno'
+    | 'aku_temple'
+    | 'volcano_magma'
+    | 'real_legend_ancient'
+    | 'primal_forest'
+    | 'squirrel_panic'
+    | 'extreme_dimension';
   battlefieldWidth: number;
   baseRewardXp: number;
   baseRewardCatFood: number;
@@ -348,6 +359,8 @@ export interface StageDefinition {
   treasureFestival?: boolean; // お宝出現率 超UP!!
   isBossStage?: boolean;
   isFinalBossStage?: boolean;
+  isExtreme?: boolean; // エクストリームモード（1.5倍）フラグ
+  extremeBossTrigger?: boolean; // エクストリーム太古の力の裏ボス降臨フラグ
   rewardCatUnlockId?: string; // 狂乱ステージクリア時のキャラ報酬アンロックID
   isZombieStage?: boolean; // ゾンビ襲来モードフラグ
   zombieRewardBonus?: boolean;
@@ -539,6 +552,7 @@ export interface PlayerProfile {
   cats: Record<string, PlayerCatProgress>;
   upgrades: PlayerUpgrades;
   clearedStages: Record<string, { stars: number; highscore: number }>;
+  clearedExtremeStages?: Record<string, boolean>; // エクストリームモードクリア記録
   treasures: Record<string, TreasureQuality>;
   items: {
     speedUp: number;

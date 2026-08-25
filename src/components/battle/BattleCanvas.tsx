@@ -276,6 +276,121 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
           </div>
         );
 
+      case 'aku_dimension':
+      case 'aku_realm':
+      case 'aku_inferno':
+      case 'aku_temple':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-950 via-black to-red-950 overflow-hidden pointer-events-none">
+            {/* Pulsing Aku Pentagram Aura */}
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-gradient-to-r from-purple-600/30 via-red-600/30 to-fuchsia-600/30 blur-3xl animate-pulse" />
+            {/* Dark Demonic Lightning */}
+            <div className="absolute top-8 left-1/4 w-32 h-32 rounded-full border-4 border-purple-500/30 blur-sm animate-ping" style={{ animationDuration: '3s' }} />
+            <div className="absolute top-12 right-1/4 w-28 h-28 rounded-full border-4 border-red-500/30 blur-sm animate-ping" style={{ animationDuration: '4s' }} />
+            {/* Aku Temple spires */}
+            <svg className="absolute bottom-12 left-0 w-full h-48 opacity-60 text-purple-950 fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+              <polygon points="0,100 50,20 70,80 150,10 180,85 280,30 350,15 400,90 520,5 570,85 680,25 750,10 800,80 920,15 950,75 1000,100" />
+            </svg>
+            {/* Floating demonic runes */}
+            {Array.from({ length: 16 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute text-purple-400 font-serif text-lg font-black opacity-30 animate-pulse"
+                style={{
+                  left: `${(i * 23 + 10) % 95}%`,
+                  top: `${(i * 37 + 15) % 65}%`,
+                  transform: `rotate(${(i * 45) % 360}deg)`,
+                }}
+              >
+                ✦
+              </div>
+            ))}
+          </div>
+        );
+
+      case 'volcano_magma':
+      case 'aku_volcano':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-red-950 to-orange-950 overflow-hidden pointer-events-none">
+            <div className="absolute top-0 left-1/3 w-96 h-80 bg-red-600/40 rounded-full blur-3xl animate-pulse" />
+            {/* Magma stream glow */}
+            <div className="absolute bottom-14 left-0 right-0 h-28 bg-gradient-to-t from-orange-600/50 via-red-600/20 to-transparent blur-md" />
+            {/* Volcanic Crags */}
+            <svg className="absolute bottom-12 left-0 w-full h-52 opacity-70 text-stone-950 fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+              <polygon points="0,100 100,20 180,60 250,10 380,70 500,5 620,65 720,15 850,75 930,25 1000,100" />
+            </svg>
+            {/* Rising Sparks / Embers */}
+            {Array.from({ length: 20 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#f59e0b] animate-ping"
+                style={{
+                  left: `${(i * 19) % 100}%`,
+                  top: `${40 + (i * 13) % 45}%`,
+                  animationDuration: `${1.5 + (i % 3) * 0.5}s`,
+                }}
+              />
+            ))}
+          </div>
+        );
+
+      case 'real_legend_ancient':
+      case 'primal_forest':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-amber-950 via-yellow-950 to-emerald-950 overflow-hidden pointer-events-none">
+            <div className="absolute top-4 left-1/3 w-[600px] h-72 bg-amber-500/20 rounded-full blur-3xl animate-pulse" />
+            {/* Primal Ancient Giants / Fossils */}
+            <svg className="absolute bottom-12 left-0 w-full h-44 opacity-50 text-amber-950 fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+              <polygon points="0,100 80,30 140,55 240,15 320,60 450,20 580,70 700,10 820,65 920,25 1000,100" />
+            </svg>
+            {/* Distant primeval tree foliage */}
+            <svg className="absolute bottom-12 left-0 w-full h-28 opacity-40 text-emerald-950 fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+              <polygon points="0,100 50,45 100,80 180,35 270,75 390,40 500,80 620,30 750,70 880,40 1000,100" />
+            </svg>
+          </div>
+        );
+
+      case 'squirrel_panic':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-amber-800 via-orange-700 to-yellow-900 overflow-hidden pointer-events-none">
+            {/* Speed Lines */}
+            <div className="absolute inset-0 opacity-25" style={{
+              backgroundImage: 'repeating-linear-gradient(90deg, #fef08a 0, #fef08a 2px, transparent 2px, transparent 40px)',
+            }} />
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 w-96 h-40 bg-yellow-400/40 rounded-full blur-3xl animate-pulse" />
+            {/* Running Squirrel comic silhouettes in background */}
+            <div className="absolute bottom-16 left-0 right-0 h-20 flex justify-between px-10 opacity-30 text-amber-200 text-3xl font-black select-none">
+              <span>🐿️💨</span>
+              <span>⚡🐿️</span>
+              <span>🌰💨</span>
+              <span>🐿️💨</span>
+              <span>🌰💥</span>
+            </div>
+          </div>
+        );
+
+      case 'extreme_dimension':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950 to-amber-950 overflow-hidden pointer-events-none">
+            {/* Extreme Gold & Void Rift */}
+            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-r from-amber-500/30 via-red-600/40 to-purple-600/30 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute inset-0 border-8 border-amber-500/20 pointer-events-none animate-pulse" />
+            {Array.from({ length: 24 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute bg-amber-400/80 rotate-45 animate-ping"
+                style={{
+                  left: `${(i * 29) % 100}%`,
+                  top: `${(i * 17) % 70}%`,
+                  width: `${(i % 5) + 3}px`,
+                  height: `${(i % 5) + 3}px`,
+                  animationDuration: `${1.2 + (i % 3) * 0.4}s`,
+                }}
+              />
+            ))}
+          </div>
+        );
+
       default:
         // Classic Battle Cats Sky & Plains (Matching Screenshot)
         return (
@@ -325,6 +440,22 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
         return 'bg-gradient-to-r from-purple-950 via-stone-900 to-red-950 border-rose-800';
       case 'japan_zombie':
         return 'bg-gradient-to-r from-purple-950 via-emerald-950 to-stone-900 border-purple-800';
+      case 'aku_dimension':
+      case 'aku_realm':
+      case 'aku_inferno':
+      case 'aku_temple':
+        return 'bg-gradient-to-r from-purple-950 via-black to-red-950 border-purple-600';
+      case 'volcano_magma':
+      case 'aku_volcano':
+      case 'legend_volcano':
+        return 'bg-gradient-to-r from-red-950 via-orange-950 to-stone-950 border-orange-600';
+      case 'real_legend_ancient':
+      case 'primal_forest':
+        return 'bg-gradient-to-r from-amber-950 via-yellow-950 to-emerald-950 border-amber-600';
+      case 'squirrel_panic':
+        return 'bg-gradient-to-r from-amber-900 via-yellow-900 to-amber-950 border-yellow-500';
+      case 'extreme_dimension':
+        return 'bg-gradient-to-r from-black via-purple-950 to-amber-950 border-amber-400';
       default:
         // Classic Battle Cats Japanese Grassy/Dirt Battlefield Ground
         return 'bg-[#78350f] border-[#92400e]';

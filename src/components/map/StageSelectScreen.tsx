@@ -58,13 +58,14 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
   // Selected Chapter ID
   const [selectedChapterId, setSelectedChapterId] = useState<ChapterId>('japan_1');
   const [isZombieMode, setIsZombieMode] = useState<boolean>(false);
+  const [isExtremeMode, setIsExtremeMode] = useState<boolean>(false);
   const [catSpeech, setCatSpeech] = useState<string>(
     'にゃんコンボ図鑑に表示されたにゃんコンボの名前部分をダブルタップすると自動でセット出来て便利にゃ'
   );
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
 
   // Category filter for the chapter select menu
-  const [activeCategoryTab, setActiveCategoryTab] = useState<'all' | 'japan' | 'future' | 'cosmos' | 'legend' | 'crazed' | 'advent'>('all');
+  const [activeCategoryTab, setActiveCategoryTab] = useState<'all' | 'japan' | 'future' | 'cosmos' | 'legend' | 'special' | 'crazed' | 'advent'>('all');
 
   const isInfiniteEnergy = !!profile.devMode?.infiniteEnergy;
   const isInfiniteXp = !!profile.devMode?.infiniteXp;
@@ -134,34 +135,34 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
       case 'legend_8':
         return checkChapterCleared('legend_7');
       case 'legend_9':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_8');
+        return checkChapterCleared('legend_8') || !!profile.hasClearedFilibuster;
       case 'legend_10':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_9');
+        return checkChapterCleared('legend_9');
       case 'legend_11':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_10');
+        return checkChapterCleared('legend_10');
       case 'legend_12':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_11');
+        return checkChapterCleared('legend_11');
       case 'legend_13':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_12');
+        return checkChapterCleared('legend_12');
       case 'legend_14':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_13');
+        return checkChapterCleared('legend_13');
       case 'legend_15':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_14');
+        return checkChapterCleared('legend_14');
       case 'legend_16':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_15');
+        return checkChapterCleared('legend_15');
       case 'legend_17':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_16');
+        return checkChapterCleared('legend_16');
       case 'legend_18':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_17');
+        return checkChapterCleared('legend_17');
       case 'legend_19':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_18');
+        return checkChapterCleared('legend_18');
       case 'legend_20':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_19');
+        return checkChapterCleared('legend_19');
       case 'legend_21':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_20');
+        return checkChapterCleared('legend_20');
       case 'real_legend_1':
       case 'real_legend':
-        return !!profile.hasClearedFilibuster && checkChapterCleared('legend_21');
+        return checkChapterCleared('legend_21') || checkChapterCleared('legend_12') || !!profile.hasClearedFilibuster;
       case 'real_legend_2':
         return checkChapterCleared('real_legend_1');
       case 'real_legend_3':
@@ -170,6 +171,12 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
         return checkChapterCleared('real_legend_3');
       case 'real_legend_5':
         return checkChapterCleared('real_legend_4');
+      case 'real_legend_6':
+        return checkChapterCleared('real_legend_5');
+      case 'real_legend_7':
+        return checkChapterCleared('real_legend_6');
+      case 'real_legend_8':
+        return checkChapterCleared('real_legend_7');
       case 'aku_realm_1':
       case 'aku_realm':
       case 'special':
@@ -387,7 +394,11 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
       alert('統率力（エナジー）が足りないにゃ！時間が経つと回復するにゃ。');
       return;
     }
-    onSelectStage(currentStage, activeItems);
+    const stageToLaunch: StageDefinition = {
+      ...currentStage,
+      isExtreme: isExtremeMode,
+    };
+    onSelectStage(stageToLaunch, activeItems);
   };
 
   // Navigate prev / next stage
@@ -802,9 +813,9 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
               containerRef={mapScrollRef}
             />
 
-            {/* Zombie Mode Switcher Button (Overlay on Map for Japan/Future) */}
-            {hasZombieStages && (
-              <div className="absolute top-3 left-3 z-30">
+            {/* Zombie & Extreme Mode Switcher Buttons (Overlay on Map) */}
+            <div className="absolute top-3 left-3 z-30 flex flex-wrap gap-2">
+              {hasZombieStages && (
                 <button
                   id="btn-toggle-zombie-mode-map"
                   onClick={() => {
@@ -821,8 +832,28 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                   <span>🧟</span>
                   <span>{isZombieMode ? 'ゾンビ襲来中！' : 'ゾンビ襲来切替'}</span>
                 </button>
-              </div>
-            )}
+              )}
+
+              {/* Extreme Mode (1.5x Multiplier) - Available for cleared chapters or legend stages */}
+              {(currentChapter.category === 'legend' || checkChapterCleared(currentChapter.id)) && (
+                <button
+                  id="btn-toggle-extreme-mode-map"
+                  onClick={() => {
+                    audio.playClick();
+                    setIsExtremeMode((prev) => !prev);
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shadow-lg border-2 active:scale-95 ${
+                    isExtremeMode
+                      ? 'bg-gradient-to-r from-red-600 via-rose-700 to-amber-700 text-yellow-200 border-yellow-400 ring-2 ring-red-500 shadow-red-600/60 animate-pulse'
+                      : 'bg-[#2b1e16]/90 text-orange-400 border-orange-700/80 hover:bg-[#3d2a1c]'
+                  }`}
+                  title="エクストリームモード切替 (敵倍率1.5倍 / 報酬UP / 太古の力で裏ボス覚醒)"
+                >
+                  <Flame size={14} className={isExtremeMode ? 'text-yellow-300 animate-bounce' : 'text-orange-400'} />
+                  <span>{isExtremeMode ? 'エクストリーム(1.5倍)ON！' : 'エクストリーム(1.5倍)'}</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Right/Bottom Stage Deployment Control Panel (Responsive for Portrait & Landscape) */}
@@ -919,6 +950,25 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                         )}
                       </div>
                     </div>
+
+                    {/* Extreme Mode Active Banner */}
+                    {isExtremeMode && (
+                      <div className="bg-gradient-to-r from-red-950 via-rose-900 to-amber-950 border-2 border-red-500 p-2 rounded-xl flex flex-col gap-1 shadow-lg shadow-red-900/40 animate-pulse">
+                        <div className="flex items-center gap-1.5 text-xs font-black text-yellow-300">
+                          <Flame size={15} className="text-red-400" />
+                          <span>【エクストリームモード発動中】</span>
+                        </div>
+                        <div className="text-[10px] text-amber-200 font-bold">
+                          敵ステータス1.5倍！獲得XP＆ネコカン大幅UP！
+                        </div>
+                        {(currentStage.name.includes('太古の力') || currentStage.id === 'legend_21_2' || currentStage.id === 'real_legend_1_1') && (
+                          <div className="text-[10px] text-rose-300 font-black flex items-center gap-1 bg-black/60 p-1 rounded border border-red-400">
+                            <span>⚠️</span>
+                            <span>裏ボス【太古の創世神 ゼロ】覚醒出現警報！</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {currentStage.rewardCatUnlockId && (
                       <div className="bg-gradient-to-r from-purple-950 to-red-950 border border-purple-400 p-1.5 rounded-xl flex items-center gap-1.5">

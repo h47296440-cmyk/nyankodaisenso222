@@ -4251,6 +4251,48 @@ function renderSpriteSvg(
         </svg>
       );
 
+    case 'enemy_ancient_zero':
+      return (
+        <svg width="150" height="150" viewBox="0 0 150 150" className="drop-shadow-[0_0_30px_rgba(234,179,8,0.8)]">
+          {/* Golden Divine Halo Ring */}
+          <circle cx="75" cy="65" r="55" fill="none" stroke="#eab308" strokeWidth="4" strokeDasharray="8 6" className="animate-spin" style={{ animationDuration: '8s' }} />
+          <circle cx="75" cy="65" r="42" fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="4 4" />
+          
+          {/* Celestial Ancient Wings */}
+          <path d="M 75 65 Q 10 15 5 55 Q 30 75 75 65" fill="#0f172a" stroke="#eab308" strokeWidth="3.5" />
+          <path d="M 75 65 Q 140 15 145 55 Q 120 75 75 65" fill="#0f172a" stroke="#eab308" strokeWidth="3.5" />
+          <path d="M 75 65 Q 20 50 15 85 Q 45 95 75 65" fill="#1e293b" stroke="#f59e0b" strokeWidth="3" />
+          <path d="M 75 65 Q 130 50 135 85 Q 105 95 75 65" fill="#1e293b" stroke="#f59e0b" strokeWidth="3" />
+
+          {/* Central God Body (Ancient Primeval Core) */}
+          <circle cx="75" cy="65" r="30" fill="#020617" stroke="#eab308" strokeWidth="4.5" />
+          <ellipse cx="75" cy="65" rx="20" ry="24" fill="#047857" stroke="#10b981" strokeWidth="3" />
+          
+          {/* Divine Eyes */}
+          <circle cx="68" cy="58" r="5" fill="#ef4444" stroke="#fef08a" strokeWidth="2" />
+          <circle cx="82" cy="58" r="5" fill="#ef4444" stroke="#fef08a" strokeWidth="2" />
+          <circle cx="75" cy="48" r="4" fill="#facc15" stroke="#ffffff" strokeWidth="1.5" />
+          
+          {/* God Crown / Horns */}
+          <polygon points="75,20 65,42 85,42" fill="#eab308" stroke="#78350f" strokeWidth="2" />
+          <polygon points="52,28 60,45 50,48" fill="#f59e0b" stroke="#78350f" strokeWidth="2" />
+          <polygon points="98,28 90,45 100,48" fill="#f59e0b" stroke="#78350f" strokeWidth="2" />
+
+          {/* Divine Lightning Ray on Attack */}
+          {isAttacking && (
+            <g>
+              <line x1="75" y1="65" x2="-30" y2="90" stroke="#fef08a" strokeWidth="8" strokeLinecap="round" />
+              <circle cx="-30" cy="90" r="18" fill="#eab308" opacity="0.8" />
+            </g>
+          )}
+
+          {/* Flowing Divine Mantle */}
+          <path d="M 60 88 Q 75 135 55 145" fill="none" stroke="#eab308" strokeWidth="4" />
+          <path d="M 90 88 Q 75 135 95 145" fill="none" stroke="#eab308" strokeWidth="4" />
+          <circle cx="75" cy="115" r="8" fill="#ef4444" stroke="#eab308" strokeWidth="2.5" />
+        </svg>
+      );
+
     default:
       return (
         <svg width="50" height="50" viewBox="0 0 50 50">

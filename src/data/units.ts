@@ -4617,6 +4617,33 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     spriteType: 'enemy_real_ancient_sloth',
     scale: 2.6,
     isBoss: true
+  },
+  // =========================================================================
+  // エクストリーム太古の力 裏ボス: 真・古代神エンシェント・ゼロ
+  // =========================================================================
+  enemy_ancient_zero: {
+    id: 'enemy_ancient_zero',
+    name: '真・古代神エンシェント・ゼロ（始原の絶対支配者）',
+    description: '【エクストリーム太古の力 裏ボス / 古代種 / 浮いてる敵 / 神の烈波 / 50%クリティカル】太古の時空の裂け目より顕現せし創造と終焉の最高神！体力6,800,000、攻撃力48,000（秒間2.2回連撃）、射程460から黄金の神雷烈波Lv.4を放ち、踏み込む猫軍団を一瞬で無に帰す！',
+    hp: 6800000,
+    attackPower: 48000,
+    attackRange: 460,
+    attackSpeed: 2.2,
+    attackWindup: 0.12,
+    speed: 38,
+    knockbacks: 8,
+    attackType: 'area',
+    rewardMoney: 100000,
+    rewardXp: 500000,
+    traits: ['white', 'floating', 'boss'],
+    spriteType: 'enemy_ancient_zero',
+    scale: 3.5,
+    isBoss: true,
+    abilities: {
+      criticalChance: 0.50,
+      surge: { level: 4, chance: 0.8 },
+      wave: { level: 3, chance: 0.5 }
+    }
   }
 };
 
