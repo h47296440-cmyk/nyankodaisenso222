@@ -279,6 +279,11 @@ export type ChapterId =
   | 'real_legend_6'
   | 'real_legend_7'
   | 'real_legend_8'
+  | 'real_legend_9'
+  | 'real_legend_10'
+  | 'real_legend_11'
+  | 'real_legend_12'
+  | 'real_legend_13'
   | 'aku_realm'
   | 'aku_realm_1'
   | 'aku_realm_2'
@@ -287,6 +292,7 @@ export type ChapterId =
   | 'special_event'
   | 'advent_clionel'
   | 'advent_hannya'
+  | 'advent_hedgehog'
   | 'advent_red_cyclone'
   | 'advent_black_cyclone'
   | 'advent_alien_cyclone'
@@ -511,6 +517,11 @@ export interface PlayerStats {
   totalCatsUpgraded: number;
   totalBaseUpgrades: number;
   totalGamatotoSent: number;
+  playTimeSeconds?: number; // 累計プレイ時間（秒）
+  totalMoneySpent?: number; // 戦闘中の累計使用金額（円）
+  totalCatsSpawned?: number; // 累計にゃんこ生産回数
+  totalEnemiesDefeated?: number; // 累計敵撃破数
+  totalCatFoodUsed?: number; // 累計消費ネコカン数
 }
 
 export interface PvpDeckUnitSummary {

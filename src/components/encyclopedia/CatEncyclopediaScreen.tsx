@@ -7,11 +7,12 @@ import { audio } from '../../utils/audio';
 
 interface CatEncyclopediaScreenProps {
   onBack: () => void;
+  onBattleEnemy?: (enemyId: string) => void;
 }
 
 type TraitFilter = 'all' | 'has_trait' | 'red' | 'floating' | 'black' | 'alien' | 'zombie' | 'critical' | 'wave';
 
-export const CatEncyclopediaScreen: React.FC<CatEncyclopediaScreenProps> = ({ onBack }) => {
+export const CatEncyclopediaScreen: React.FC<CatEncyclopediaScreenProps> = ({ onBack, onBattleEnemy }) => {
   const [tab, setTab] = useState<'cats' | 'enemies'>('cats');
   const [selectedCatId, setSelectedCatId] = useState<string>('cat_basic');
   const [selectedEnemyId, setSelectedEnemyId] = useState<string>('enemy_doge');
@@ -608,7 +609,7 @@ export const CatEncyclopediaScreen: React.FC<CatEncyclopediaScreenProps> = ({ on
               )}
 
               {/* Enemy Stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs mb-3">
                 <div className="bg-stone-900 p-2.5 rounded-xl border border-stone-800">
                   <div className="text-stone-400 font-bold">体力 (HP)</div>
                   <div className="text-sm font-black text-rose-400 mt-0.5">{selectedEnemy.hp.toLocaleString()}</div>
@@ -628,6 +629,21 @@ export const CatEncyclopediaScreen: React.FC<CatEncyclopediaScreenProps> = ({ on
                   </div>
                 </div>
               </div>
+
+              {/* Simulation Battle Button */}
+              {onBattleEnemy && (
+                <button
+                  id="btn-encyclopedia-test-battle"
+                  onClick={() => {
+                    audio.playClick();
+                    onBattleEnemy(selectedEnemy.id);
+                  }}
+                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-red-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-black text-sm sm:text-base border-2 border-yellow-300 shadow-[0_4px_12px_rgba(225,29,72,0.4)] flex items-center justify-center gap-2 active:scale-95 transition-all"
+                >
+                  <Swords size={18} />
+                  <span>【模擬戦】この敵とバトルする！</span>
+                </button>
+              )}
             </div>
           )}
         </div>

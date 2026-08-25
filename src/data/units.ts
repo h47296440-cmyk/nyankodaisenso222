@@ -797,9 +797,9 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         spriteType: 'cat_macho',
       },
       {
-        name: 'ネコモヒカン',
-        jpName: 'ネコモヒカン',
-        description: '怒りのモヒカンを手に入れた世紀末戦士。高い機動力と打たれ強さで前線を強固に維持する。',
+        name: 'マッスルネコ',
+        jpName: 'マッスルネコ',
+        description: '極限まで鍛え抜かれた肉体を持つ超高速壁キャラ。爆速で前線へ駆けつけ味方を守る！',
         hp: 650,
         attackPower: 60,
         attackRange: 85,
@@ -811,7 +811,7 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         cost: 75,
         cooldown: 1.8,
         scale: 1.1,
-        spriteType: 'cat_mohican',
+        spriteType: 'cat_macho',
       }
     ]
   },
@@ -4546,11 +4546,11 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
   enemy_real_ancient_elephant: {
     id: 'enemy_real_ancient_elephant',
     name: '古代超パオちゃん（原始巨象メガテリウム）',
-    description: '【真レジェンド / 古代種 / 射程440範囲砲】始原の大地を踏み鳴らす超巨大象。射程440から繰り出される古代鼻息砲は破壊力絶大！',
+    description: '【真レジェンド / 古代種 / 射程440範囲砲 / 攻撃間隔10秒】始原の大地を踏み鳴らす超巨大象。射程440から繰り出される古代鼻息砲は破壊力絶大だが、あまりの巨大さゆえ攻撃間隔は10秒とゆったり！',
     hp: 1600000,
     attackPower: 32000,
     attackRange: 440,
-    attackSpeed: 0.5,
+    attackSpeed: 0.1, // ★ 攻撃間隔 10.0秒 (1 / 0.1)
     attackWindup: 0.5,
     speed: 10,
     knockbacks: 2,
@@ -4617,6 +4617,109 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     spriteType: 'enemy_real_ancient_sloth',
     scale: 2.6,
     isBoss: true
+  },
+  // =========================================================================
+  // 降臨ボス: 豪針神ヘッジホッグ (超遠方範囲攻撃 / 針乱れ撃ち / 絶・超極ムズ)
+  // =========================================================================
+  enemy_advent_hedgehog: {
+    id: 'enemy_advent_hedgehog',
+    name: '豪針神ヘッジホッグ（千本狂針の主）',
+    description: '【降臨ボス / 遠方範囲攻撃 300〜850 / クリティカル / 針乱射】全身から無数の鋭利な猛毒針を全方位へ発射する太古の豪針獣！超遠方から後衛キャラを一撃で串刺しにする。懐に入り込んで一気に叩け！',
+    hp: 3600000,
+    attackPower: 38000,
+    attackRange: 650,
+    attackSpeed: 0.35,
+    attackWindup: 0.6,
+    speed: 12,
+    knockbacks: 6,
+    attackType: 'area',
+    rewardMoney: 50000,
+    rewardXp: 120000,
+    traits: ['white', 'boss'],
+    spriteType: 'enemy_advent_hedgehog',
+    scale: 2.4,
+    isBoss: true,
+    abilities: {
+      criticalChance: 0.25,
+      knockback: { chance: 0.6 }
+    }
+  },
+  // =========================================================================
+  // 真レジェンド 烈波敵: 古代呪導師パオパオ (古代種 / 烈波Lv.3)
+  // =========================================================================
+  enemy_ancient_witch_pao: {
+    id: 'enemy_ancient_witch_pao',
+    name: '古代呪導師パオパオ（呪術の原始神官）',
+    description: '【真レジェンド / 古代種 / 烈波Lv.3 (80%)】太古の呪術儀式を受け継ぐ妖しき神官。射程380から放つ呪文とともに足元から古代の怨嗟を込めた烈波を立ち昇らせる！',
+    hp: 1350000,
+    attackPower: 22000,
+    attackRange: 380,
+    attackSpeed: 0.45,
+    attackWindup: 0.4,
+    speed: 14,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 22000,
+    rewardXp: 38000,
+    traits: ['white', 'boss'],
+    spriteType: 'enemy_ancient_witch_pao',
+    scale: 2.2,
+    isBoss: true,
+    abilities: {
+      surge: { level: 3, chance: 0.8, minDistance: 150, maxDistance: 450 }
+    }
+  },
+  // =========================================================================
+  // 真レジェンド 烈波敵: 始原烈波竜エンシェントワイバーン (古代種 / 浮いてる敵 / 烈波Lv.4)
+  // =========================================================================
+  enemy_ancient_surge_dragon: {
+    id: 'enemy_ancient_surge_dragon',
+    name: '始原烈波竜エンシェントワイバーン',
+    description: '【真レジェンド / 古代種 / 浮いてる敵 / 烈波Lv.4 (70%)】天空より古代の大地を見下ろす巨竜。咆哮一閃、射程420のブレスとともに巨大な神話烈波の柱を召喚する！',
+    hp: 2800000,
+    attackPower: 36000,
+    attackRange: 420,
+    attackSpeed: 0.3,
+    attackWindup: 0.5,
+    speed: 22,
+    knockbacks: 4,
+    attackType: 'area',
+    rewardMoney: 35000,
+    rewardXp: 75000,
+    traits: ['white', 'floating', 'boss'],
+    spriteType: 'enemy_ancient_surge_dragon',
+    scale: 2.8,
+    isBoss: true,
+    abilities: {
+      surge: { level: 4, chance: 0.7, minDistance: 200, maxDistance: 550 },
+      knockback: { chance: 0.5 }
+    }
+  },
+  // =========================================================================
+  // 魔界・真レジェ 烈波敵: 悪魔呪術司デビルオカルティ (悪魔種 / 烈波Lv.3 / シールド)
+  // =========================================================================
+  enemy_aku_surge_priest: {
+    id: 'enemy_aku_surge_priest',
+    name: '悪魔呪術司デビルオカルティ',
+    description: '【真レジェンド＆魔界編 / 悪魔種 / 悪魔シールド / 烈波Lv.3 / 遺志の烈波】深淵の悪魔教団の長。強固な悪魔シールドを纏い、攻撃時と撃破時の両方で怨念の黒煙烈波を放つ危険人物！',
+    hp: 1200000,
+    attackPower: 25000,
+    attackRange: 360,
+    attackSpeed: 0.4,
+    attackWindup: 0.35,
+    speed: 16,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 26000,
+    rewardXp: 45000,
+    traits: ['white'],
+    spriteType: 'enemy_aku_surge_priest',
+    scale: 2.1,
+    abilities: {
+      shield: { hp: 400000 },
+      surge: { level: 3, chance: 0.75, minDistance: 150, maxDistance: 450 },
+      deathSurge: { level: 3, chance: 1.0, minDistance: 100, maxDistance: 400 }
+    }
   },
   // =========================================================================
   // エクストリーム太古の力 裏ボス: 真・古代神エンシェント・ゼロ

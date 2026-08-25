@@ -177,9 +177,17 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
         return checkChapterCleared('real_legend_6');
       case 'real_legend_8':
         return checkChapterCleared('real_legend_7');
+      case 'real_legend_9':
+        return checkChapterCleared('real_legend_8');
+      case 'real_legend_10':
+        return checkChapterCleared('real_legend_9');
+      case 'real_legend_11':
+        return checkChapterCleared('real_legend_10');
+      case 'real_legend_12':
+        return checkChapterCleared('real_legend_11');
+      case 'real_legend_13':
+        return checkChapterCleared('real_legend_12');
       case 'aku_realm_1':
-      case 'aku_realm':
-      case 'special':
         return checkChapterCleared('japan_3') || checkChapterCleared('cosmos_3') || checkChapterCleared('japan_1');
       case 'aku_realm_2':
         return checkChapterCleared('aku_realm_1');
@@ -199,6 +207,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
       case 'advent_alien_cyclone':
       case 'advent_zombie_cyclone':
       case 'advent_ancient_cyclone':
+      case 'advent_hedgehog':
       case 'advent_aku_cyclone':
       case 'advent_all_cyclone':
       case 'advent':
@@ -834,8 +843,8 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                 </button>
               )}
 
-              {/* Extreme Mode (1.5x Multiplier) - Available for cleared chapters or legend stages */}
-              {(currentChapter.category === 'legend' || checkChapterCleared(currentChapter.id)) && (
+              {/* Extreme Mode (1.5x Multiplier) - ONLY for Legend Story Chapters when cleared */}
+              {currentChapter.category === 'legend' && checkChapterCleared(currentChapter.id) && (
                 <button
                   id="btn-toggle-extreme-mode-map"
                   onClick={() => {
@@ -847,7 +856,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                       ? 'bg-gradient-to-r from-red-600 via-rose-700 to-amber-700 text-yellow-200 border-yellow-400 ring-2 ring-red-500 shadow-red-600/60 animate-pulse'
                       : 'bg-[#2b1e16]/90 text-orange-400 border-orange-700/80 hover:bg-[#3d2a1c]'
                   }`}
-                  title="エクストリームモード切替 (敵倍率1.5倍 / 報酬UP / 太古の力で裏ボス覚醒)"
+                  title="レジェンド限定：エクストリームモード切替 (敵倍率1.5倍 / 報酬UP / 太古の力で裏ボス覚醒)"
                 >
                   <Flame size={14} className={isExtremeMode ? 'text-yellow-300 animate-bounce' : 'text-orange-400'} />
                   <span>{isExtremeMode ? 'エクストリーム(1.5倍)ON！' : 'エクストリーム(1.5倍)'}</span>

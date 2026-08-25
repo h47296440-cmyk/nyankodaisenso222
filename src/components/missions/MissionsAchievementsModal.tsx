@@ -16,6 +16,11 @@ import {
   Flame,
   Star,
   Check,
+  Clock,
+  Swords,
+  Users,
+  Skull,
+  BarChart3,
 } from 'lucide-react';
 
 interface MissionsAchievementsModalProps {
@@ -23,7 +28,7 @@ interface MissionsAchievementsModalProps {
   profile: PlayerProfile;
   onClose: () => void;
   onUpdateProfile: (updater: (prev: PlayerProfile) => PlayerProfile) => void;
-  defaultTab?: 'missions' | 'achievements';
+  defaultTab?: 'missions' | 'achievements' | 'records';
 }
 
 export const MissionsAchievementsModal: React.FC<MissionsAchievementsModalProps> = ({
@@ -33,7 +38,7 @@ export const MissionsAchievementsModal: React.FC<MissionsAchievementsModalProps>
   onUpdateProfile,
   defaultTab = 'missions',
 }) => {
-  const [activeMainTab, setActiveMainTab] = useState<'missions' | 'achievements'>(defaultTab);
+  const [activeMainTab, setActiveMainTab] = useState<'missions' | 'achievements' | 'records'>(defaultTab);
   const [missionCategory, setMissionCategory] = useState<'daily' | 'main' | 'event'>('daily');
   const [claimedNotice, setClaimedNotice] = useState<string | null>(null);
 
@@ -199,6 +204,22 @@ export const MissionsAchievementsModal: React.FC<MissionsAchievementsModalProps>
                     {unclaimedAchievementsCount}
                   </span>
                 )}
+              </button>
+
+              <button
+                id="tab-btn-records"
+                onClick={() => {
+                  audio.playClick();
+                  setActiveMainTab('records');
+                }}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                  activeMainTab === 'records'
+                    ? 'bg-emerald-500 text-stone-950 shadow-md'
+                    : 'text-stone-400 hover:text-stone-200'
+                }`}
+              >
+                <BarChart3 size={14} />
+                <span>📊 戦歴・記録</span>
               </button>
             </div>
           </div>
@@ -368,7 +389,7 @@ export const MissionsAchievementsModal: React.FC<MissionsAchievementsModalProps>
                 })}
               </div>
             </>
-          ) : (
+          ) : activeMainTab === 'achievements' ? (
             /* ACHIEVEMENTS TAB */
             <div className="space-y-2.5">
               {ACHIEVEMENTS.map((ach) => {
@@ -451,6 +472,79 @@ export const MissionsAchievementsModal: React.FC<MissionsAchievementsModalProps>
                   </div>
                 );
               })}
+            </div>
+          ) : (
+            /* Records / 戦歴 tab */
+            <div className="space-y-3 animate-fade-in">
+              <div className="bg-stone-950 p-3 rounded-2xl border border-stone-800 flex items-center justify-between">
+                <div>
+                  <div className="text-xs text-stone-400 font-bold">司令官ステータス</div>
+                  <div className="text-base sm:text-lg font-black text-amber-300">
+                    UR {profile.userRank} （ユーザーランク）
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[11px] text-stone-400 font-bold">総プレイ時間</div>
+                  <div className="text-xs sm:text-sm font-mono font-black text-cyan-300">
+                    {Math.floor((profile.stats?.playTimeSeconds || 0) / 3600)}時間{' '}
+                    {Math.floor(((profile.stats?.playTimeSeconds || 0) % 3600) / 60)}分{' '}
+                    {(profile.stats?.playTimeSeconds || 0) % 60}秒
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="bg-stone-950/80 p-3 rounded-xl border border-amber-500/30 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-950 border border-amber-500/40 flex items-center justify-center shrink-0">
+                    <Coins className="text-amber-400" size={20} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] text-stone-400 font-bold">使ったお金の総額 (戦闘中)</div>
+                    <div className="text-sm font-black text-amber-300 font-mono">
+                      ¥{(profile.stats?.totalMoneySpent || 0).toLocaleString()} 円
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-stone-950/80 p-3 rounded-xl border border-emerald-500/30 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-950 border border-emerald-500/40 flex items-center justify-center shrink-0">
+                    <Users className="text-emerald-400" size={20} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] text-stone-400 font-bold">生産したにゃんこ総数</div>
+                    <div className="text-sm font-black text-emerald-300 font-mono">
+                      {(profile.stats?.totalCatsSpawned || 0).toLocaleString()} 体
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-stone-950/80 p-3 rounded-xl border border-rose-500/30 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-rose-950 border border-rose-500/40 flex items-center justify-center shrink-0">
+                    <Swords className="text-rose-400" size={20} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] text-stone-400 font-bold">総出撃回数（バトル）</div>
+                    <div className="text-sm font-black text-rose-300 font-mono">
+                      {(profile.stats?.battlesFought || 0).toLocaleString()} 回{' '}
+                      <span className="text-[11px] font-normal text-stone-400">
+                        (勝利: {(profile.stats?.battlesWon || 0).toLocaleString()}回)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-stone-950/80 p-3 rounded-xl border border-purple-500/30 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-purple-950 border border-purple-500/40 flex items-center justify-center shrink-0">
+                    <Skull className="text-purple-400" size={20} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] text-stone-400 font-bold">撃破した敵の総数</div>
+                    <div className="text-sm font-black text-purple-300 font-mono">
+                      {(profile.stats?.totalEnemiesDefeated || 0).toLocaleString()} 体
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>

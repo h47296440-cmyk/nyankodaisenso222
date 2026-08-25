@@ -21,6 +21,36 @@ export type BgmTrack =
   | 'ancient_power'
   | 'none';
 
+export interface BgmTrackInfo {
+  id: BgmTrack;
+  title: string;
+  jpTitle: string;
+  category: 'main' | 'battle' | 'boss' | 'special';
+  description: string;
+  durationSec?: number;
+}
+
+export const BGM_CATALOG: BgmTrackInfo[] = [
+  { id: 'title', title: 'Title March', jpTitle: 'にゃんこ行進曲（タイトル）', category: 'main', description: 'にゃんこ大戦争の象徴！元気いっぱいのオープニングマーチ。' },
+  { id: 'map', title: 'World Invasion Map', jpTitle: '世界侵略の地図（章選択）', category: 'main', description: '進撃の舞台を選ぶ軽快でコミカルなフィールドBGM。' },
+  { id: 'battle_japan', title: 'March of the Doggies', jpTitle: 'わんこ達の進撃（日本編）', category: 'battle', description: 'すべての始まり。愉快でにぎやかな基本戦闘曲。' },
+  { id: 'battle_future', title: 'Future Neon Cyber', jpTitle: 'エイリアン・ネオン（未来編）', category: 'battle', description: '近未来サイバー空間を疾走するシンセポップサウンド。' },
+  { id: 'battle_cosmos', title: 'Cosmic Psychedelic', jpTitle: '銀河虚空のサイケデリック（宇宙編）', category: 'battle', description: 'ビッグバンと宇宙の深淵を漂うスペーシーなアンビエント。' },
+  { id: 'battle_real_legend', title: 'Ancient Pulse', jpTitle: '太古の原始鼓動（真・レジェンド）', category: 'battle', description: '太古の原始ジャングルと古代種たちの鼓動を刻むエスニックビート。' },
+  { id: 'battle_volcano', title: 'Magma Inferno', jpTitle: '業火のマグマ・バーニング（火山）', category: 'battle', description: '灼熱のマグマ溶岩地帯で激突するヘヴィ＆スリリングな戦闘曲。' },
+  { id: 'battle_squirrel_panic', title: 'Squirrel Panic Hyper', jpTitle: '狂騒のリスパニック・ラッシュ', category: 'battle', description: '超高速で押し寄せるリスの大群！BPM170の超高速ハイパーチューン。' },
+  { id: 'battle_aku', title: 'Abyss Inferno', jpTitle: '深淵のヘル・インフェルノ（魔界編）', category: 'battle', description: '悪魔たちの儀式と暗黒の業火が渦巻くダークオーケストラ。' },
+  { id: 'boss_normal', title: 'Clash for the Castle', jpTitle: '激突！城を賭けた大乱闘（ボス戦）', category: 'boss', description: 'お城を叩いた瞬間に鳴り響く緊迫の大決戦BGM！' },
+  { id: 'boss_bunbun', title: 'Teacher Bun Bun Panic', jpTitle: 'ブンブン先生の熱血指導', category: 'boss', description: '絶望の超高速連打が迫り来る！圧倒的プレッシャーの強敵ボス曲。' },
+  { id: 'legend_battle', title: 'Twilight of Myths', jpTitle: '神話の黄昏（レジェンドボス戦）', category: 'boss', description: '数々の伝説を越えた先に待つ終焉の守護神との激戦。' },
+  { id: 'crazed_boss', title: 'Storm & Cyclone Warning', jpTitle: '狂乱の嵐・暴風警報（降臨ボス）', category: 'boss', description: '暴風サイクロン＆狂乱降臨！狂気とスピードが交錯する激闘の調べ。' },
+  { id: 'ancient_power', title: 'Roar of the Ancients', jpTitle: '古代の咆哮（太古の力）', category: 'boss', description: 'レジェンド最終決戦・太古の力を司る古代獣との宿命の対決。' },
+  { id: 'boss_secret_god', title: 'Creator of the Void Zero', jpTitle: '始原の創世神 ゼロ（裏ボス）', category: 'boss', description: 'エクストリーム太古の力に降臨する裏ボス専用の壮大なる神話BGM。' },
+  { id: 'boss_final', title: 'Oblivion Filibuster', jpTitle: '破滅のフィリバスター序曲（終焉）', category: 'boss', description: '世界消滅のカウントダウンを告げるパイプオルガンと鐘の絶望的旋律。' },
+  { id: 'opening', title: 'Scroll of Ancient Lore', jpTitle: '悠久の神話絵巻（物語OP）', category: 'special', description: '古の時代より語り継がれるにゃんこたちの神話を綴る叙情詩。' },
+  { id: 'epilogue', title: 'Sunset Epilogue', jpTitle: '茜色の夕焼け・凱旋（EDテーマ）', category: 'special', description: '激戦を終えた戦士たちを優しく包み込む夕暮れのエピローグ。' },
+];
+
 type InstrumentType = 'brass' | 'accordion' | 'bass' | 'organ' | 'synth' | 'bell' | 'strings';
 type DrumType = 'kick' | 'snare' | 'hihat' | 'cymbal' | 'timpani';
 

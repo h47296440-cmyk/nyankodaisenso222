@@ -12,6 +12,9 @@ interface MenuModalProps {
   onOpenUpdateHistory: () => void;
   onOpenDevMode: () => void;
   onOpenMissions: () => void;
+  onOpenRecords?: () => void;
+  onOpenBgm?: () => void;
+  onOpenAncientPearlMovie?: () => void;
   onOpenGiftCode: () => void;
   onBackToTitle: () => void;
 }
@@ -26,6 +29,9 @@ export const MenuModal: React.FC<MenuModalProps> = ({
   onOpenUpdateHistory,
   onOpenDevMode,
   onOpenMissions,
+  onOpenRecords,
+  onOpenBgm,
+  onOpenAncientPearlMovie,
   onOpenGiftCode,
   onBackToTitle,
 }) => {
@@ -80,6 +86,54 @@ export const MenuModal: React.FC<MenuModalProps> = ({
               <span>🎯 ミッション＆実績</span>
             </div>
             <span className="text-xs text-yellow-200">報酬受取 →</span>
+          </button>
+
+          {/* 戦歴と記録 (Records) */}
+          <button
+            id="menu-btn-records"
+            onClick={() => {
+              onClose();
+              if (onOpenRecords) onOpenRecords();
+            }}
+            className="w-full bg-gradient-to-r from-teal-800 to-emerald-800 hover:brightness-110 border-2 border-emerald-400 p-3 rounded-2xl flex items-center justify-between text-left shadow text-white font-black text-sm"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xl">📊</span>
+              <span>📊 戦歴と記録 (プレイ時間・出撃数・総支出)</span>
+            </div>
+            <span className="text-xs bg-emerald-600 px-2 py-0.5 rounded-full font-black text-emerald-100">記録 →</span>
+          </button>
+
+          {/* サウンド鑑賞室 (BGM Jukebox) */}
+          <button
+            id="menu-btn-bgm-jukebox"
+            onClick={() => {
+              onClose();
+              if (onOpenBgm) onOpenBgm();
+            }}
+            className="w-full bg-gradient-to-r from-purple-800 via-indigo-900 to-stone-800 hover:brightness-110 border-2 border-purple-400 p-3 rounded-2xl flex items-center justify-between text-left shadow text-white font-black text-sm"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xl">🎵</span>
+              <span>🎵 にゃんこ サウンド鑑賞室 (BGM全曲)</span>
+            </div>
+            <span className="text-xs bg-purple-600 px-2 py-0.5 rounded-full font-black text-purple-100">試聴 →</span>
+          </button>
+
+          {/* 古代の真珠ムービー */}
+          <button
+            id="menu-btn-ancient-pearl-movie"
+            onClick={() => {
+              onClose();
+              if (onOpenAncientPearlMovie) onOpenAncientPearlMovie();
+            }}
+            className="w-full bg-gradient-to-r from-cyan-900 via-blue-950 to-stone-900 hover:brightness-110 border-2 border-cyan-400 p-3 rounded-2xl flex items-center justify-between text-left shadow text-white font-black text-sm"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xl">🎬</span>
+              <span>🎬 特別アニメ：古代の真珠の記憶</span>
+            </div>
+            <span className="text-xs bg-cyan-600 px-2 py-0.5 rounded-full font-black text-cyan-100">上映 →</span>
           </button>
 
           {/* プレゼントコード */}

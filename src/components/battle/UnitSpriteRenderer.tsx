@@ -4251,6 +4251,139 @@ function renderSpriteSvg(
         </svg>
       );
 
+    case 'enemy_advent_hedgehog':
+      return (
+        <svg width="110" height="90" viewBox="0 0 110 90" className="drop-shadow-lg">
+          {/* Spikes / Quills burst out */}
+          <g>
+            {[-45, -30, -15, 0, 15, 30, 45, 60, 75, 90, 105, 120, 135].map((angle, idx) => {
+              const rad = (angle * Math.PI) / 180;
+              const len = 35 + (idx % 3) * 6;
+              const x1 = 55 + Math.cos(rad) * 22;
+              const y1 = 45 - Math.sin(rad) * 22;
+              const x2 = 55 + Math.cos(rad) * len;
+              const y2 = 45 - Math.sin(rad) * len;
+              return (
+                <line
+                  key={idx}
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  stroke={idx % 2 === 0 ? '#1e293b' : '#d97706'}
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                />
+              );
+            })}
+          </g>
+          {/* Main Body */}
+          <ellipse cx="55" cy="48" rx="26" ry="22" fill="#78350f" stroke="#451a03" strokeWidth="3" />
+          <ellipse cx="48" cy="50" rx="18" ry="15" fill="#d97706" />
+          {/* Hedgehog Snout & Face */}
+          <path d="M 32 50 Q 15 54 20 60 Q 32 62 36 55" fill="#fde68a" stroke="#78350f" strokeWidth="2" />
+          <circle cx="18" cy="56" r="3.5" fill="#000000" />
+          <circle cx="34" cy="46" r="4.5" fill="#ef4444" stroke="#78350f" strokeWidth="1.5" />
+          {/* Glowing ancient eye */}
+          <circle cx="33" cy="45" r="1.5" fill="#ffffff" />
+          {/* Sharp Shooting Needle Effect when attacking */}
+          {isAttacking && (
+            <g>
+              <line x1="20" y1="52" x2="-25" y2="48" stroke="#f59e0b" strokeWidth="4" strokeLinecap="round" />
+              <line x1="22" y1="44" x2="-22" y2="30" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" />
+              <line x1="22" y1="60" x2="-20" y2="68" stroke="#d97706" strokeWidth="3" strokeLinecap="round" />
+              <polygon points="-25,48 -18,44 -18,52" fill="#ef4444" />
+            </g>
+          )}
+          {/* Feet */}
+          <ellipse cx="42 + legOffset1" cy="70" rx="7" ry="5" fill="#451a03" />
+          <ellipse cx="68 + legOffset2" cy="70" rx="7" ry="5" fill="#451a03" />
+        </svg>
+      );
+
+    case 'enemy_ancient_witch_pao':
+      return (
+        <svg width="120" height="110" viewBox="0 0 120 110" className="drop-shadow-lg">
+          {/* Ancient Shaman Cloak & Runes */}
+          <ellipse cx="60" cy="55" rx="34" ry="30" fill="#064e3b" stroke="#047857" strokeWidth="3.5" />
+          <path d="M 35 45 Q 60 20 85 45 Q 92 85 60 88 Q 28 85 35 45" fill="#047857" stroke="#10b981" strokeWidth="2.5" />
+          {/* Shaman Mask / Headdress */}
+          <polygon points="60,15 45,38 75,38" fill="#d97706" stroke="#78350f" strokeWidth="2" />
+          <polygon points="40,22 48,38 36,42" fill="#ef4444" />
+          <polygon points="80,22 72,38 84,42" fill="#ef4444" />
+          {/* Glowing Eyes */}
+          <circle cx="52" cy="48" r="4.5" fill="#10b981" stroke="#ffffff" strokeWidth="1.5" />
+          <circle cx="68" cy="48" r="4.5" fill="#10b981" stroke="#ffffff" strokeWidth="1.5" />
+          {/* Trunk & Tusks */}
+          <path d="M 60 55 Q 52 75 38 76 Q 32 72 45 66" fill="#064e3b" stroke="#10b981" strokeWidth="2.5" />
+          <path d="M 46 58 Q 38 65 30 62" fill="none" stroke="#fef08a" strokeWidth="3.5" strokeLinecap="round" />
+          <path d="M 74 58 Q 82 65 90 62" fill="none" stroke="#fef08a" strokeWidth="3.5" strokeLinecap="round" />
+          {/* Witch Staff */}
+          <line x1="88" y1="30" x2="88" y2="92" stroke="#78350f" strokeWidth="4" strokeLinecap="round" />
+          <circle cx="88" cy="28" r="10" fill="#059669" stroke="#34d399" strokeWidth="3" className={isAttacking ? 'animate-ping' : ''} />
+          {/* Surge Spellcast */}
+          {isAttacking && (
+            <circle cx="88" cy="28" r="18" fill="none" stroke="#10b981" strokeWidth="3" strokeDasharray="4 4" />
+          )}
+          {/* Feet */}
+          <ellipse cx="44 + legOffset1" cy="86" rx="9" ry="7" fill="#064e3b" stroke="#047857" strokeWidth="2" />
+          <ellipse cx="76 + legOffset2" cy="86" rx="9" ry="7" fill="#064e3b" stroke="#047857" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_ancient_surge_dragon':
+      return (
+        <svg width="140" height="120" viewBox="0 0 140 120" className="drop-shadow-xl">
+          {/* Wings */}
+          <path d="M 70 55 Q 20 15 10 45 Q 40 60 70 55" fill="#064e3b" stroke="#10b981" strokeWidth="3" />
+          <path d="M 70 55 Q 120 15 130 45 Q 100 60 70 55" fill="#064e3b" stroke="#10b981" strokeWidth="3" />
+          {/* Tail */}
+          <path d="M 85 70 Q 115 85 125 100 Q 110 102 95 80" fill="#047857" stroke="#10b981" strokeWidth="2" />
+          {/* Dragon Body */}
+          <ellipse cx="70" cy="65" rx="28" ry="22" fill="#065f46" stroke="#34d399" strokeWidth="3" />
+          <path d="M 52 50 Q 70 70 88 50" fill="none" stroke="#fde047" strokeWidth="3" />
+          {/* Dragon Head & Horns */}
+          <polygon points="45,45 25,35 32,58" fill="#064e3b" stroke="#10b981" strokeWidth="2.5" />
+          <path d="M 32 36 Q 22 18 18 15" fill="none" stroke="#f59e0b" strokeWidth="3" strokeLinecap="round" />
+          <path d="M 42 36 Q 38 18 36 12" fill="none" stroke="#f59e0b" strokeWidth="3" strokeLinecap="round" />
+          {/* Glowing Eyes */}
+          <circle cx="34" cy="44" r="3.5" fill="#ef4444" stroke="#ffffff" strokeWidth="1" />
+          {/* Breath & Surge Blast */}
+          {isAttacking && (
+            <g>
+              <ellipse cx="10" cy="52" rx="14" ry="10" fill="#10b981" opacity="0.85" />
+              <polygon points="25,48 -10,35 -10,65" fill="#34d399" opacity="0.75" />
+            </g>
+          )}
+          {/* Claws */}
+          <ellipse cx="56 + legOffset1" cy="85" rx="8" ry="6" fill="#047857" stroke="#10b981" strokeWidth="2" />
+          <ellipse cx="84 + legOffset2" cy="85" rx="8" ry="6" fill="#047857" stroke="#10b981" strokeWidth="2" />
+        </svg>
+      );
+
+    case 'enemy_aku_surge_priest':
+      return (
+        <svg width="105" height="110" viewBox="0 0 105 110" className="drop-shadow-lg">
+          {/* Dark Shadow Robe */}
+          <path d="M 52 35 Q 25 60 22 95 Q 52 100 82 95 Q 78 60 52 35" fill="#1e1b4b" stroke="#4338ca" strokeWidth="3" />
+          <ellipse cx="52" cy="58" rx="20" ry="24" fill="#312e81" />
+          {/* Demon Horns */}
+          <path d="M 42 32 Q 30 15 22 18" fill="none" stroke="#dc2626" strokeWidth="4" strokeLinecap="round" />
+          <path d="M 62 32 Q 74 15 82 18" fill="none" stroke="#dc2626" strokeWidth="4" strokeLinecap="round" />
+          {/* Skull Face & Eyes */}
+          <circle cx="52" cy="40" r="15" fill="#f8fafc" stroke="#334155" strokeWidth="2" />
+          <circle cx="46" cy="38" r="3.5" fill="#991b1b" />
+          <circle cx="58" cy="38" r="3.5" fill="#991b1b" />
+          {/* Dark Magic Tome / Skull Staff */}
+          <line x1="80" y1="35" x2="80" y2="95" stroke="#451a03" strokeWidth="3.5" strokeLinecap="round" />
+          <circle cx="80" cy="32" r="8" fill="#7f1d1d" stroke="#ef4444" strokeWidth="2" className={isAttacking ? 'animate-ping' : ''} />
+          {/* Aku Surge Ring */}
+          {isAttacking && (
+            <circle cx="80" cy="32" r="16" fill="none" stroke="#dc2626" strokeWidth="2.5" strokeDasharray="3 3" />
+          )}
+        </svg>
+      );
+
     case 'enemy_ancient_zero':
       return (
         <svg width="150" height="150" viewBox="0 0 150 150" className="drop-shadow-[0_0_30px_rgba(234,179,8,0.8)]">

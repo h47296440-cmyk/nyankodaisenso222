@@ -22,6 +22,9 @@ import { MenuModal } from './components/base/MenuModal';
 import { DeckFormationModal } from './components/upgrade/DeckFormationModal';
 import { GiftCodeModal } from './components/gift/GiftCodeModal';
 import { MissionsAchievementsModal } from './components/missions/MissionsAchievementsModal';
+import { PlayerRecordsModal } from './components/missions/PlayerRecordsModal';
+import { BgmJukeboxModal } from './components/audio/BgmJukeboxModal';
+import { AncientPearlMovieModal } from './components/story/AncientPearlMovieModal';
 import { AnnouncementsModal } from './components/announcements/AnnouncementsModal';
 import { PvpLobbyModal, PvpConnectionPayload } from './components/pvp/PvpLobbyModal';
 import { PvpBattleScreen } from './components/pvp/PvpBattleScreen';
@@ -46,6 +49,9 @@ export default function App() {
   const [showDeckFormationModal, setShowDeckFormationModal] = useState(false);
   const [showGiftCodeModal, setShowGiftCodeModal] = useState(false);
   const [showMissionsModal, setShowMissionsModal] = useState(false);
+  const [showPlayerRecordsModal, setShowPlayerRecordsModal] = useState(false);
+  const [showBgmJukeboxModal, setShowBgmJukeboxModal] = useState(false);
+  const [showAncientPearlMovieModal, setShowAncientPearlMovieModal] = useState(false);
   const [showPvpLobbyModal, setShowPvpLobbyModal] = useState(false);
   const [pvpPayload, setPvpPayload] = useState<PvpConnectionPayload | null>(null);
   const [activeStoryKey, setActiveStoryKey] = useState<string | null>(null);
@@ -65,6 +71,21 @@ export default function App() {
   useEffect(() => {
     saveProfile(profile);
   }, [profile]);
+
+  // Track play time every second
+  useEffect(() => {
+    const playTimeTimer = setInterval(() => {
+      setProfile((prev) => ({
+        ...prev,
+        stats: {
+          ...prev.stats,
+          playTimeSeconds: (prev.stats?.playTimeSeconds || 0) + 1,
+        },
+      }));
+    }, 1000);
+
+    return () => clearInterval(playTimeTimer);
+  }, []);
 
   // Periodic energy regeneration (1 energy every 30 seconds up to maxEnergy)
   useEffect(() => {
@@ -132,6 +153,9 @@ export default function App() {
     catFoodEarned: number;
     treasureQuality?: TreasureQuality;
     scoreAttackScore?: number;
+    moneySpent?: number;
+    catsSpawned?: number;
+    enemiesDefeated?: number;
   }) => {
     if (!activeStage) return;
 
@@ -189,6 +213,8 @@ export default function App() {
           setTimeout(() => setActiveStoryKey('legend_ending'), 600);
         } else if (activeStage.id === 'aku_realm_3_5' || activeStage.id === 'aku_realm_5') {
           setTimeout(() => setActiveStoryKey('aku_ending'), 600);
+        } else if (activeStage.id === 'real_legend_10_1' || activeStage.id === 'real_legend_10_2') {
+          setTimeout(() => setShowAncientPearlMovieModal(true), 800);
         }
       }
 
@@ -222,6 +248,17 @@ export default function App() {
         nextScoreAttackHighScore = Math.max(nextScoreAttackHighScore, result.scoreAttackScore);
       }
 
+      const nextStats = {
+        ...prev.stats,
+        totalBattles: (prev.stats?.totalBattles || 0) + 1,
+        totalVictories: (prev.stats?.totalVictories || 0) + (result.victory ? 1 : 0),
+        battlesFought: (prev.stats?.battlesFought || 0) + 1,
+        battlesWon: (prev.stats?.battlesWon || 0) + (result.victory ? 1 : 0),
+        totalMoneySpent: (prev.stats?.totalMoneySpent || 0) + (result.moneySpent || 0),
+        totalCatsSpawned: (prev.stats?.totalCatsSpawned || 0) + (result.catsSpawned || 0),
+        totalEnemiesDefeated: (prev.stats?.totalEnemiesDefeated || 0) + (result.enemiesDefeated || 0),
+      };
+
       return {
         ...prev,
         xp: prev.xp + result.xpEarned,
@@ -235,6 +272,7 @@ export default function App() {
         unlockedHannyaDrop: isHannyaDropUnlocked,
         unlockedCycloneDrop: isCycloneDropUnlocked,
         scoreAttackHighScore: nextScoreAttackHighScore,
+        stats: nextStats,
       };
     });
   };
@@ -250,6 +288,38 @@ export default function App() {
       }));
     }
     setPvpPayload(null);
+  };
+
+  // Launch Simulation Battle against a specific enemy from Encyclopedia
+  const handleBattleEnemy = (enemyId: string) => {
+    const customTestStage: StageDefinition = {
+      id: `encyclopedia_test_${enemyId}_${Date.now()}`,
+      chapterId: 'japan_1',
+      stageNumber: 99,
+      name: `模擬戦：${enemyId}`,
+      jpName: `【図鑑シミュレーション戦】`,
+      energyCost: 0,
+      castleHp: 1000000,
+      enemyCastleSprite: 'castle_cosmos',
+      bgType: 'japan_grass',
+      battlefieldWidth: 2600,
+      baseRewardXp: 10000,
+      baseRewardCatFood: 10,
+      mapX: 50,
+      mapY: 50,
+      isBossStage: true,
+      difficultyLabel: '模擬戦',
+      stageLoreTip: '図鑑から選択した敵との実戦シミュレーション！敵の挙動や射程をテストせよ！',
+      waves: [
+        { timeSeconds: 1.0, enemyId: 'enemy_doge', count: 5, interval: 3.0 },
+        { timeSeconds: 3.0, enemyId: enemyId, count: 1, interval: 0, castleHpThreshold: 99, boss: true },
+      ],
+      bossAlert: 'シミュレーション開始！ 選択エネミーが出現！',
+    };
+
+    setActiveStage(customTestStage);
+    setBattleActiveItems({});
+    setCurrentView('battle');
   };
 
   // Find next stage in sequence if available
@@ -383,6 +453,7 @@ export default function App() {
             {currentView === 'encyclopedia' && (
               <CatEncyclopediaScreen
                 onBack={() => setCurrentView('base')}
+                onBattleEnemy={handleBattleEnemy}
               />
             )}
           </>
@@ -408,6 +479,25 @@ export default function App() {
         <ChapterStoryModal
           storyKey={activeStoryKey}
           onClose={() => setActiveStoryKey(null)}
+        />
+
+        {/* Ancient Pearl Special Movie Modal */}
+        <AncientPearlMovieModal
+          isOpen={showAncientPearlMovieModal}
+          onClose={() => setShowAncientPearlMovieModal(false)}
+        />
+
+        {/* BGM Jukebox / Sound Room Modal */}
+        <BgmJukeboxModal
+          isOpen={showBgmJukeboxModal}
+          onClose={() => setShowBgmJukeboxModal(false)}
+        />
+
+        {/* Player Records & Combat Statistics Modal */}
+        <PlayerRecordsModal
+          isOpen={showPlayerRecordsModal}
+          profile={profile}
+          onClose={() => setShowPlayerRecordsModal(false)}
         />
 
         {/* Developer Mode Modal */}
@@ -464,6 +554,18 @@ export default function App() {
           onOpenMissions={() => {
             setShowMenuModal(false);
             setShowMissionsModal(true);
+          }}
+          onOpenRecords={() => {
+            setShowMenuModal(false);
+            setShowPlayerRecordsModal(true);
+          }}
+          onOpenBgm={() => {
+            setShowMenuModal(false);
+            setShowBgmJukeboxModal(true);
+          }}
+          onOpenAncientPearlMovie={() => {
+            setShowMenuModal(false);
+            setShowAncientPearlMovieModal(true);
           }}
           onOpenGiftCode={() => {
             setShowMenuModal(false);

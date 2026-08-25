@@ -27,6 +27,9 @@ interface BattleScreenProps {
     catFoodEarned: number;
     treasureQuality?: TreasureQuality;
     scoreAttackScore?: number;
+    moneySpent?: number;
+    catsSpawned?: number;
+    enemiesDefeated?: number;
   }) => void;
   onExit: () => void;
   onNextStage?: () => void;
@@ -94,6 +97,9 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const battleTimeRef = useRef(0);
   const sniperTimerRef = useRef(0);
   const defeatedEnemiesCountRef = useRef(0);
+  const bossSpawnedCountRef = useRef(0);
+  const matchMoneySpentRef = useRef(0);
+  const matchCatsSpawnedRef = useRef(0);
   const spawnedWaveIndicesRef = useRef<Set<number>>(new Set());
   const spawnedThresholdWavesRef = useRef<Set<number>>(new Set());
   const secretBossSpawnedRef = useRef(false);
@@ -420,6 +426,8 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     };
 
     moneyRef.current -= form.cost;
+    matchMoneySpentRef.current += form.cost;
+    matchCatsSpawnedRef.current += 1;
     deckCooldownsRef.current[catId] = slot.maxCooldown;
     catsRef.current.push(newCat);
 
@@ -429,7 +437,14 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   // Spawn Enemy Helper (Spawns at enemyCastleX on the Right)
   const spawnEnemy = (enemyId: string, isBoss: boolean = false, customMultiplier?: number) => {
     const def = ENEMY_DEFINITIONS[enemyId] || ENEMY_DEFINITIONS.enemy_doge;
-    const isBossEntity = isBoss || def.isBoss;
+    
+    // Check if a boss has already spawned in this match to prevent multiple bosses appearing
+    const isStageBossCandidate = isBoss || def.isBoss;
+    const canSpawnAsBoss = isStageBossCandidate && bossSpawnedCountRef.current === 0;
+    if (isStageBossCandidate && canSpawnAsBoss) {
+      bossSpawnedCountRef.current += 1;
+    }
+    const isBossEntity = canSpawnAsBoss;
 
     // Calculate stage multiplier (真レジェンドや魔界編では昔の敵のステータス倍率が上昇、真レジェ最新ボスや古代種・悪魔種は1.0倍)
     let multiplier = customMultiplier || 1.0;
@@ -1490,6 +1505,9 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       catFoodEarned,
       treasureQuality,
       scoreAttackScore,
+      moneySpent: matchMoneySpentRef.current,
+      catsSpawned: matchCatsSpawnedRef.current,
+      enemiesDefeated: defeatedEnemiesCountRef.current,
     });
   };
 
