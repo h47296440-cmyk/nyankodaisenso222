@@ -30,6 +30,15 @@ export interface PvpPlayerInfo {
   clearedStagesCount: number;
   peerId?: string;
   deck: PvpDeckUnitSummary[];
+  treasures?: Record<string, 'none' | 'bronze' | 'silver' | 'gold'>;
+  facilities?: {
+    workerEfficiency: number;
+    workerWallet: number;
+    castleHealth: number;
+    cannonPower: number;
+    cannonChargeRate: number;
+    xpBonus: number;
+  };
   profile?: PlayerProfile;
 }
 
@@ -207,7 +216,23 @@ export const PvpLobbyModal: React.FC<PvpLobbyModalProps> = ({
       clearedStagesCount: clearedCount,
       peerId: myPeerId,
       deck: deckUnits,
+      treasures: profile.treasures,
+      facilities: profile.facilities,
       profile: profile,
+    };
+  };
+
+  // Helper to strip heavy profile properties for lightweight WebRTC DataChannel transfer (< 2KB)
+  const toTransferableInfo = (info: PvpPlayerInfo) => {
+    return {
+      name: info.name,
+      rank: info.rank,
+      scoreAttackHighScore: info.scoreAttackHighScore,
+      clearedStagesCount: info.clearedStagesCount,
+      peerId: info.peerId,
+      deck: info.deck,
+      treasures: info.treasures,
+      facilities: info.facilities,
     };
   };
 
@@ -269,8 +294,9 @@ export const PvpLobbyModal: React.FC<PvpLobbyModalProps> = ({
           if (syncInterval) clearInterval(syncInterval);
           saveRivalRecord(remotePlayerInfo, conn.peer);
           const localInfo = buildLocalPlayerInfo(peer.id);
+          const transferInfo = toTransferableInfo(localInfo);
           try {
-            conn.send({ type: 'START_MATCH', data: localInfo });
+            conn.send({ type: 'START_MATCH', data: transferInfo });
           } catch (e) {}
           audio.playVictory();
           onStartBattle({
@@ -285,7 +311,7 @@ export const PvpLobbyModal: React.FC<PvpLobbyModalProps> = ({
         const sendLocalInfo = () => {
           try {
             const localInfo = buildLocalPlayerInfo(peer.id);
-            conn.send({ type: 'PLAYER_INFO', data: localInfo });
+            conn.send({ type: 'PLAYER_INFO', data: toTransferableInfo(localInfo) });
           } catch (e) {}
         };
 
@@ -295,12 +321,12 @@ export const PvpLobbyModal: React.FC<PvpLobbyModalProps> = ({
           conn.on('open', sendLocalInfo);
         }
 
-        // 定期的にハートビート送信して確実に同期
+        // 高速ハートビート送信して確実に同期 (250ms)
         syncInterval = window.setInterval(() => {
           if (!hasStarted && conn.open) {
             sendLocalInfo();
           }
-        }, 600);
+        }, 250);
 
         conn.on('data', (data: any) => {
           if (!data) return;
@@ -380,7 +406,7 @@ export const PvpLobbyModal: React.FC<PvpLobbyModalProps> = ({
           saveRivalRecord(remoteInfo, targetId);
           const localInfo = buildLocalPlayerInfo(peer.id);
           try {
-            conn.send({ type: 'PLAYER_INFO_ACK', data: localInfo });
+            conn.send({ type: 'PLAYER_INFO_ACK', data: toTransferableInfo(localInfo) });
           } catch (e) {}
           audio.playVictory();
           onStartBattle({
@@ -395,7 +421,7 @@ export const PvpLobbyModal: React.FC<PvpLobbyModalProps> = ({
         const sendGuestInfo = () => {
           try {
             const localInfo = buildLocalPlayerInfo(peer.id);
-            conn.send({ type: 'PLAYER_INFO', data: localInfo });
+            conn.send({ type: 'PLAYER_INFO', data: toTransferableInfo(localInfo) });
           } catch (e) {}
         };
 
@@ -406,7 +432,7 @@ export const PvpLobbyModal: React.FC<PvpLobbyModalProps> = ({
             if (!hasStarted && conn.open) {
               sendGuestInfo();
             }
-          }, 600);
+          }, 250);
         });
 
         conn.on('data', (data: any) => {

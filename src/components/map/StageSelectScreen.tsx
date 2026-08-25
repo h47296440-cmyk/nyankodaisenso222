@@ -162,6 +162,22 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
       case 'real_legend_1':
       case 'real_legend':
         return !!profile.hasClearedFilibuster && checkChapterCleared('legend_21');
+      case 'real_legend_2':
+        return checkChapterCleared('real_legend_1');
+      case 'real_legend_3':
+        return checkChapterCleared('real_legend_2');
+      case 'real_legend_4':
+        return checkChapterCleared('real_legend_3');
+      case 'real_legend_5':
+        return checkChapterCleared('real_legend_4');
+      case 'aku_realm_1':
+      case 'aku_realm':
+      case 'special':
+        return checkChapterCleared('japan_3') || checkChapterCleared('cosmos_3') || checkChapterCleared('japan_1');
+      case 'aku_realm_2':
+        return checkChapterCleared('aku_realm_1');
+      case 'aku_realm_3':
+        return checkChapterCleared('aku_realm_2');
       case 'crazed_event':
       case 'crazed':
         return checkChapterCleared('japan_1');
@@ -176,6 +192,8 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
       case 'advent_alien_cyclone':
       case 'advent_zombie_cyclone':
       case 'advent_ancient_cyclone':
+      case 'advent_aku_cyclone':
+      case 'advent_all_cyclone':
       case 'advent':
         return checkChapterCleared('japan_3') || checkChapterCleared('japan_1');
       case 'challenge_score_attack':
@@ -567,6 +585,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                 { id: 'future' as const, label: '未来編' },
                 { id: 'cosmos' as const, label: '宇宙編' },
                 { id: 'legend' as const, label: 'レジェンド' },
+                { id: 'special' as const, label: '魔界編' },
                 { id: 'crazed' as const, label: '狂乱祭' },
                 { id: 'advent' as const, label: '降臨BOSS' },
               ].map((tab) => (

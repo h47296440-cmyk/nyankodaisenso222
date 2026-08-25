@@ -8,6 +8,7 @@ interface TitleScreenProps {
   onResetData: () => void;
   onOpenUpdateHistory: () => void;
   onOpenDevMode: () => void;
+  isLegendCleared?: boolean;
 }
 
 export const TitleScreen: React.FC<TitleScreenProps> = ({
@@ -15,6 +16,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
   onResetData,
   onOpenUpdateHistory,
   onOpenDevMode,
+  isLegendCleared = false,
 }) => {
   const [soundEnabled, setSoundEnabled] = React.useState(true);
 
@@ -30,11 +32,31 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full min-h-0 bg-gradient-to-b from-sky-400 via-sky-200 to-amber-100 flex flex-col items-center justify-between px-3 sm:px-6 pt-[max(0.5rem,env(safe-area-inset-top,0px))] pb-[calc(max(0.4rem,env(safe-area-inset-bottom,0px))+2px)] select-none overflow-hidden font-['M_PLUS_Rounded_1c']">
-      {/* Sun & Clouds */}
-      <div className="absolute top-8 left-12 w-28 h-28 bg-yellow-300 rounded-full blur-xl opacity-80 pointer-events-none" />
-      <div className="absolute top-16 right-16 w-56 h-20 bg-white/80 rounded-full blur-sm pointer-events-none" />
-      <div className="absolute top-28 left-1/4 w-40 h-16 bg-white/70 rounded-full blur-sm pointer-events-none" />
+    <div
+      className={`relative w-full h-full min-h-0 flex flex-col items-center justify-between px-3 sm:px-6 pt-[max(0.5rem,env(safe-area-inset-top,0px))] pb-[calc(max(0.4rem,env(safe-area-inset-bottom,0px))+2px)] select-none overflow-hidden font-['M_PLUS_Rounded_1c'] transition-colors duration-1000 ${
+        isLegendCleared
+          ? 'bg-gradient-to-b from-orange-600 via-rose-500 via-amber-400 to-amber-200'
+          : 'bg-gradient-to-b from-sky-400 via-sky-200 to-amber-100'
+      }`}
+    >
+      {/* Sun & Sunset Glow & Clouds */}
+      {isLegendCleared ? (
+        <>
+          {/* Sunset Sun */}
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-b from-yellow-200 via-orange-400 to-red-500 rounded-full blur-2xl opacity-60 pointer-events-none animate-pulse" />
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-36 bg-gradient-to-b from-yellow-100 to-amber-300 rounded-full blur-md opacity-90 pointer-events-none" />
+          {/* Sunset Clouds */}
+          <div className="absolute top-12 right-12 w-64 h-16 bg-purple-900/30 rounded-full blur-md pointer-events-none" />
+          <div className="absolute top-24 left-10 w-72 h-16 bg-rose-900/30 rounded-full blur-md pointer-events-none" />
+          <div className="absolute top-40 right-1/4 w-80 h-14 bg-amber-900/25 rounded-full blur-md pointer-events-none" />
+        </>
+      ) : (
+        <>
+          <div className="absolute top-8 left-12 w-28 h-28 bg-yellow-300 rounded-full blur-xl opacity-80 pointer-events-none" />
+          <div className="absolute top-16 right-16 w-56 h-20 bg-white/80 rounded-full blur-sm pointer-events-none" />
+          <div className="absolute top-28 left-1/4 w-40 h-16 bg-white/70 rounded-full blur-sm pointer-events-none" />
+        </>
+      )}
 
       {/* Top Bar */}
       <div className="w-full flex justify-between items-center z-10">

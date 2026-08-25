@@ -31,8 +31,8 @@ export interface AbilityDefinition {
   shield?: { hp: number }; // 悪魔シールド (耐久値分のダメージを完全に無効化＆破壊時ノックバック)
   shieldPiercer?: { chance: number }; // シールドブレイカー能力 (悪魔シールドを即座に破壊)
   savageBlow?: { chance: number; mult: number }; // 渾身の一撃 (確率で3倍などの超大ダメージ+赤エフェクト)
-  surge?: { level: number; chance?: number }; // 烈波 (足元に立ち上る連続ダメージ柱)
-  deathSurge?: { level: number; chance?: number }; // 遺志の烈波 (撃破時に烈波発生)
+  surge?: { level: number; chance?: number; minDistance?: number; maxDistance?: number }; // 烈波 (足元に立ち上る連続ダメージ柱)
+  deathSurge?: { level: number; chance?: number; minDistance?: number; maxDistance?: number }; // 遺志の烈波 (撃破時に烈波発生)
   chargeAttack?: { chargeTime: number; isOneHitKill?: boolean }; // フィリバスター等の大溜め即死攻撃
   burrow?: { count: number; distance: number };
   revive?: { count: number; hpPercent: number; delaySeconds: number };
@@ -279,6 +279,7 @@ export type ChapterId =
   | 'aku_realm'
   | 'aku_realm_1'
   | 'aku_realm_2'
+  | 'aku_realm_3'
   | 'crazed_event'
   | 'special_event'
   | 'advent_clionel'
@@ -289,6 +290,7 @@ export type ChapterId =
   | 'advent_zombie_cyclone'
   | 'advent_ancient_cyclone'
   | 'advent_aku_cyclone'
+  | 'advent_all_cyclone'
   | 'challenge_score_attack'
   | 'advent'
   | 'zombie_future'

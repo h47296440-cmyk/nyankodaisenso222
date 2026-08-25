@@ -412,33 +412,50 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     const def = ENEMY_DEFINITIONS[enemyId] || ENEMY_DEFINITIONS.enemy_doge;
     const isBossEntity = isBoss || def.isBoss;
 
-    // Calculate stage multiplier (真レジェンドや魔界編では昔の敵のステータス倍率が大幅に上昇)
+    // Calculate stage multiplier (真レジェンドや魔界編では昔の敵のステータス倍率が上昇、真レジェ最新ボスや古代種・悪魔種は1.0倍)
     let multiplier = customMultiplier || 1.0;
     if (!customMultiplier) {
       const isRealLegend = stage.chapterId?.startsWith('real_legend');
       const isAkuRealm = stage.chapterId?.startsWith('aku_realm');
       const isLateLegend = stage.chapterId?.startsWith('legend_') && parseInt(stage.chapterId.replace('legend_', ''), 10) >= 10;
       
-      const isAncientEnemy = def.traits?.includes('relic');
-      const isAkuEnemy = def.traits?.includes('aku');
+      const isNewOrSpecialEnemy = 
+        def.traits?.includes('ancient') || 
+        def.traits?.includes('aku') || 
+        enemyId.includes('ancient') || 
+        enemyId.includes('relic') || 
+        enemyId.includes('aku') || 
+        enemyId.startsWith('enemy_real_ancient') ||
+        enemyId.startsWith('enemy_hell_') ||
+        enemyId.startsWith('enemy_sister_') ||
+        enemyId.startsWith('enemy_mamomo') ||
+        enemyId.startsWith('enemy_guilty_') ||
+        enemyId.startsWith('enemy_midnight_') ||
+        enemyId.startsWith('enemy_demon_lord_') ||
+        enemyId.startsWith('enemy_filibuster') ||
+        enemyId.includes('cyclone') ||
+        enemyId.includes('clionel') ||
+        enemyId.includes('hannya');
 
       if (isRealLegend) {
-        // 真レジェンド: 昔の敵(非古代種)は 300%〜600% 倍率
-        if (!isAncientEnemy) {
-          multiplier = 4.0;
+        // 真レジェンド: 昔の敵(初期キャラ)だけ 3.0倍〜3.5倍、最新ボスや古代種は等倍(1.0)
+        if (!isNewOrSpecialEnemy) {
+          multiplier = 3.5;
         } else {
-          multiplier = 1.2;
+          multiplier = 1.0;
         }
       } else if (isAkuRealm) {
-        // 魔界編: 昔の敵は 300% 倍率
-        if (!isAkuEnemy) {
-          multiplier = 3.0;
+        // 魔界編: 昔の敵は 2.5倍、悪魔種・ボスは等倍(1.0)
+        if (!isNewOrSpecialEnemy) {
+          multiplier = 2.5;
         } else {
           multiplier = 1.0;
         }
       } else if (isLateLegend) {
         // 後半レジェンド
-        multiplier = 1.8;
+        if (!isNewOrSpecialEnemy) {
+          multiplier = 1.8;
+        }
       }
     }
 

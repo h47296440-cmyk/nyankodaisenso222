@@ -60,6 +60,10 @@ export const StorySelectModal: React.FC<StorySelectModalProps> = ({
 
   const isRealLegendOpeningUnlocked = isDevUnlocked || isLegendEndingUnlocked;
   const isAkuOpeningUnlocked = isDevUnlocked || isJapanEndingUnlocked;
+  const isAkuEndingUnlocked =
+    isDevUnlocked ||
+    !!profile.clearedStages['aku_realm_3_5'] ||
+    !!profile.clearedStages['aku_realm_5'];
 
   const storyItems = [
     {
@@ -141,6 +145,14 @@ export const StorySelectModal: React.FC<StorySelectModalProps> = ({
       unlocked: isAkuOpeningUnlocked,
       condition: '日本編クリアで解放',
       badgeColor: 'from-red-800 to-purple-900',
+    },
+    {
+      key: 'aku_ending',
+      chapter: '魔界編',
+      type: 'エンディング (ED)',
+      unlocked: isAkuEndingUnlocked,
+      condition: '魔界編 最終決戦クリアで解放',
+      badgeColor: 'from-red-900 to-amber-800',
     },
   ];
 

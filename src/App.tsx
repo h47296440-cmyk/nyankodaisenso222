@@ -179,12 +179,16 @@ export default function App() {
         }
 
         // Check if clearing final stage of a chapter to trigger Ending cutscene
-        if (activeStage.id === 'japan_12' || activeStage.id === 'japan_6') {
+        if (activeStage.id === 'japan_12' || activeStage.id === 'japan_6' || activeStage.id === 'japan_1_5' || activeStage.id === 'japan_3_3') {
           setTimeout(() => setActiveStoryKey('japan_ending'), 600);
-        } else if (activeStage.id === 'future_3') {
+        } else if (activeStage.id === 'future_3' || activeStage.id === 'future_3_3') {
           setTimeout(() => setActiveStoryKey('future_ending'), 600);
-        } else if (activeStage.id === 'cosmos_3') {
+        } else if (activeStage.id === 'cosmos_3' || activeStage.id === 'cosmos_3_3') {
           setTimeout(() => setActiveStoryKey('cosmos_ending'), 600);
+        } else if (activeStage.id === 'legend_21_2' || activeStage.id === 'legend_49_1') {
+          setTimeout(() => setActiveStoryKey('legend_ending'), 600);
+        } else if (activeStage.id === 'aku_realm_3_5' || activeStage.id === 'aku_realm_5') {
+          setTimeout(() => setActiveStoryKey('aku_ending'), 600);
         }
       }
 
@@ -294,6 +298,12 @@ export default function App() {
                 onResetData={handleResetData}
                 onOpenUpdateHistory={() => setShowUpdateHistory(true)}
                 onOpenDevMode={() => setShowDevModal(true)}
+                isLegendCleared={
+                  !!profile.hasClearedFilibuster ||
+                  !!profile.clearedStages['legend_21_2'] ||
+                  !!profile.clearedStages['legend_49_1'] ||
+                  !!profile.clearedStages['legend_12_3']
+                }
               />
             )}
 

@@ -2259,19 +2259,20 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
   },
   {
     id: 'cat_ancient_cyclone_drop',
-    name: 'ネコエンシェント',
-    description: '原初の暴風『エンシェントサイクロン降臨』制覇の証として目覚めた古代の神官。太古の呪いを無効化し、古代種・浮いてる敵に対してめっぽう強くクリティカルを叩き込む！',
     rarity: 'super_rare',
-    cost: 1650,
+    unlockMethod: 'stage_reward',
+    requiredStageId: 'advent_ancient_cyclone_1',
+    unlockHint: 'エンシェントサイクロン降臨クリアで獲得',
     forms: [
       {
-        formIndex: 0,
         name: 'ネコエンシェント',
+        jpName: 'ネコエンシェント',
         description: '太古の化石石板を携えた神聖なるネコ。古代の英知で古代種にめっぽう強く、高確率でクリティカル！',
         hp: 38000,
         attackPower: 9200,
         attackRange: 240,
         attackSpeed: 1.2,
+        attackWindup: 0.25,
         attackType: 'area',
         speed: 36,
         knockbacks: 3,
@@ -2285,13 +2286,14 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         }
       },
       {
-        formIndex: 1,
         name: '古代神ネコ・プライマル',
+        jpName: '古代神ネコ・プライマル',
         description: '進化によって始原の神性を解放した古代神。超絶破壊力の琥珀光線を放ち、古代の呪いを寄せ付けない！',
         hp: 54000,
         attackPower: 14500,
         attackRange: 280,
         attackSpeed: 1.4,
+        attackWindup: 0.22,
         attackType: 'area',
         speed: 40,
         knockbacks: 4,
@@ -2305,13 +2307,14 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         }
       },
       {
-        formIndex: 2,
         name: '覚醒古代神ネコ・ゼウス',
+        jpName: '覚醒古代神ネコ・ゼウス',
         description: '第三形態！太古の創世雷を纏いし最高神。秒間2回の超高速連撃と50%クリティカルで全ての古代種と暴風神を屠る！',
         hp: 76000,
         attackPower: 21000,
         attackRange: 320,
         attackSpeed: 1.8,
+        attackWindup: 0.2,
         attackType: 'area',
         speed: 45,
         knockbacks: 5,
@@ -3975,6 +3978,25 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
   // =========================================================================
   // CYCLONE & RELIC/LEGEND BOSSES (降臨サイクロン＆新敵キャラクター)
   // =========================================================================
+  enemy_white_cyclone: {
+    id: 'enemy_white_cyclone',
+    name: 'ホワイトサイクロン',
+    description: '【降臨BOSS / 浮いてる敵 / 秒間8回超絶高火力】元祖・白き暴風神！秒間8回の超高速突風（攻撃力8800）で壁を瞬殺する！浮いてる敵対策の停止・ふっとばし妨害で足止めせよ！',
+    hp: 1400000,
+    attackPower: 8800,
+    attackRange: 90,
+    attackSpeed: 8.0,
+    attackWindup: 0.05,
+    speed: 15,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 30000,
+    rewardXp: 80000,
+    traits: ['white', 'floating', 'boss'],
+    spriteType: 'enemy_white_cyclone',
+    scale: 2.7,
+    isBoss: true,
+  },
   enemy_red_cyclone: {
     id: 'enemy_red_cyclone',
     name: 'レッドサイクロン',

@@ -3433,8 +3433,33 @@ function renderSpriteSvg(
       );
 
     // =========================================================================
-    // ADVENT BOSS CYCLONES (レッド・ブラック・スペース・アンデッド)
+    // ADVENT BOSS CYCLONES (ホワイト・レッド・ブラック・スペース・アンデッド)
     // =========================================================================
+    case 'enemy_white_cyclone':
+      return (
+        <svg width="110" height="110" viewBox="0 0 110 110" className="drop-shadow-2xl">
+          {/* Outer White/Silver Raging Gale */}
+          <circle cx="55" cy="55" r="50" fill="none" stroke="#e2e8f0" strokeWidth="6" strokeDasharray="16,8" className="animate-spin" />
+          {/* Razor Whirl Blades */}
+          <path d="M 55 12 Q 80 25 75 55 Q 70 85 55 98 Q 30 85 35 55 Q 40 25 55 12 Z" fill="#f8fafc" stroke="#94a3b8" strokeWidth="3" />
+          <path d="M 12 55 Q 25 30 55 35 Q 85 40 98 55 Q 85 80 55 75 Q 25 70 12 55 Z" fill="#cbd5e1" opacity="0.8" />
+          {/* Terrifying Cyclone Core Face */}
+          <circle cx="55" cy="55" r="26" fill="#e2e8f0" stroke="#475569" strokeWidth="4" />
+          {/* Sharp White Gale Eyes */}
+          <circle cx="45" cy="48" r="5" fill="#38bdf8" />
+          <circle cx="65" cy="48" r="5" fill="#38bdf8" />
+          <circle cx="45" cy="48" r="2.5" fill="#0f172a" />
+          <circle cx="65" cy="48" r="2.5" fill="#0f172a" />
+          {/* Gnashing Whirlpool Maw */}
+          <polygon points="40,64 45,72 50,64" fill="#0f172a" />
+          <polygon points="50,64 55,72 60,64" fill="#0f172a" />
+          <polygon points="60,64 65,72 70,64" fill="#0f172a" />
+          {isAttacking && (
+            <ellipse cx="55" cy="55" rx="52" ry="52" fill="none" stroke="#e2e8f0" strokeWidth="8" className="animate-ping" />
+          )}
+        </svg>
+      );
+
     case 'enemy_red_cyclone':
       return (
         <svg width="110" height="110" viewBox="0 0 110 110" className="drop-shadow-2xl">
