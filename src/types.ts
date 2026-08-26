@@ -284,6 +284,9 @@ export type ChapterId =
   | 'real_legend_11'
   | 'real_legend_12'
   | 'real_legend_13'
+  | 'matatabi_stages'
+  | 'catseye_stages'
+  | 'manic_crazed_stages'
   | 'aku_realm'
   | 'aku_realm_1'
   | 'aku_realm_2'
@@ -386,7 +389,7 @@ export interface BattleActiveItems {
 
 export interface ChapterDefinition {
   id: ChapterId;
-  category: 'japan' | 'future' | 'cosmos' | 'legend' | 'crazed' | 'special' | 'advent';
+  category: 'japan' | 'future' | 'cosmos' | 'legend' | 'crazed' | 'special' | 'advent' | 'real_legend' | 'matatabi' | 'catseye' | 'manic';
   chapterNumber: number;
   name: string;
   jpName: string;
@@ -413,9 +416,10 @@ export interface PlayerUpgrades {
 
 export interface PlayerCatProgress {
   catId: string;
-  level: number; // 1 to 20
+  level: number; // 1 to 40
   unlocked: boolean;
-  activeForm: number; // 0 or 1
+  activeForm: number; // 0: 1st, 1: 2nd, 2: 3rd (True Form)
+  maxLevelUnlocked?: number; // 30 by default, up to 40 via Catseyes!
 }
 
 export interface DevModeSettings {
@@ -589,6 +593,10 @@ export interface PlayerProfile {
   claimedMissions?: Record<string, number>; // missionId -> claimedTimestamp
   claimedAchievements?: Record<string, number>; // achievementId -> claimedTimestamp
   stats?: PlayerStats;
+  catseyes?: Record<string, number>; // ex, rare, super_rare, uber_rare, legend_rare
+  catfruits?: Record<string, number>; // green, purple, red, blue, yellow, rainbow, ancient, aku, seeds
+  unlockedTrueForms?: Record<string, boolean>; // catId -> boolean (マタタビ進化・大狂乱進化)
+  inputMode?: 'touch' | 'gamepad';
 }
 
 

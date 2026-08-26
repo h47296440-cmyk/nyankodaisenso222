@@ -1538,8 +1538,9 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   );
 
   const handlePanCamera = useCallback((deltaX: number) => {
-    setCameraX((prev) => Math.max(0, Math.min(1000, prev + deltaX)));
-  }, []);
+    const maxScroll = Math.max(0, battlefieldWidth - 400);
+    setCameraX((prev) => Math.max(0, Math.min(maxScroll, prev + deltaX)));
+  }, [battlefieldWidth]);
 
   const gamepadState = useGamepad(
     {

@@ -18,6 +18,8 @@ interface CatBaseScreenProps {
   onOpenGamatoto: () => void;
   onOpenStorage: () => void;
   onOpenMissions: () => void;
+  onOpenRecords?: () => void;
+  onOpenBgm?: () => void;
   onOpenGiftCode: () => void;
   onOpenAnnouncements?: () => void;
   onOpenMenu: () => void;
@@ -50,6 +52,8 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
   onOpenGamatoto,
   onOpenStorage,
   onOpenMissions,
+  onOpenRecords,
+  onOpenBgm,
   onOpenGiftCode,
   onOpenAnnouncements,
   onOpenMenu,
@@ -152,8 +156,31 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
           </h1>
         </div>
 
-        {/* Right Info: Promo Banner & XP Counter */}
+        {/* Right Info: Input Mode Switcher, Promo Banner & XP Counter */}
         <div className="flex items-center gap-2 sm:gap-4">
+          {/* Input Mode Toggle (Gamepad vs Touch/Keyboard) */}
+          <button
+            id="btn-toggle-input-mode"
+            onClick={() => {
+              audio.playClick();
+              if (onUpdateProfile) {
+                onUpdateProfile((prev) => ({
+                  ...prev,
+                  inputMode: prev.inputMode === 'gamepad' ? 'touch' : 'gamepad',
+                }));
+              }
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border-2 transition-all shadow active:scale-95 ${
+              profile.inputMode === 'gamepad'
+                ? 'bg-gradient-to-r from-indigo-700 to-purple-800 text-yellow-300 border-yellow-400 ring-2 ring-purple-400 animate-pulse'
+                : 'bg-stone-900/90 text-amber-200 border-amber-600/80 hover:bg-stone-800'
+            }`}
+            title="操作モード切替（コントローラー ⇄ タッチ・キーボード）"
+          >
+            <span>{profile.inputMode === 'gamepad' ? '🎮' : '📱'}</span>
+            <span>{profile.inputMode === 'gamepad' ? 'コントローラー操作' : 'タッチ・キーボード'}</span>
+          </button>
+
           {/* Platinum Ticket Promo Badge */}
           <div className="hidden md:flex items-center gap-1.5 bg-gradient-to-r from-pink-600 to-rose-700 border-2 border-pink-300 px-2.5 py-0.5 rounded-full shadow-md text-white text-[11px] font-black">
             <span className="bg-yellow-300 text-pink-900 text-[9px] px-1 py-0.2 rounded font-extrabold">いまだけ!!</span>
@@ -380,6 +407,46 @@ export const CatBaseScreen: React.FC<CatBaseScreenProps> = ({
                 </div>
                 <span className="text-[9px] sm:text-[10px] font-black text-amber-100 tracking-tighter mt-0.5 drop-shadow">
                   ミッション
+                </span>
+              </button>
+
+              {/* 記録 (Player Records / Combat Stats) */}
+              <button
+                id="btn-sub-records"
+                onClick={() => {
+                  audio.playClick();
+                  if (onOpenRecords) onOpenRecords();
+                }}
+                className="relative flex flex-col items-center justify-center p-0.5 hover:scale-110 transition-transform group"
+              >
+                <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-b from-teal-100 via-emerald-200 to-teal-300 border-2 border-emerald-800 shadow-md flex items-center justify-center">
+                  <span className="text-xl sm:text-2xl">📊</span>
+                  <div className="absolute -top-1.5 -right-1.5 px-1 py-0.2 rounded-full bg-emerald-600 border border-white text-white text-[8px] font-black shadow">
+                    戦歴
+                  </div>
+                </div>
+                <span className="text-[9px] sm:text-[10px] font-black text-amber-100 tracking-tighter mt-0.5 drop-shadow">
+                  記録
+                </span>
+              </button>
+
+              {/* BGM鑑賞 (Sound Room) */}
+              <button
+                id="btn-sub-bgm"
+                onClick={() => {
+                  audio.playClick();
+                  if (onOpenBgm) onOpenBgm();
+                }}
+                className="relative flex flex-col items-center justify-center p-0.5 hover:scale-110 transition-transform group"
+              >
+                <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-b from-purple-100 to-indigo-200 border-2 border-purple-800 shadow-md flex items-center justify-center">
+                  <span className="text-xl sm:text-2xl">🎵</span>
+                  <div className="absolute -top-1.5 -right-1.5 px-1 py-0.2 rounded-full bg-purple-600 border border-white text-white text-[8px] font-black shadow">
+                    曲
+                  </div>
+                </div>
+                <span className="text-[9px] sm:text-[10px] font-black text-amber-100 tracking-tighter mt-0.5 drop-shadow">
+                  BGM
                 </span>
               </button>
 

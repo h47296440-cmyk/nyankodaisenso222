@@ -393,6 +393,8 @@ export default function App() {
                 onOpenGamatoto={() => setShowGamatotoModal(true)}
                 onOpenStorage={() => setShowStorageModal(true)}
                 onOpenMissions={() => setShowMissionsModal(true)}
+                onOpenRecords={() => setShowPlayerRecordsModal(true)}
+                onOpenBgm={() => setShowBgmJukeboxModal(true)}
                 onOpenGiftCode={() => setShowGiftCodeModal(true)}
                 onOpenAnnouncements={() => setShowAnnouncementsModal(true)}
                 onOpenMenu={() => setShowMenuModal(true)}

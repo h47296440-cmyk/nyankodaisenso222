@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import {
   ChapterDefinition,
   StageDefinition,
@@ -21,9 +21,12 @@ import {
   Info,
   Shield,
   Flame,
+  Gamepad2,
+  Tv,
 } from 'lucide-react';
 import { audio } from '../../utils/audio';
 import { JapanMapCanvas } from './JapanMapCanvas';
+import { AncientPearlMovieModal } from '../story/AncientPearlMovieModal';
 
 interface StageSelectScreenProps {
   profile: PlayerProfile;
@@ -63,6 +66,8 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
     'にゃんコンボ図鑑に表示されたにゃんコンボの名前部分をダブルタップすると自動でセット出来て便利にゃ'
   );
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
+  const [showAncientPearlMovie, setShowAncientPearlMovie] = useState<boolean>(false);
+  const [hasWatchedMovie, setHasWatchedMovie] = useState<boolean>(false);
 
   // Category filter for the chapter select menu
   const [activeCategoryTab, setActiveCategoryTab] = useState<'all' | 'japan' | 'future' | 'cosmos' | 'legend' | 'special' | 'crazed' | 'advent'>('all');
@@ -193,6 +198,10 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
         return checkChapterCleared('aku_realm_1');
       case 'aku_realm_3':
         return checkChapterCleared('aku_realm_2');
+      case 'matatabi_stages':
+      case 'catseye_stages':
+      case 'manic_crazed_stages':
+        return checkChapterCleared('real_legend_1') || checkChapterCleared('real_legend') || checkChapterCleared('legend_21');
       case 'crazed_event':
       case 'crazed':
         return checkChapterCleared('japan_1');
@@ -411,19 +420,180 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
   };
 
   // Navigate prev / next stage
-  const handlePrevStage = () => {
+  const handlePrevStage = useCallback(() => {
     if (currentIndex > 0) {
       audio.playClick();
       setSelectedStageId(rawActiveStages[currentIndex - 1].id);
     }
-  };
+  }, [currentIndex, rawActiveStages]);
 
-  const handleNextStage = () => {
+  const handleNextStage = useCallback(() => {
     if (currentIndex < rawActiveStages.length - 1) {
       audio.playClick();
       setSelectedStageId(rawActiveStages[currentIndex + 1].id);
     }
-  };
+  }, [currentIndex, rawActiveStages]);
+
+  // Handle chapter entry with Chapter 10 Ancient Pearl Movie trigger
+  const handleSelectChapter = useCallback((chId: ChapterId) => {
+    audio.playClick();
+    setSelectedChapterId(chId);
+    setScreenView('stage_map');
+    if (chId === 'real_legend_10' && !hasWatchedMovie) {
+      setShowAncientPearlMovie(true);
+      setHasWatchedMovie(true);
+    }
+  }, [hasWatchedMovie]);
+
+  // Gamepad & Keyboard Controller Navigation outside battle
+  useEffect(() => {
+    let lastButtonPressTime = 0;
+    const DEBOUNCE_MS = 220;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't capture when modals are open
+      if (showHelpModal || showAncientPearlMovie) return;
+
+      if (screenView === 'chapter_select') {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          const curIdx = visibleChaptersWithStatus.findIndex((c) => c.chapter.id === selectedChapterId);
+          if (curIdx < visibleChaptersWithStatus.length - 1) {
+            setSelectedChapterId(visibleChaptersWithStatus[curIdx + 1].chapter.id);
+            audio.playClick();
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          const curIdx = visibleChaptersWithStatus.findIndex((c) => c.chapter.id === selectedChapterId);
+          if (curIdx > 0) {
+            setSelectedChapterId(visibleChaptersWithStatus[curIdx - 1].chapter.id);
+            audio.playClick();
+          }
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleSelectChapter(selectedChapterId);
+        } else if (e.key === 'Escape' || e.key === 'Backspace') {
+          e.preventDefault();
+          onBackToTitle();
+        }
+      } else if (screenView === 'stage_map') {
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+          e.preventDefault();
+          handlePrevStage();
+        } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+          e.preventDefault();
+          handleNextStage();
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleDeploy();
+        } else if (e.key === 'Escape' || e.key === 'Backspace') {
+          e.preventDefault();
+          setScreenView('chapter_select');
+        } else if (e.key === 'z' || e.key === 'Z') {
+          if (hasZombieStages) {
+            setIsZombieMode((prev) => !prev);
+            audio.playClick();
+          }
+        } else if (e.key === 'x' || e.key === 'X') {
+          if (currentChapter.category === 'legend' && checkChapterCleared(currentChapter.id)) {
+            setIsExtremeMode((prev) => !prev);
+            audio.playClick();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Gamepad Polling Loop
+    let animFrameId: number;
+    const pollGamepad = () => {
+      const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+      const gp = gamepads[0] || gamepads[1];
+
+      if (gp && !showHelpModal && !showAncientPearlMovie) {
+        const now = Date.now();
+        if (now - lastButtonPressTime > DEBOUNCE_MS) {
+          const dpadUp = gp.buttons[12]?.pressed || gp.axes[1] < -0.5;
+          const dpadDown = gp.buttons[13]?.pressed || gp.axes[1] > 0.5;
+          const dpadLeft = gp.buttons[14]?.pressed || gp.axes[0] < -0.5;
+          const dpadRight = gp.buttons[15]?.pressed || gp.axes[0] > 0.5;
+          const btnA = gp.buttons[0]?.pressed; // Confirm / Deploy
+          const btnB = gp.buttons[1]?.pressed; // Back
+          const btnX = gp.buttons[2]?.pressed; // Zombie toggle
+          const btnY = gp.buttons[3]?.pressed; // Extreme toggle
+
+          if (screenView === 'chapter_select') {
+            if (dpadDown) {
+              const curIdx = visibleChaptersWithStatus.findIndex((c) => c.chapter.id === selectedChapterId);
+              if (curIdx < visibleChaptersWithStatus.length - 1) {
+                setSelectedChapterId(visibleChaptersWithStatus[curIdx + 1].chapter.id);
+                audio.playClick();
+                lastButtonPressTime = now;
+              }
+            } else if (dpadUp) {
+              const curIdx = visibleChaptersWithStatus.findIndex((c) => c.chapter.id === selectedChapterId);
+              if (curIdx > 0) {
+                setSelectedChapterId(visibleChaptersWithStatus[curIdx - 1].chapter.id);
+                audio.playClick();
+                lastButtonPressTime = now;
+              }
+            } else if (btnA) {
+              handleSelectChapter(selectedChapterId);
+              lastButtonPressTime = now;
+            } else if (btnB) {
+              onBackToTitle();
+              lastButtonPressTime = now;
+            }
+          } else if (screenView === 'stage_map') {
+            if (dpadLeft) {
+              handlePrevStage();
+              lastButtonPressTime = now;
+            } else if (dpadRight) {
+              handleNextStage();
+              lastButtonPressTime = now;
+            } else if (btnA) {
+              handleDeploy();
+              lastButtonPressTime = now;
+            } else if (btnB) {
+              setScreenView('chapter_select');
+              lastButtonPressTime = now;
+            } else if (btnX && hasZombieStages) {
+              setIsZombieMode((prev) => !prev);
+              audio.playClick();
+              lastButtonPressTime = now;
+            } else if (btnY && currentChapter.category === 'legend' && checkChapterCleared(currentChapter.id)) {
+              setIsExtremeMode((prev) => !prev);
+              audio.playClick();
+              lastButtonPressTime = now;
+            }
+          }
+        }
+      }
+
+      animFrameId = requestAnimationFrame(pollGamepad);
+    };
+
+    animFrameId = requestAnimationFrame(pollGamepad);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      cancelAnimationFrame(animFrameId);
+    };
+  }, [
+    screenView,
+    visibleChaptersWithStatus,
+    selectedChapterId,
+    showHelpModal,
+    showAncientPearlMovie,
+    handleSelectChapter,
+    handlePrevStage,
+    handleNextStage,
+    handleDeploy,
+    hasZombieStages,
+    currentChapter,
+    onBackToTitle,
+  ]);
 
   // Treasure status helper
   const getTreasureStatus = (stageId: string): TreasureQuality => {
@@ -642,9 +812,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                     id={`chapter-card-${ch.id}`}
                     onClick={() => {
                       if (!isNextLocked) {
-                        audio.playClick();
-                        setSelectedChapterId(ch.id);
-                        setScreenView('stage_map'); // Transition to JapanMapCanvas!
+                        handleSelectChapter(ch.id);
                       }
                     }}
                     className={`group relative w-full rounded-2xl border-[3.5px] p-3 sm:p-4 flex items-center justify-between gap-3 shadow-[0_6px_0_rgba(0,0,0,0.6)] active:translate-y-1 active:shadow-[0_2px_0_rgba(0,0,0,0.6)] transition-all ${
@@ -860,6 +1028,22 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                 >
                   <Flame size={14} className={isExtremeMode ? 'text-yellow-300 animate-bounce' : 'text-orange-400'} />
                   <span>{isExtremeMode ? 'エクストリーム(1.5倍)ON！' : 'エクストリーム(1.5倍)'}</span>
+                </button>
+              )}
+
+              {/* Ancient Pearl Special Movie Button (Available on Real Legend Ch 10) */}
+              {(currentChapter.id === 'real_legend_10' || currentChapter.category === 'real_legend') && (
+                <button
+                  id="btn-open-ancient-pearl-movie"
+                  onClick={() => {
+                    audio.playClick();
+                    setShowAncientPearlMovie(true);
+                  }}
+                  className="px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shadow-lg border-2 active:scale-95 bg-gradient-to-r from-teal-700 via-cyan-800 to-blue-900 text-cyan-100 border-cyan-400 hover:brightness-110 animate-pulse"
+                  title="古代の真珠 特別アニメーション再生"
+                >
+                  <Tv size={14} className="text-yellow-300" />
+                  <span>🎬 古代の真珠ムービー</span>
                 </button>
               )}
             </div>
@@ -1194,6 +1378,12 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
           </div>
         </div>
       )}
+
+      {/* 4. ANCIENT PEARL MOVIE ANIMATION MODAL (Chapter 10 Story) */}
+      <AncientPearlMovieModal
+        isOpen={showAncientPearlMovie}
+        onClose={() => setShowAncientPearlMovie(false)}
+      />
     </div>
   );
 };

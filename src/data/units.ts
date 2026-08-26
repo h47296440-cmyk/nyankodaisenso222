@@ -1129,6 +1129,23 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         cooldown: 2.0,
         scale: 1.05,
         spriteType: 'cat_crazed_builder',
+      },
+      {
+        name: '大狂乱のネコモヒカン',
+        jpName: '大狂乱のネコモヒカン',
+        description: '【第三形態 / 大狂乱降臨報酬】極限の狂気を纏ったモヒカン。神速の足で最前線へ突進し鉄壁の肉壁となる！',
+        hp: 1200,
+        attackPower: 220,
+        attackRange: 95,
+        attackSpeed: 1.8,
+        attackWindup: 0.1,
+        speed: 95,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 75,
+        cooldown: 2.0,
+        scale: 1.1,
+        spriteType: 'cat_crazed_mohawk',
       }
     ]
   },
@@ -1173,6 +1190,23 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         cooldown: 2.4,
         scale: 1.15,
         spriteType: 'cat_crazed_wall',
+      },
+      {
+        name: '大狂乱のゴムネコ',
+        jpName: '大狂乱のゴムネコ',
+        description: '【第三形態 / 大狂乱降臨報酬 / 最強耐久壁】超高速で前線へ駆け込みボスの猛攻を耐え抜く究極の量産盾！',
+        hp: 5200,
+        attackPower: 80,
+        attackRange: 85,
+        attackSpeed: 1.1,
+        attackWindup: 0.18,
+        speed: 85,
+        knockbacks: 1,
+        attackType: 'single',
+        cost: 150,
+        cooldown: 2.2,
+        scale: 1.2,
+        spriteType: 'cat_crazed_eraser',
       }
     ]
   },
@@ -1219,6 +1253,24 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         scale: 1.15,
         spriteType: 'cat_crazed_brave',
         traitBonus: { trait: 'red', multiplier: 3.0, effect: 'strong' },
+      },
+      {
+        name: '大狂乱の暗黒ネコ',
+        jpName: '大狂乱の暗黒ネコ',
+        description: '【第三形態 / 大狂乱降臨報酬 / 赤い敵に超めっぽう強い】暗黒闘気を纏った狂戦士。赤い敵を猛スピードで叩き斬る！',
+        hp: 4200,
+        attackPower: 1100,
+        attackRange: 110,
+        attackSpeed: 1.6,
+        attackWindup: 0.15,
+        speed: 70,
+        knockbacks: 2,
+        attackType: 'single',
+        cost: 300,
+        cooldown: 3.8,
+        scale: 1.2,
+        spriteType: 'cat_crazed_dark',
+        traitBonus: { trait: 'red', multiplier: 3.5, effect: 'strong' },
       }
     ]
   },
@@ -1263,6 +1315,23 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         cooldown: 4.2,
         scale: 1.15,
         spriteType: 'cat_crazed_giraffe',
+      },
+      {
+        name: '大狂乱のライオン',
+        jpName: '大狂乱のライオン',
+        description: '【第三形態 / 大狂乱降臨報酬 / 超神速範囲連打】超音速で駆け抜ける百獣の王。範囲攻撃の怒涛ラッシュで敵城を瞬殺！',
+        hp: 4600,
+        attackPower: 580,
+        attackRange: 95,
+        attackSpeed: 4.2,
+        attackWindup: 0.04,
+        speed: 150,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 750,
+        cooldown: 3.8,
+        scale: 1.2,
+        spriteType: 'cat_crazed_lion',
       }
     ]
   },
@@ -1309,6 +1378,24 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         scale: 1.3,
         spriteType: 'cat_crazed_macholegs',
         waveLevel: 3,
+      },
+      {
+        name: '大狂乱のムキあしネコ',
+        jpName: '大狂乱のムキあしネコ',
+        description: '【第三形態 / 大狂乱降臨報酬 / 確定Lv4波動】筋肉美を極めし大狂乱の美脚。踏み込みから100%の確率で超長距離Lv4波動を放ち敵後衛を殲滅！',
+        hp: 5800,
+        attackPower: 2200,
+        attackRange: 240,
+        attackSpeed: 1.0,
+        attackWindup: 0.2,
+        speed: 42,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 600,
+        cooldown: 7.0,
+        scale: 1.35,
+        spriteType: 'cat_crazed_macholegs_true',
+        waveLevel: 4,
       }
     ]
   },
@@ -1353,6 +1440,23 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         cooldown: 8.5,
         scale: 1.25,
         spriteType: 'cat_crazed_ufo',
+      },
+      {
+        name: '大狂乱の天空のネコ',
+        jpName: '大狂乱の天空のネコ',
+        description: '【第三形態 / 大狂乱降臨報酬 / 超絶範囲火力】天空の巨大母艦。広範囲にメガレーザーを浴びせ敵前線を一網打尽！',
+        hp: 6200,
+        attackPower: 4800,
+        attackRange: 235,
+        attackSpeed: 0.9,
+        attackWindup: 0.25,
+        speed: 40,
+        knockbacks: 4,
+        attackType: 'area',
+        cost: 900,
+        cooldown: 7.8,
+        scale: 1.3,
+        spriteType: 'cat_crazed_flying_true',
       }
     ]
   },
@@ -1399,6 +1503,27 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         scale: 1.25,
         spriteType: 'cat_crazed_whale',
         traitBonus: { trait: 'red', multiplier: 3.0, effect: 'strong' },
+      },
+      {
+        name: '大狂乱のネコ島',
+        jpName: '大狂乱のネコ島',
+        description: '【第三形態 / 大狂乱降臨報酬 / 赤超めっぽう強い＆50%クリティカル】火山島と化した究極形態。赤い敵とメタル敵を確実に粉砕！',
+        hp: 7500,
+        attackPower: 3100,
+        attackRange: 150,
+        attackSpeed: 1.2,
+        attackWindup: 0.15,
+        speed: 48,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 735,
+        cooldown: 4.5,
+        scale: 1.3,
+        spriteType: 'cat_crazed_island_true',
+        abilities: {
+          criticalChance: 0.5,
+          strong: { traits: ['red'] }
+        }
       }
     ]
   },
@@ -1443,6 +1568,23 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         cooldown: 11.5,
         scale: 1.25,
         spriteType: 'cat_crazed_dragon',
+      },
+      {
+        name: '大狂乱のネコキングドラゴン',
+        jpName: '大狂乱のネコキングドラゴン',
+        description: '【第三形態 / 大狂乱降臨報酬 / 射程430超長距離砲】竜王の王冠を戴く最強ドラゴン。長射程高火力の一撃でボスを一撃粉砕！',
+        hp: 6400,
+        attackPower: 3200,
+        attackRange: 430,
+        attackSpeed: 0.8,
+        attackWindup: 0.3,
+        speed: 48,
+        knockbacks: 3,
+        attackType: 'single',
+        cost: 1500,
+        cooldown: 10.5,
+        scale: 1.3,
+        spriteType: 'cat_crazed_dragon_true',
       }
     ]
   },
@@ -1489,6 +1631,27 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         scale: 1.7,
         spriteType: 'cat_crazed_mythical',
         waveLevel: 3,
+      },
+      {
+        name: '大狂乱のネコジャラミ',
+        jpName: '大狂乱のネコジャラミ',
+        description: '【第三形態 / 大狂乱降臨報酬 / 40%超破滅Lv4波動＆ふっとばす】邪神と化した巨神。圧倒的HPと豪腕パンチで敵前線を吹き飛ばす！',
+        hp: 16500,
+        attackPower: 6800,
+        attackRange: 160,
+        attackSpeed: 0.7,
+        attackWindup: 0.4,
+        speed: 44,
+        knockbacks: 1,
+        attackType: 'area',
+        cost: 1950,
+        cooldown: 15.0,
+        scale: 1.8,
+        spriteType: 'cat_crazed_mythical_true',
+        abilities: {
+          wave: { level: 4, chance: 0.4 },
+          knockback: { chance: 0.5 }
+        }
       }
     ]
   },
@@ -1836,6 +1999,26 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         abilities: {
           freeze: { chance: 1.0, duration: 3.5, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie', 'metal'] }
         }
+      },
+      {
+        name: '究極時空神クロノス',
+        jpName: '究極時空神クロノス',
+        description: '【第三形態 / 全属性完全時空凍結 / 超長射程4連撃】時空の深淵へと至りし究極女神。超長射程から放つクロノスノヴァで全属性の敵の時間を4.5秒間完全に停止させる！',
+        hp: 22500,
+        attackPower: 6200,
+        attackRange: 440,
+        attackSpeed: 0.6,
+        attackWindup: 0.45,
+        speed: 38,
+        knockbacks: 5,
+        attackType: 'area',
+        cost: 3900,
+        cooldown: 23.0,
+        scale: 1.7,
+        spriteType: 'cat_chronos_true',
+        abilities: {
+          freeze: { chance: 1.0, duration: 4.5, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie', 'metal', 'white'] }
+        }
       }
     ]
   },
@@ -1886,6 +2069,28 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         abilities: {
           zombieKiller: true,
           massiveDamage: { mult: 3.5, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] }
+        }
+      },
+      {
+        name: '覚醒創生神アマテラス',
+        jpName: '覚醒創生神アマテラス',
+        description: '【第三形態 / 全属性極大超ダメージ / ゾンビキラー / バリアブレイカー】神光の真価を開放した最高太陽神。全属性の敵に4倍の超絶ダメージを与え、スターエイリアンのバリアも粉砕！',
+        hp: 24500,
+        attackPower: 7400,
+        attackRange: 415,
+        attackSpeed: 0.65,
+        attackWindup: 0.45,
+        speed: 40,
+        knockbacks: 4,
+        attackType: 'area',
+        cost: 4050,
+        cooldown: 25.0,
+        scale: 1.75,
+        spriteType: 'cat_amaterasu_true',
+        abilities: {
+          zombieKiller: true,
+          barrierBreaker: { chance: 1.0 },
+          massiveDamage: { mult: 4.0, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] }
         }
       }
     ]
@@ -1938,6 +2143,28 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
           zombieKiller: true,
           freeze: { chance: 1.0, duration: 4.0, traits: ['zombie', 'metal'] }
         }
+      },
+      {
+        name: '超絶海皇ポセイドン',
+        jpName: '超絶海皇ポセイドン',
+        description: '【第三形態 / ゾンビ・メタル5秒完全停止 / 確定クリティカル＆ゾンビキラー】大海の支配者。神速突撃でゾンビとメタルを5秒間完全停止させ、会心の一撃でメタルを一撃粉砕！',
+        hp: 26000,
+        attackPower: 7900,
+        attackRange: 310,
+        attackSpeed: 0.75,
+        attackWindup: 0.35,
+        speed: 68,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 3750,
+        cooldown: 22.0,
+        scale: 1.8,
+        spriteType: 'cat_poseidon_true',
+        abilities: {
+          zombieKiller: true,
+          criticalChance: 0.5,
+          freeze: { chance: 1.0, duration: 5.0, traits: ['zombie', 'metal'] }
+        }
       }
     ]
   },
@@ -1988,6 +2215,27 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
         abilities: {
           zombieKiller: true,
           massiveDamage: { mult: 4.0, traits: ['zombie', 'angel'] }
+        }
+      },
+      {
+        name: '豪神サルカニメガフォート',
+        jpName: '豪神サルカニメガフォート',
+        description: '【第三形態 / ゾンビと天使に極大超ダメージ / 超絶耐久＆超長射程】究極の要塞戦艦。超長射程から放つ神威ビーム連射でゾンビと天使を完全に消滅・成仏させる！',
+        hp: 29500,
+        attackPower: 8900,
+        attackRange: 460,
+        attackSpeed: 0.5,
+        attackWindup: 0.6,
+        speed: 28,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 4350,
+        cooldown: 28.0,
+        scale: 1.95,
+        spriteType: 'cat_sarukani_true',
+        abilities: {
+          zombieKiller: true,
+          massiveDamage: { mult: 4.5, traits: ['zombie', 'angel'] }
         }
       }
     ]
@@ -2093,6 +2341,298 @@ export const CAT_DEFINITIONS: CatDefinition[] = [
           massiveDamage: { mult: 3.5, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] },
           freeze: { chance: 1.0, duration: 4.0, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie', 'metal'] },
           zombieKiller: true
+        }
+      }
+    ]
+  },
+  // =========================================================================
+  // FESTIVAL EXCLUSIVE CHARACTERS (超ネコ祭＆極ネコ祭限定フェスキャラ)
+  // =========================================================================
+  {
+    id: 'cat_dark_kasli',
+    rarity: 'uber_rare',
+    unlockedAtStart: false,
+    unlockMethod: 'gacha',
+    unlockHint: '「超ネコ祭＆極ネコ祭」限定で排出！',
+    forms: [
+      {
+        name: '禍根の魔女キャスリィ',
+        jpName: '禍根の魔女キャスリィ',
+        description: '【超ネコ祭限定 / 烈波Lv.3 / 範囲攻撃】深淵の闇を司る魔女。杖から放つ呪詛の光弾が着弾点に巨大な烈波を巻き起こし、敵前線を丸ごと焼き払う！',
+        hp: 11000,
+        attackPower: 3200,
+        attackRange: 375,
+        attackSpeed: 0.6,
+        attackWindup: 0.4,
+        speed: 36,
+        knockbacks: 5,
+        attackType: 'area',
+        cost: 3950,
+        cooldown: 25.0,
+        scale: 1.45,
+        spriteType: 'cat_dark_kasli',
+        abilities: {
+          surge: { level: 3, chance: 1.0, minDistance: 200, maxDistance: 450 }
+        }
+      },
+      {
+        name: '漆黒の魔女ダークキャスリィ',
+        jpName: '漆黒の魔女ダークキャスリィ',
+        description: '【極ネコ祭限定 / 確定烈波Lv.3 / 全敵呪い / 波動・烈波無効】呪われし魔導の極致。100%の確率で超広範囲に連続大ダメージの烈波Lv.3を召喚し、敵の特殊能力を封じる呪いを付与！',
+        hp: 19500,
+        attackPower: 5800,
+        attackRange: 400,
+        attackSpeed: 0.65,
+        attackWindup: 0.35,
+        speed: 40,
+        knockbacks: 5,
+        attackType: 'area',
+        cost: 3950,
+        cooldown: 22.0,
+        scale: 1.6,
+        spriteType: 'cat_dark_kasli_evolved',
+        abilities: {
+          surge: { level: 3, chance: 1.0, minDistance: 200, maxDistance: 480 },
+          weaken: { chance: 1.0, duration: 4.0, mult: 0.5 }
+        }
+      },
+      {
+        name: '宵闇の冥界神ダークキャスリィ',
+        jpName: '宵闇の冥界神ダークキャスリィ',
+        description: '【第三形態 / 究極烈波Lv.4 / 全敵呪い＆極限火力】冥界の玉座より君臨せし破壊神。戦場全体を覆い尽くす烈波Lv.4と超絶威力で敵城ごと全てを闇に葬る！',
+        hp: 28000,
+        attackPower: 8600,
+        attackRange: 420,
+        attackSpeed: 0.7,
+        attackWindup: 0.3,
+        speed: 44,
+        knockbacks: 6,
+        attackType: 'area',
+        cost: 3950,
+        cooldown: 20.0,
+        scale: 1.7,
+        spriteType: 'cat_dark_kasli_true',
+        abilities: {
+          surge: { level: 4, chance: 1.0, minDistance: 180, maxDistance: 500 },
+          weaken: { chance: 1.0, duration: 5.0, mult: 0.5 }
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_dark_dartanyan',
+    rarity: 'uber_rare',
+    unlockedAtStart: false,
+    unlockMethod: 'gacha',
+    unlockHint: '「超ネコ祭＆極ネコ祭」限定で排出！',
+    forms: [
+      {
+        name: '黒の幼獣ダルタ',
+        jpName: '黒の幼獣ダルタ',
+        description: '【超ネコ祭限定 / 白い敵に超ダメージ / 範囲攻撃】双銃を構えた誇り高き黒き銃士。無属性（白い敵）に対して圧倒的な火力で弾幕を叩き込む！',
+        hp: 9500,
+        attackPower: 3400,
+        attackRange: 290,
+        attackSpeed: 0.85,
+        attackWindup: 0.25,
+        speed: 50,
+        knockbacks: 4,
+        attackType: 'area',
+        cost: 3600,
+        cooldown: 20.0,
+        scale: 1.35,
+        spriteType: 'cat_dark_dartanyan',
+        abilities: {
+          massiveDamage: { mult: 3.5, traits: ['white'] }
+        }
+      },
+      {
+        name: '黒獣ダークダルターニャ',
+        jpName: '黒獣ダークダルターニャ',
+        description: '【極ネコ祭限定 / 白い敵に極大超ダメージ / 超高ステータス突撃】影を纏いし伝説の銃士。超高速突撃と神速の銃撃ラッシュで白い強敵やボスを瞬殺する！',
+        hp: 18500,
+        attackPower: 6400,
+        attackRange: 325,
+        attackSpeed: 0.95,
+        attackWindup: 0.2,
+        speed: 58,
+        knockbacks: 4,
+        attackType: 'area',
+        cost: 3600,
+        cooldown: 18.0,
+        scale: 1.5,
+        spriteType: 'cat_dark_dartanyan_evolved',
+        abilities: {
+          massiveDamage: { mult: 4.0, traits: ['white'] },
+          criticalChance: 0.35
+        }
+      },
+      {
+        name: '漆黒の獣王ダークダルターニャ',
+        jpName: '漆黒の獣王ダークダルターニャ',
+        description: '【第三形態 / 白＆全属性超大ダメージ / 秒間1.2回超絶連射】百獣の王の魂を覚醒させた究極のダルターニャ。圧倒的HPと攻撃力で戦場を切り裂く！',
+        hp: 27500,
+        attackPower: 9200,
+        attackRange: 340,
+        attackSpeed: 1.1,
+        attackWindup: 0.18,
+        speed: 62,
+        knockbacks: 5,
+        attackType: 'area',
+        cost: 3600,
+        cooldown: 16.0,
+        scale: 1.6,
+        spriteType: 'cat_dark_dartanyan_true',
+        abilities: {
+          massiveDamage: { mult: 4.5, traits: ['white', 'floating', 'alien', 'angel'] },
+          criticalChance: 0.45
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_gao',
+    rarity: 'uber_rare',
+    unlockedAtStart: false,
+    unlockMethod: 'gacha',
+    unlockHint: '「超ネコ祭＆極ネコ祭」限定で排出！',
+    forms: [
+      {
+        name: '幼獣ガオ',
+        jpName: '幼獣ガオ',
+        description: '【超ネコ祭限定 / 全属性にめっぽう強い＆クリティカル / 波動無効】神獣の力を秘めた幼獣。全属性の敵にめっぽう強く、高確率で会心の一撃を放つ！',
+        hp: 10500,
+        attackPower: 2900,
+        attackRange: 310,
+        attackSpeed: 0.7,
+        attackWindup: 0.35,
+        speed: 35,
+        knockbacks: 3,
+        attackType: 'area',
+        cost: 3750,
+        cooldown: 24.0,
+        scale: 1.4,
+        spriteType: 'cat_gao',
+        abilities: {
+          strong: { traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] },
+          criticalChance: 0.3
+        }
+      },
+      {
+        name: '皇獣ガオウ',
+        jpName: '皇獣ガオウ',
+        description: '【超ネコ祭限定 / 全属性に超めっぽう強い＆必ずクリティカル＆波動無効】百獣を統べる皇帝。威厳に満ちた咆哮と巨大な爪撃で属性持ちの敵を圧倒！',
+        hp: 19000,
+        attackPower: 5500,
+        attackRange: 380,
+        attackSpeed: 0.75,
+        attackWindup: 0.3,
+        speed: 38,
+        knockbacks: 4,
+        attackType: 'area',
+        cost: 3750,
+        cooldown: 21.0,
+        scale: 1.6,
+        spriteType: 'cat_gao_evolved',
+        abilities: {
+          strong: { traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] },
+          criticalChance: 0.45,
+          zombieKiller: true
+        }
+      },
+      {
+        name: '覚醒皇獣ガオウ・マスター',
+        jpName: '覚醒皇獣ガオウ・マスター',
+        description: '【第三形態 / 万物支配の覇気 / 全属性超めっぽう強い＆50%クリティカル】真の神獣へと覚醒。神聖なるオーラで全敵属性を制圧し、壊滅的ダメージを与える！',
+        hp: 29000,
+        attackPower: 8200,
+        attackRange: 410,
+        attackSpeed: 0.8,
+        attackWindup: 0.25,
+        speed: 40,
+        knockbacks: 4,
+        attackType: 'area',
+        cost: 3750,
+        cooldown: 19.0,
+        scale: 1.7,
+        spriteType: 'cat_gao_true',
+        abilities: {
+          strong: { traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie', 'white'] },
+          criticalChance: 0.5,
+          zombieKiller: true
+        }
+      }
+    ]
+  },
+  {
+    id: 'cat_mitama',
+    rarity: 'uber_rare',
+    unlockedAtStart: false,
+    unlockMethod: 'gacha',
+    unlockHint: '「超ネコ祭＆極ネコ祭」限定で排出！',
+    forms: [
+      {
+        name: '巫女姫ミタマ',
+        jpName: '巫女姫ミタマ',
+        description: '【超ネコ祭限定 / 全属性の敵の動きを遅くする / 打たれ強い】神聖な鈴を鳴らし邪気を払う巫女。属性を持つすべての敵の動きを遅くし前線を完全に維持する！',
+        hp: 13000,
+        attackPower: 2400,
+        attackRange: 330,
+        attackSpeed: 0.65,
+        attackWindup: 0.4,
+        speed: 30,
+        knockbacks: 8,
+        attackType: 'area',
+        cost: 3850,
+        cooldown: 25.0,
+        scale: 1.4,
+        spriteType: 'cat_mitama',
+        abilities: {
+          slow: { chance: 1.0, duration: 3.5, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] },
+          resist: { traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] }
+        }
+      },
+      {
+        name: '白無垢のミタマ',
+        jpName: '白無垢のミタマ',
+        description: '【超ネコ祭限定 / 全属性の敵を極大遅鈍＆超打たれ強い / 波動無効】白無垢を纏いし神の化身。超長射程から舞い散る花吹雪で全属性の敵を永久に足止め！',
+        hp: 22000,
+        attackPower: 4800,
+        attackRange: 390,
+        attackSpeed: 0.7,
+        attackWindup: 0.35,
+        speed: 32,
+        knockbacks: 10,
+        attackType: 'area',
+        cost: 3850,
+        cooldown: 22.0,
+        scale: 1.6,
+        spriteType: 'cat_mitama_evolved',
+        abilities: {
+          slow: { chance: 1.0, duration: 4.5, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] },
+          resist: { traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] }
+        }
+      },
+      {
+        name: '聖魔浄化神ミタマ',
+        jpName: '聖魔浄化神ミタマ',
+        description: '【第三形態 / 全属性完全無力化 / 超打たれ強い＆攻撃力低下】神聖浄化の光で全属性の敵を鈍足＆攻撃力半減にし、味方前線を絶対に崩させない究極守護神！',
+        hp: 31000,
+        attackPower: 6800,
+        attackRange: 410,
+        attackSpeed: 0.75,
+        attackWindup: 0.3,
+        speed: 34,
+        knockbacks: 12,
+        attackType: 'area',
+        cost: 3850,
+        cooldown: 20.0,
+        scale: 1.7,
+        spriteType: 'cat_mitama_true',
+        abilities: {
+          slow: { chance: 1.0, duration: 5.0, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie', 'white'] },
+          weaken: { chance: 1.0, duration: 5.0, mult: 0.5, traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie'] },
+          resist: { traits: ['red', 'floating', 'black', 'alien', 'angel', 'zombie', 'white'] }
         }
       }
     ]
@@ -4727,25 +5267,25 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
   enemy_ancient_zero: {
     id: 'enemy_ancient_zero',
     name: '真・古代神エンシェント・ゼロ（始原の絶対支配者）',
-    description: '【エクストリーム太古の力 裏ボス / 古代種 / 浮いてる敵 / 神の烈波 / 50%クリティカル】太古の時空の裂け目より顕現せし創造と終焉の最高神！体力6,800,000、攻撃力48,000（秒間2.2回連撃）、射程460から黄金の神雷烈波Lv.4を放ち、踏み込む猫軍団を一瞬で無に帰す！',
-    hp: 6800000,
-    attackPower: 48000,
-    attackRange: 460,
-    attackSpeed: 2.2,
-    attackWindup: 0.12,
-    speed: 38,
+    description: '【エクストリーム太古の力 裏ボス / 古代種 / 浮いてる敵 / 神の烈波 / 渾身の一撃】太古の時空の裂け目より顕現せし創造と終焉の最高神！長時間の神雷チャージから繰り出される破滅の烈波は戦場を揺るがすが、攻撃頻度が調整され壁キャラの生産タイミングで対抗可能となった！',
+    hp: 3800000,
+    attackPower: 32000,
+    attackRange: 440,
+    attackSpeed: 0.32, // 約3.1秒に1回の攻撃頻度に調整（壁生産で十分対応可能）
+    attackWindup: 0.75, // 0.75秒の大溜めモーション
+    speed: 18,
     knockbacks: 8,
     attackType: 'area',
     rewardMoney: 100000,
     rewardXp: 500000,
     traits: ['white', 'floating', 'boss'],
     spriteType: 'enemy_ancient_zero',
-    scale: 3.5,
+    scale: 3.2,
     isBoss: true,
     abilities: {
-      criticalChance: 0.50,
-      surge: { level: 4, chance: 0.8 },
-      wave: { level: 3, chance: 0.5 }
+      criticalChance: 0.30,
+      surge: { level: 3, chance: 0.6, minDistance: 150, maxDistance: 450 },
+      wave: { level: 2, chance: 0.35 }
     }
   }
 };

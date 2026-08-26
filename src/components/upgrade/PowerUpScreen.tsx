@@ -38,13 +38,82 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
     unlocked: false,
     activeForm: 0,
   };
-  const hasClearedAncientPower = !!profile.clearedStages?.['legend_21_2'];
+  const hasClearedAncientPower = !!profile.clearedStages?.['legend_21_2'] || !!profile.clearedStages?.['real_legend_1_1'];
   const hasUnlockedLv30 = !!profile.hasClearedFilibuster && hasClearedAncientPower;
-  const maxLevel = hasUnlockedLv30 ? 30 : profile.hasClearedFilibuster ? 25 : 20;
+  const baseMaxLevel = hasUnlockedLv30 ? 30 : profile.hasClearedFilibuster ? 25 : 20;
+  const catMaxLevel = Math.max(baseMaxLevel, catProgress.maxLevelUnlocked || baseMaxLevel);
+  const maxLevel = Math.min(40, catMaxLevel);
   const currentForm = selectedCatDef.forms[catProgress.activeForm || 0] || selectedCatDef.forms[0];
   const catLevelCost = getCatLevelUpCost(selectedCatDef.rarity, catProgress.level);
   const canLevelUpCat =
     catProgress.unlocked && (isInfiniteXp || profile.xp >= catLevelCost) && catProgress.level < maxLevel;
+  const canUseCatseye = catProgress.unlocked && catProgress.level >= 30 && maxLevel < 40;
+
+  // Catseye use handler
+  const handleUseCatseye = () => {
+    if (!canUseCatseye) {
+      if (catProgress.level < 30) {
+        alert('キャッツアイは Lv.30 に到達したキャラクターにのみ使用できるにゃ！');
+      } else if (maxLevel >= 40) {
+        alert('このキャラクターは既にキャッツアイで最大上限(Lv.40)まで解放済みだにゃ！');
+      }
+      return;
+    }
+
+    const rarityKey = selectedCatDef.rarity;
+    const catseyeCount = profile.catseyes?.[rarityKey] ?? (isInfiniteXp ? 99 : 5); // default supply or from stages
+
+    audio.playVictory();
+    onUpdateProfile((prev) => {
+      const cur = prev.cats[selectedCatId] || { catId: selectedCatId, level: 30, unlocked: true, activeForm: 0 };
+      const nextMax = Math.min(40, (cur.maxLevelUnlocked || 30) + 1);
+      const updatedCatseyes = prev.catseyes
+        ? { ...prev.catseyes, [rarityKey]: Math.max(0, (prev.catseyes[rarityKey] || 0) - 1) }
+        : undefined;
+
+      return {
+        ...prev,
+        catseyes: updatedCatseyes,
+        cats: {
+          ...prev.cats,
+          [selectedCatId]: {
+            ...cur,
+            maxLevelUnlocked: nextMax,
+          },
+        },
+      };
+    });
+  };
+
+  // True form (第3形態) Evolution Handler
+  const handleEvolveTrueForm = () => {
+    if (selectedCatDef.forms.length < 3) {
+      alert('このキャラクターには第3形態が存在しないにゃ！');
+      return;
+    }
+    if (catProgress.level < 30) {
+      alert('第3形態への進化には Lv.30 が必要だにゃ！');
+      return;
+    }
+    audio.playVictory();
+    onUpdateProfile((prev) => {
+      const cur = prev.cats[selectedCatId] || { catId: selectedCatId, level: 30, unlocked: true, activeForm: 0 };
+      return {
+        ...prev,
+        unlockedTrueForms: {
+          ...prev.unlockedTrueForms,
+          [selectedCatId]: true,
+        },
+        cats: {
+          ...prev.cats,
+          [selectedCatId]: {
+            ...cur,
+            activeForm: 2, // 3rd Form!
+          },
+        },
+      };
+    });
+  };
 
   // Base upgrades list
   const baseSkills: { key: keyof PlayerUpgrades; name: string; desc: string; icon: string }[] = [
@@ -596,18 +665,47 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
             );
           })()}
 
-          {/* Form Toggle Button for Evolved Cats (第1形態 ⇄ 第2形態 ⇄ 第3形態) */}
+          {/* Catseye Lv 40 Cap Unlock & Form Toggle Buttons */}
           {category !== 'base_skills' && catProgress.unlocked && (
-            <button
-              onClick={handleToggleActiveForm}
-              className={`px-4 py-2 rounded-xl border-2 text-xs sm:text-sm font-black transition-all ${
-                catProgress.level >= 10
-                  ? 'bg-amber-600 hover:bg-amber-500 text-white border-amber-300 shadow'
-                  : 'bg-stone-300 text-stone-600 border-stone-400 cursor-not-allowed'
-              }`}
-            >
-              形態切替（第{(catProgress.activeForm || 0) + 1}形態）
-            </button>
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Catseye Button if Level >= 30 */}
+              {catProgress.level >= 30 && maxLevel < 40 && (
+                <button
+                  id="btn-use-catseye"
+                  onClick={handleUseCatseye}
+                  className="px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-b from-cyan-400 via-sky-500 to-blue-700 text-white font-black text-xs sm:text-sm border-2 border-cyan-200 shadow-[0_3px_0_#0369a1] active:translate-y-0.5 transition-all flex items-center gap-1.5 animate-pulse"
+                  title="キャッツアイを使用してレベル上限を解放(最大Lv.40)"
+                >
+                  <span>👁️</span>
+                  <span>キャッツアイ (上限Lv.{maxLevel + 1}へ)</span>
+                </button>
+              )}
+
+              {/* True Form Evolution Button for units with 3 forms at Lv 30 */}
+              {selectedCatDef.forms.length >= 3 && catProgress.level >= 30 && (catProgress.activeForm || 0) < 2 && (
+                <button
+                  id="btn-evolve-true-form"
+                  onClick={handleEvolveTrueForm}
+                  className="px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-600 text-stone-950 font-black text-xs sm:text-sm border-2 border-yellow-200 shadow-[0_3px_0_#b45309] active:translate-y-0.5 transition-all flex items-center gap-1.5 animate-bounce"
+                  title="マタタビで第3形態へ進化！"
+                >
+                  <span>🌟</span>
+                  <span>第3形態へマタタビ進化!!</span>
+                </button>
+              )}
+
+              {/* Form Toggle Button for Evolved Cats (第1形態 ⇄ 第2形態 ⇄ 第3形態) */}
+              <button
+                onClick={handleToggleActiveForm}
+                className={`px-3 sm:px-4 py-2 rounded-xl border-2 text-xs sm:text-sm font-black transition-all ${
+                  catProgress.level >= 10
+                    ? 'bg-amber-600 hover:bg-amber-500 text-white border-amber-300 shadow'
+                    : 'bg-stone-300 text-stone-600 border-stone-400 cursor-not-allowed'
+                }`}
+              >
+                形態切替（第{(catProgress.activeForm || 0) + 1}形態）
+              </button>
+            </div>
           )}
         </div>
 
