@@ -5306,6 +5306,240 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
       surge: { level: 3, chance: 0.6, minDistance: 150, maxDistance: 450 },
       wave: { level: 2, chance: 0.35 }
     }
+  },
+
+  // =========================================================================
+  // 日本編 第0章「起源の記録」20倍強化敵ユニット
+  // =========================================================================
+  enemy_doge_0: {
+    id: 'enemy_doge_0',
+    name: '原初のわんこ (20倍)',
+    description: '【日本編第0章 / 20倍強化】原初の時空の歪みに生息する太古のわんこ。20倍の体躯と耐久力を誇る。',
+    hp: 1800, // 90 * 20
+    attackPower: 160, // 8 * 20
+    attackRange: 80,
+    attackSpeed: 1.2,
+    attackWindup: 0.2,
+    speed: 16,
+    knockbacks: 3,
+    attackType: 'single',
+    rewardMoney: 100,
+    rewardXp: 200,
+    traits: ['white'],
+    spriteType: 'enemy_doge',
+    scale: 1.3
+  },
+  enemy_snache_0: {
+    id: 'enemy_snache_0',
+    name: '原初のにょろ (20倍)',
+    description: '【日本編第0章 / 20倍強化】にょろの先祖。20倍の生命力としなやかな動きで迫る。',
+    hp: 2000, // 100 * 20
+    attackPower: 300, // 15 * 20
+    attackRange: 90,
+    attackSpeed: 1.3,
+    attackWindup: 0.2,
+    speed: 20,
+    knockbacks: 3,
+    attackType: 'single',
+    rewardMoney: 120,
+    rewardXp: 240,
+    traits: ['white'],
+    spriteType: 'enemy_snache',
+    scale: 1.3
+  },
+  enemy_guys_0: {
+    id: 'enemy_guys_0',
+    name: '原初の例のヤツ (20倍)',
+    description: '【日本編第0章 / 20倍強化】歴史の裏で暗躍していた者たちの幻影。20倍の耐久力で壁を形成する。',
+    hp: 9000, // 450 * 20
+    attackPower: 200, // 10 * 20
+    attackRange: 95,
+    attackSpeed: 0.9,
+    attackWindup: 0.25,
+    speed: 12,
+    knockbacks: 3,
+    attackType: 'single',
+    rewardMoney: 200,
+    rewardXp: 350,
+    traits: ['white'],
+    spriteType: 'enemy_guys',
+    scale: 1.3
+  },
+  enemy_hippoe_0: {
+    id: 'enemy_hippoe_0',
+    name: '原初のカバちゃん (20倍)',
+    description: '【日本編第0章 / 20倍強化】圧倒的な20倍の巨躯を持つ古代カバ。重厚な突進と範囲攻撃で前線を粉砕する。',
+    hp: 24000, // 1200 * 20
+    attackPower: 2000, // 100 * 20
+    attackRange: 130,
+    attackSpeed: 0.6,
+    attackWindup: 0.4,
+    speed: 10,
+    knockbacks: 1,
+    attackType: 'area',
+    rewardMoney: 1500,
+    rewardXp: 3000,
+    traits: ['white', 'boss'],
+    spriteType: 'enemy_hippoe',
+    scale: 1.5,
+    isBoss: true
+  },
+  enemy_pigge_0: {
+    id: 'enemy_pigge_0',
+    name: '原初のブタヤロウ (20倍)',
+    description: '【日本編第0章 / 20倍強化】赤い闘気を激しく放つ20倍ブタ。怒涛の噛みつき連撃を繰り出す。',
+    hp: 22000, // 1100 * 20
+    attackPower: 1800, // 90 * 20
+    attackRange: 110,
+    attackSpeed: 1.0,
+    attackWindup: 0.2,
+    speed: 18,
+    knockbacks: 3,
+    attackType: 'area',
+    rewardMoney: 1200,
+    rewardXp: 2500,
+    traits: ['red'],
+    spriteType: 'enemy_pigge',
+    scale: 1.4
+  },
+  enemy_jack_0: {
+    id: 'enemy_jack_0',
+    name: '原初の一角くん (20倍)',
+    description: '【日本編第0章 / 20倍強化】赤い角に超硬質マグマを宿した古代サイ。20倍の超耐久力で突き進む。',
+    hp: 60000, // 3000 * 20
+    attackPower: 3600, // 180 * 20
+    attackRange: 90,
+    attackSpeed: 1.5,
+    attackWindup: 0.15,
+    speed: 10,
+    knockbacks: 1,
+    attackType: 'single',
+    rewardMoney: 3000,
+    rewardXp: 6000,
+    traits: ['red', 'boss'],
+    spriteType: 'enemy_jack',
+    scale: 1.5,
+    isBoss: true
+  },
+  enemy_gory_0: {
+    id: 'enemy_gory_0',
+    name: '原初のゴリさん (20倍)',
+    description: '【日本編第0章 / 20倍強化】20倍の筋力を持つ古代の暴れゴリラ。超高速の連続パンチで前線を一掃する。',
+    hp: 30000, // 1500 * 20
+    attackPower: 3000, // 150 * 20
+    attackRange: 120,
+    attackSpeed: 1.8,
+    attackWindup: 0.1,
+    speed: 26,
+    knockbacks: 4,
+    attackType: 'area',
+    rewardMoney: 1800,
+    rewardXp: 4000,
+    traits: ['white'],
+    spriteType: 'enemy_gory',
+    scale: 1.4
+  },
+  enemy_baabaa_0: {
+    id: 'enemy_baabaa_0',
+    name: '原初のメエメエ (20倍)',
+    description: '【日本編第0章 / 20倍強化】原初の草原で草を食む古代羊。もふもふの毛皮は20倍の衝撃を吸収する。',
+    hp: 16000, // 800 * 20
+    attackPower: 1600, // 80 * 20
+    attackRange: 100,
+    attackSpeed: 0.9,
+    attackWindup: 0.2,
+    speed: 14,
+    knockbacks: 3,
+    attackType: 'single',
+    rewardMoney: 800,
+    rewardXp: 1800,
+    traits: ['white'],
+    spriteType: 'enemy_baabaa',
+    scale: 1.3
+  },
+  enemy_sir_seal_0: {
+    id: 'enemy_sir_seal_0',
+    name: '原初のアザラシ (20倍)',
+    description: '【日本編第0章 / 20倍強化】紅蓮の海を泳ぎ渡る巨大アザラシ。20倍の体当たりで壁役を押し崩す。',
+    hp: 44000, // 2200 * 20
+    attackPower: 4000, // 200 * 20
+    attackRange: 130,
+    attackSpeed: 0.7,
+    attackWindup: 0.3,
+    speed: 12,
+    knockbacks: 2,
+    attackType: 'area',
+    rewardMoney: 2200,
+    rewardXp: 4500,
+    traits: ['red'],
+    spriteType: 'enemy_sir_seal',
+    scale: 1.4
+  },
+  enemy_le_boin_0: {
+    id: 'enemy_le_boin_0',
+    name: '原初のパオちゃん (20倍)',
+    description: '【日本編第0章 / 20倍強化】遠距離から20倍威力の衝撃波鼻息を連射する古代巨象。射程外からの迎撃が必須。',
+    hp: 80000, // 4000 * 20
+    attackPower: 8000, // 400 * 20
+    attackRange: 400,
+    attackSpeed: 0.4,
+    attackWindup: 0.6,
+    speed: 8,
+    knockbacks: 2,
+    attackType: 'area',
+    rewardMoney: 5000,
+    rewardXp: 10000,
+    traits: ['white', 'boss'],
+    spriteType: 'enemy_le_boin',
+    scale: 1.6,
+    isBoss: true
+  },
+  enemy_face_0: {
+    id: 'enemy_face_0',
+    name: 'カオル君・零 (20倍・原初の顔管理者)',
+    description: '【日本編第0章 最終ボス / 20倍強化】月面の地下深くに眠っていた原初の顔管理者。HP2,000,000＆攻撃力30,000！巨大な顔面が浮遊しながら圧倒的威圧感で襲い来る！',
+    hp: 1999980, // 99999 * 20
+    attackPower: 30000, // 1500 * 20
+    attackRange: 260,
+    attackSpeed: 0.35,
+    attackWindup: 0.8,
+    speed: 6,
+    knockbacks: 10,
+    attackType: 'area',
+    rewardMoney: 30000,
+    rewardXp: 100000,
+    traits: ['floating', 'boss'],
+    spriteType: 'enemy_face',
+    scale: 2.5,
+    isBoss: true
+  },
+
+  // =========================================================================
+  // ゼロフィールド 最終降臨ボス: 起源神フィリバスター・ゼロ (倍率強化なし・神級ボス)
+  // =========================================================================
+  enemy_filibuster_zero: {
+    id: 'enemy_filibuster_zero',
+    name: '起源神フィリバスター・ゼロ',
+    description: '【0章制覇で解放「ゼロフィールド」神級ボス / ※倍率強化なし / 10秒チャージ即死砲 / KB20回】原初の時空の果てに現れたフィリバスターの真なる覚醒体。10秒間の神域チャージ後に放たれる【9,999,999即死光線】は全てを無に帰す！絶え間ない連続攻撃とノックバックでにゃんこ砲や突撃キャラを駆使してチャージをリセットし続けろ！',
+    hp: 2800000,
+    attackPower: 9999999,
+    attackRange: 850,
+    attackSpeed: 0.1, // 10秒に1回
+    attackWindup: 10.0, // 10秒の大溜め即死チャージ
+    speed: 14,
+    knockbacks: 20, // 頻繁にKBしてチャージをキャンセル可能！
+    attackType: 'area',
+    rewardMoney: 60000,
+    rewardXp: 300000,
+    traits: ['alien', 'star_alien', 'floating', 'boss'],
+    spriteType: 'enemy_filibuster_zero',
+    scale: 3.2,
+    isBoss: true,
+    abilities: {
+      chargeAttack: { chargeTime: 10.0, isOneHitKill: true },
+      knockback: { chance: 1.0 },
+      surge: { level: 2, chance: 0.4, minDistance: 100, maxDistance: 500 }
+    }
   }
 };
 

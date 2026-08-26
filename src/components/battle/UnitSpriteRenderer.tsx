@@ -3147,6 +3147,70 @@ function renderSpriteSvg(
       );
 
     // =========================================================================
+    // BOSS: FILIBUSTER ZERO (起源神フィリバスター・ゼロ - 究極覚醒降臨)
+    // =========================================================================
+    case 'enemy_filibuster_zero':
+    case 'boss_filibuster_zero':
+      return (
+        <svg width="195" height="185" viewBox="0 0 195 185" className="drop-shadow-[0_0_35px_rgba(239,68,68,0.95)]">
+          {/* Outermost Primordial Cosmic Eclipse Ring */}
+          <circle cx="97" cy="90" r="85" fill="none" stroke="#f43f5e" strokeWidth="5" strokeDasharray="30,12" className="animate-spin" style={{ animationDuration: '6s' }} />
+          <circle cx="97" cy="90" r="68" fill="none" stroke="#a855f7" strokeWidth="4" strokeDasharray="18,8" className="animate-spin" style={{ animationDirection: 'reverse', animationDuration: '4s' }} />
+          <circle cx="97" cy="90" r="50" fill="none" stroke="#38bdf8" strokeWidth="3" strokeDasharray="10,5" className="animate-spin" style={{ animationDuration: '3s' }} />
+          
+          {/* Singularity Aura Tendrils */}
+          {Array.from({ length: 8 }).map((_, i) => {
+            const angle = (i * 45 * Math.PI) / 180;
+            const x1 = 97 + Math.cos(angle) * 55;
+            const y1 = 90 + Math.sin(angle) * 55;
+            const x2 = 97 + Math.cos(angle) * 78;
+            const y2 = 90 + Math.sin(angle) * 78;
+            return (
+              <line
+                key={i}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke={i % 2 === 0 ? '#ef4444' : '#c084fc'}
+                strokeWidth="4"
+                strokeLinecap="round"
+                className="animate-pulse"
+              />
+            );
+          })}
+
+          {/* Godly Dark Cosmic Relic Body Armor */}
+          <polygon points="97,12 115,46 162,54 125,85 136,134 97,108 58,134 69,85 32,54 79,46" fill="#18042b" stroke="#e11d48" strokeWidth="4.5" />
+          <polygon points="97,25 110,50 145,56 117,80 125,118 97,98 69,118 77,80 49,56 84,50" fill="#3b0764" stroke="#a855f7" strokeWidth="2.5" />
+
+          {/* Primordial Singularity Eye */}
+          <ellipse cx="97" cy="80" rx="24" ry="28" fill="#000000" stroke="#f43f5e" strokeWidth="5" />
+          <circle cx="97" cy="80" r="14" fill="#dc2626" className="animate-pulse" />
+          <circle cx="97" cy="80" r="6" fill="#fef08a" />
+          <circle cx="97" cy="80" r="2.5" fill="#ffffff" />
+
+          {/* Celestial Floating Claws / Dimensional Arms */}
+          <g transform={`rotate(${Math.sin(timer * 10) * 20} 40 95)`}>
+            <polygon points="20,82 42,70 34,108" fill="#581c87" stroke="#f43f5e" strokeWidth="3" />
+            <polygon points="12,88 24,80 18,102" fill="#ef4444" />
+          </g>
+          <g transform={`rotate(${-Math.sin(timer * 10) * 20} 155 95)`}>
+            <polygon points="175,82 153,70 161,108" fill="#581c87" stroke="#f43f5e" strokeWidth="3" />
+            <polygon points="183,88 171,80 177,102" fill="#ef4444" />
+          </g>
+
+          {/* 10s Super Divine Charging Nova Effect */}
+          {isAttacking && (
+            <g>
+              <circle cx="97" cy="80" r="60" fill="none" stroke="#ef4444" strokeWidth="10" className="animate-ping" />
+              <circle cx="97" cy="80" r="80" fill="none" stroke="#fef08a" strokeWidth="6" className="animate-ping" style={{ animationDelay: '0.2s' }} />
+            </g>
+          )}
+        </svg>
+      );
+
+    // =========================================================================
     // NEW CAT: SUMMER CAT 2026 (夏キャット2026)
     // =========================================================================
     case 'cat_summer_2026':

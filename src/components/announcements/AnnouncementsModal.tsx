@@ -21,6 +21,7 @@ export const AnnouncementsModal: React.FC<AnnouncementsModalProps> = ({
   if (!isOpen) return null;
 
   const isApologyClaimed = !!profile?.claimedApologies?.['bug_apology_750'];
+  const isBlackScreenApologyClaimed = !!profile?.claimedApologies?.['bug_apology_blackscreen_750'];
 
   const handleClaimApology = () => {
     if (isApologyClaimed) return;
@@ -32,6 +33,21 @@ export const AnnouncementsModal: React.FC<AnnouncementsModalProps> = ({
         claimedApologies: {
           ...(prev.claimedApologies || {}),
           bug_apology_750: true,
+        },
+      }));
+    }
+  };
+
+  const handleClaimBlackScreenApology = () => {
+    if (isBlackScreenApologyClaimed) return;
+    audio.playVictory();
+    if (onUpdateProfile) {
+      onUpdateProfile((prev) => ({
+        ...prev,
+        catFood: prev.catFood + 750,
+        claimedApologies: {
+          ...(prev.claimedApologies || {}),
+          bug_apology_blackscreen_750: true,
         },
       }));
     }
@@ -126,6 +142,75 @@ export const AnnouncementsModal: React.FC<AnnouncementsModalProps> = ({
 
         {/* Content Body */}
         <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-6">
+          {/* ========================================================
+              APOLOGY NOTICE SECTION 2 (Black Screen Fix 750 Cat Food)
+             ======================================================== */}
+          {(selectedCategory === 'all' || selectedCategory === 'apology') && (
+            <div
+              id="notice-blackscreen-apology"
+              className="relative rounded-2xl overflow-hidden border-2 border-red-500 bg-gradient-to-br from-red-950 via-stone-900 to-black p-4 sm:p-5 shadow-2xl"
+            >
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-2xl bg-red-600/30 border border-red-500 text-red-400 flex items-center justify-center font-black shrink-0">
+                    <ShieldAlert className="w-6 h-6 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] bg-red-600 text-white px-2 py-0.5 rounded font-black">
+                        緊急お詫び
+                      </span>
+                      <span className="text-xs text-red-300 font-mono">2026.08.26 (最新)</span>
+                    </div>
+                    <h3 className="text-base sm:text-lg font-black text-red-200">
+                      【緊急お詫び】編成・パワーアップ・出撃時の暗転不具合のお詫び
+                    </h3>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-black/60 rounded-xl p-3.5 border border-red-900/60 mb-4 text-xs sm:text-sm text-stone-200 leading-relaxed space-y-2">
+                <p className="font-bold text-red-300">
+                  プレイヤーの皆様へ
+                </p>
+                <p>
+                  編成画面、パワーアップ画面、出撃画面等へ移動した際に画面が真っ暗になってしまう重大な遷移不具合が発生しておりました。
+                </p>
+                <p>
+                  本不具合は最新アップデート（v3.9）にて完全修正いたしました。
+                  重ねてのお詫びといたしまして、全プレイヤーの皆様へ追加で<strong className="text-yellow-300 text-base">【ネコカン 750個】</strong>をお贈りいたします。
+                </p>
+              </div>
+
+              {/* Claim Button */}
+              <div className="flex items-center justify-between flex-wrap gap-3 bg-stone-950/80 rounded-xl p-3 border border-red-500/40">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🐱🥫</span>
+                  <div>
+                    <div className="text-xs text-stone-400 font-bold">緊急お詫び配布アイテム</div>
+                    <div className="text-sm font-black text-yellow-300">ネコカン × 750個 (追加配布)</div>
+                  </div>
+                </div>
+
+                {isBlackScreenApologyClaimed ? (
+                  <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-stone-800 border border-stone-700 text-stone-400 text-xs sm:text-sm font-black">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span>受取済み</span>
+                  </div>
+                ) : (
+                  <button
+                    id="btn-claim-blackscreen-apology"
+                    onClick={handleClaimBlackScreenApology}
+                    className="px-5 sm:px-6 py-2.5 rounded-xl bg-gradient-to-r from-red-500 via-amber-400 to-yellow-400 hover:brightness-110 text-stone-950 font-black text-xs sm:text-sm shadow-[0_0_15px_rgba(239,68,68,0.5),0_3px_0_#991b1b] active:translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer animate-bounce"
+                  >
+                    <span>🎁</span>
+                    <span>緊急お詫びを受け取る (750缶)</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* ========================================================
               APOLOGY NOTICE SECTION (750 Cat Food Distribution)
              ======================================================== */}

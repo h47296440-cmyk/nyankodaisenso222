@@ -241,6 +241,7 @@ export interface StageWave {
 }
 
 export type ChapterId =
+  | 'japan_0'
   | 'japan_1'
   | 'japan_2'
   | 'japan_3'
@@ -330,6 +331,8 @@ export interface StageDefinition {
     | 'japan_volcano'
     | 'japan_zombie'
     | 'japan_standard'
+    | 'japan_zero'
+    | 'zero_field'
     | 'future_neon'
     | 'future_space'
     | 'future_zombie'

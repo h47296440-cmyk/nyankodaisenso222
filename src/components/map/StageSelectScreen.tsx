@@ -104,6 +104,8 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
       case 'japan_1':
       case 'japan':
         return true;
+      case 'japan_0':
+        return checkChapterCleared('japan_1');
       case 'japan_2':
         return checkChapterCleared('japan_1');
       case 'japan_3':
@@ -301,6 +303,9 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
     return baseList.filter((st) => {
       if (st.id === 'cosmos_3_filibuster') {
         return checkChapterCleared('legend_8');
+      }
+      if (st.id === 'japan_0_zerofield') {
+        return !!profile.clearedStages['japan_0_8'] || checkChapterCleared('japan_0');
       }
       return true;
     });

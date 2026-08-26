@@ -391,6 +391,55 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
           </div>
         );
 
+      case 'japan_zero':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-slate-900 to-rose-950 overflow-hidden pointer-events-none">
+            {/* Ominous Red Primordial Sun */}
+            <div className="absolute top-6 right-24 w-28 h-28 rounded-full bg-gradient-to-br from-red-600 via-rose-800 to-black border border-red-500/50 shadow-[0_0_50px_rgba(239,68,68,0.6)] animate-pulse" />
+            <div className="absolute top-20 left-1/4 w-80 h-32 bg-red-950/40 rounded-full blur-2xl" />
+            {/* Distant Japanese Ancient Mountains */}
+            <svg
+              className="absolute bottom-12 left-0 w-full h-36 opacity-60 text-stone-950 fill-current"
+              viewBox="0 0 1000 100"
+              preserveAspectRatio="none"
+            >
+              <polygon points="0,100 120,35 280,70 450,25 650,75 820,30 1000,100" />
+            </svg>
+            <svg
+              className="absolute bottom-12 left-0 w-full h-24 opacity-40 text-rose-950 fill-current"
+              viewBox="0 0 1000 100"
+              preserveAspectRatio="none"
+            >
+              <polygon points="0,100 180,45 350,80 520,40 720,65 900,35 1000,100" />
+            </svg>
+          </div>
+        );
+
+      case 'zero_field':
+        return (
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-[#0d0118] to-[#1e052d] overflow-hidden pointer-events-none">
+            {/* Massive Primordial Cosmic Singularity Core */}
+            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[360px] bg-gradient-to-r from-red-600/30 via-purple-600/40 to-cyan-500/30 rounded-full blur-3xl animate-pulse" />
+            {/* Celestial Halo & Event Horizon */}
+            <div className="absolute top-12 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full border-2 border-rose-500/40 shadow-[0_0_80px_rgba(244,63,94,0.7)] animate-spin" style={{ animationDuration: '20s' }} />
+            <div className="absolute top-16 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full border-2 border-cyan-400/40 shadow-[0_0_60px_rgba(34,211,238,0.5)] animate-spin" style={{ animationDirection: 'reverse', animationDuration: '15s' }} />
+            {/* Floating Space & Time Shards */}
+            {Array.from({ length: 20 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute bg-gradient-to-t from-rose-400 to-purple-300 rotate-45 opacity-60 animate-pulse"
+                style={{
+                  left: `${(i * 31 + 7) % 100}%`,
+                  top: `${(i * 23 + 11) % 75}%`,
+                  width: `${(i % 4) + 3}px`,
+                  height: `${(i % 4) + 3}px`,
+                  animationDuration: `${1.5 + (i % 4) * 0.5}s`,
+                }}
+              />
+            ))}
+          </div>
+        );
+
       default:
         // Classic Battle Cats Sky & Plains (Matching Screenshot)
         return (
@@ -440,6 +489,10 @@ export const BattleCanvas: React.FC<BattleCanvasProps> = ({
         return 'bg-gradient-to-r from-purple-950 via-stone-900 to-red-950 border-rose-800';
       case 'japan_zombie':
         return 'bg-gradient-to-r from-purple-950 via-emerald-950 to-stone-900 border-purple-800';
+      case 'japan_zero':
+        return 'bg-gradient-to-r from-stone-950 via-rose-950 to-stone-900 border-rose-800';
+      case 'zero_field':
+        return 'bg-gradient-to-r from-[#030005] via-[#240038] to-[#030005] border-rose-500';
       case 'aku_dimension':
       case 'aku_realm':
       case 'aku_inferno':
