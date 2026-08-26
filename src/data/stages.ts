@@ -4581,7 +4581,7 @@ export const CHAPTERS: ChapterDefinition[] = [
   // ==========================================
   {
     id: 'aku_realm_1',
-    category: 'special',
+    category: 'makai',
     chapterNumber: 1,
     name: '魔界編 第1章「暗黒の幕開け」',
     jpName: '魔界編 第1章「暗黒の幕開け」',
@@ -4720,7 +4720,7 @@ export const CHAPTERS: ChapterDefinition[] = [
   },
   {
     id: 'aku_realm_2',
-    category: 'special',
+    category: 'makai',
     chapterNumber: 2,
     name: '魔界編 第2章「邪神の胎動」',
     jpName: '魔界編 第2章「邪神の胎動」',
@@ -4862,7 +4862,7 @@ export const CHAPTERS: ChapterDefinition[] = [
   },
   {
     id: 'aku_realm_3',
-    category: 'special',
+    category: 'makai',
     chapterNumber: 3,
     name: '魔界編 第3章「終焉の魔界門」',
     jpName: '魔界編 第3章「終焉の魔界門」',
@@ -6250,7 +6250,7 @@ export const CHAPTERS: ChapterDefinition[] = [
     subtitle: '【真レジェ1章クリアで解放】狂乱キャラを第三形態（大狂乱）へと覚醒させる超極ムズ降臨戦！',
     bannerBg: 'from-purple-950 via-slate-950 to-red-950',
     bossName: '大狂乱の神影',
-    bossSprite: 'enemy_crazed_titan',
+    bossSprite: 'enemy_manic_titan',
     stages: [
       {
         id: 'manic_stage_1',
@@ -6274,8 +6274,8 @@ export const CHAPTERS: ChapterDefinition[] = [
         stageLoreTip: 'HP1,800,000＆神速移動の大狂乱モヒカン！クリアで「大狂乱のネコモヒカン」進化解放！',
         waves: [
           { timeSeconds: 1.0, enemyId: 'enemy_doge', count: 30, interval: 0.8 },
-          { timeSeconds: 3.0, enemyId: 'enemy_crazed_basic', count: 5, interval: 3.0 },
-          { timeSeconds: 0, enemyId: 'enemy_crazed_basic', count: 1, interval: 0, castleHpThreshold: 99, boss: true },
+          { timeSeconds: 2.0, enemyId: 'enemy_manic_cat', count: 1, interval: 0, boss: true },
+          { timeSeconds: 5.0, enemyId: 'enemy_crazed_basic', count: 8, interval: 4.0 },
         ],
         bossAlert: '大狂乱警報！ 【大狂乱のネコモヒカン】降臨！！ 神速で戦場を切り裂く！',
       },
@@ -6301,8 +6301,8 @@ export const CHAPTERS: ChapterDefinition[] = [
         stageLoreTip: 'HP2,400,000＆超射程メガパンチ！クリアで「大狂乱のゴムネコ」進化解放！',
         waves: [
           { timeSeconds: 1.0, enemyId: 'enemy_snache', count: 30, interval: 0.8 },
-          { timeSeconds: 4.0, enemyId: 'enemy_crazed_tank', count: 3, interval: 6.0 },
-          { timeSeconds: 0, enemyId: 'enemy_crazed_tank', count: 1, interval: 0, castleHpThreshold: 99, boss: true },
+          { timeSeconds: 3.0, enemyId: 'enemy_manic_tank', count: 1, interval: 0, boss: true },
+          { timeSeconds: 6.0, enemyId: 'enemy_crazed_tank', count: 5, interval: 8.0 },
         ],
         bossAlert: '大狂乱警報！ 【大狂乱のゴムネコ】降臨！！ 鉄壁の城壁が立ち塞がる！',
       },
@@ -6328,7 +6328,8 @@ export const CHAPTERS: ChapterDefinition[] = [
         stageLoreTip: '暗黒闘気で切り刻む大狂乱暗黒ネコ！クリアで「大狂乱の暗黒ネコ」進化解放！',
         waves: [
           { timeSeconds: 1.0, enemyId: 'enemy_red_snake', count: 25, interval: 1.0 },
-          { timeSeconds: 0, enemyId: 'enemy_crazed_axe', count: 1, interval: 0, castleHpThreshold: 99, boss: true },
+          { timeSeconds: 2.5, enemyId: 'enemy_manic_axe', count: 1, interval: 0, boss: true },
+          { timeSeconds: 8.0, enemyId: 'enemy_red_seal', count: 4, interval: 6.0 },
         ],
         bossAlert: '大狂乱警報！ 【大狂乱の暗黒ネコ】降臨！！ 紅蓮の刃が唸る！',
       },
@@ -6353,8 +6354,8 @@ export const CHAPTERS: ChapterDefinition[] = [
         difficultyLabel: '極ムズ',
         stageLoreTip: '確定Lv4波動の連打！クリアで「大狂乱のムキあしネコ」進化解放！',
         waves: [
-          { timeSeconds: 1.0, enemyId: 'enemy_crazed_gross', count: 8, interval: 4.0 },
-          { timeSeconds: 0, enemyId: 'enemy_crazed_gross', count: 1, interval: 0, castleHpThreshold: 99, boss: true },
+          { timeSeconds: 1.0, enemyId: 'enemy_manic_gross', count: 1, interval: 0, boss: true },
+          { timeSeconds: 4.0, enemyId: 'enemy_manic_gross', count: 8, interval: 5.0 },
         ],
         bossAlert: '大狂乱警報！ 【大狂乱のムキあしネコ】大連隊出現！ 波動無効キャラで対抗せよ！',
       },
@@ -6379,8 +6380,8 @@ export const CHAPTERS: ChapterDefinition[] = [
         difficultyLabel: '極ムズ',
         stageLoreTip: '超神速ラッシュで城を削り落とす獅子王！クリアで「大狂乱のライオン」進化解放！',
         waves: [
-          { timeSeconds: 1.0, enemyId: 'enemy_crazed_cow', count: 15, interval: 2.0 },
-          { timeSeconds: 0, enemyId: 'enemy_crazed_cow', count: 1, interval: 0, castleHpThreshold: 99, boss: true },
+          { timeSeconds: 1.0, enemyId: 'enemy_manic_cow', count: 1, interval: 0, boss: true },
+          { timeSeconds: 3.0, enemyId: 'enemy_manic_cow', count: 15, interval: 2.0 },
         ],
         bossAlert: '大狂乱警報！ 【大狂乱のライオン】超大群が猛突進！！ 肉壁を絶やさず生産せよ！',
       },
@@ -6405,8 +6406,9 @@ export const CHAPTERS: ChapterDefinition[] = [
         difficultyLabel: '極ムズ',
         stageLoreTip: '超長射程メガレーザーの空爆母艦！クリアで「大狂乱の天空のネコ」進化解放！',
         waves: [
-          { timeSeconds: 1.0, enemyId: 'enemy_crazed_bird', count: 3, interval: 8.0 },
-          { timeSeconds: 0, enemyId: 'enemy_crazed_bird', count: 1, interval: 0, castleHpThreshold: 99, boss: true },
+          { timeSeconds: 1.0, enemyId: 'enemy_snache', count: 20, interval: 1.0 },
+          { timeSeconds: 3.0, enemyId: 'enemy_manic_bird', count: 1, interval: 0, boss: true },
+          { timeSeconds: 10.0, enemyId: 'enemy_crazed_bird', count: 3, interval: 8.0 },
         ],
         bossAlert: '大狂乱警報！ 【大狂乱の天空のネコ】降臨！！ 超絶威力の爆撃を潜り抜けろ！',
       },
@@ -6431,8 +6433,8 @@ export const CHAPTERS: ChapterDefinition[] = [
         difficultyLabel: '極ムズ',
         stageLoreTip: '火山島と化した凶暴魚！クリアで「大狂乱のネコ島」進化解放！',
         waves: [
-          { timeSeconds: 1.0, enemyId: 'enemy_crazed_fish', count: 10, interval: 3.0 },
-          { timeSeconds: 0, enemyId: 'enemy_crazed_fish', count: 1, interval: 0, castleHpThreshold: 99, boss: true },
+          { timeSeconds: 1.0, enemyId: 'enemy_manic_fish', count: 1, interval: 0, boss: true },
+          { timeSeconds: 3.0, enemyId: 'enemy_manic_fish', count: 10, interval: 3.5 },
         ],
         bossAlert: '大狂乱警報！ 【大狂乱のネコ島】大群出現！！ クリティカルバイトに注意！',
       },
@@ -6457,8 +6459,9 @@ export const CHAPTERS: ChapterDefinition[] = [
         difficultyLabel: '極ムズ',
         stageLoreTip: '射程430超長距離火炎の竜王！クリアで「大狂乱のネコキングドラゴン」進化解放！',
         waves: [
-          { timeSeconds: 1.0, enemyId: 'enemy_crazed_lizard', count: 3, interval: 10.0 },
-          { timeSeconds: 0, enemyId: 'enemy_crazed_lizard', count: 1, interval: 0, castleHpThreshold: 99, boss: true },
+          { timeSeconds: 1.0, enemyId: 'enemy_doge', count: 20, interval: 1.0 },
+          { timeSeconds: 3.0, enemyId: 'enemy_manic_lizard', count: 1, interval: 0, boss: true },
+          { timeSeconds: 12.0, enemyId: 'enemy_manic_lizard', count: 2, interval: 12.0 },
         ],
         bossAlert: '大狂乱警報！ 【大狂乱のネコキングドラゴン】降臨！！ 灼熱の超長距離砲！',
       },
@@ -6484,7 +6487,7 @@ export const CHAPTERS: ChapterDefinition[] = [
         stageLoreTip: 'HP3,000,000＆40%超破滅Lv4波動！クリアで「大狂乱のネコジャラミ」進化解放！',
         waves: [
           { timeSeconds: 1.0, enemyId: 'enemy_shadow_boxer', count: 3, interval: 6.0 },
-          { timeSeconds: 0, enemyId: 'enemy_crazed_titan', count: 1, interval: 0, castleHpThreshold: 99, boss: true },
+          { timeSeconds: 3.0, enemyId: 'enemy_manic_titan', count: 1, interval: 0, boss: true },
         ],
         bossAlert: '大狂乱警報！ 【大狂乱のネコジャラミ】降臨！！ 破滅の波動パンチが大地を砕く！',
       }

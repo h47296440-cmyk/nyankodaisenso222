@@ -1,16 +1,41 @@
 import React, { useState } from 'react';
+import { PlayerProfile } from '../../types';
 import { audio } from '../../utils/audio';
-import { X, Bell, Sparkles, Flame, ShieldAlert, Award, ChevronRight, Calendar } from 'lucide-react';
+import { X, Bell, Sparkles, Flame, ShieldAlert, Gift, CheckCircle2 } from 'lucide-react';
 
 interface AnnouncementsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  profile?: PlayerProfile;
+  onUpdateProfile?: (updater: (prev: PlayerProfile) => PlayerProfile) => void;
 }
 
-export const AnnouncementsModal: React.FC<AnnouncementsModalProps> = ({ isOpen, onClose }) => {
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'event' | 'update'>('all');
+export const AnnouncementsModal: React.FC<AnnouncementsModalProps> = ({
+  isOpen,
+  onClose,
+  profile,
+  onUpdateProfile,
+}) => {
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'apology' | 'event' | 'update'>('all');
 
   if (!isOpen) return null;
+
+  const isApologyClaimed = !!profile?.claimedApologies?.['bug_apology_750'];
+
+  const handleClaimApology = () => {
+    if (isApologyClaimed) return;
+    audio.playVictory();
+    if (onUpdateProfile) {
+      onUpdateProfile((prev) => ({
+        ...prev,
+        catFood: prev.catFood + 750,
+        claimedApologies: {
+          ...(prev.claimedApologies || {}),
+          bug_apology_750: true,
+        },
+      }));
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 animate-fadeIn">
@@ -44,13 +69,13 @@ export const AnnouncementsModal: React.FC<AnnouncementsModalProps> = ({ isOpen, 
         </div>
 
         {/* Category Filter Tabs */}
-        <div className="bg-stone-950/80 px-4 py-2 border-b border-stone-800 flex gap-2">
+        <div className="bg-stone-950/80 px-4 py-2 border-b border-stone-800 flex gap-2 overflow-x-auto">
           <button
             onClick={() => {
               audio.playClick();
               setSelectedCategory('all');
             }}
-            className={`px-3 py-1 rounded-full text-xs font-black transition-all ${
+            className={`px-3 py-1 rounded-full text-xs font-black transition-all whitespace-nowrap ${
               selectedCategory === 'all'
                 ? 'bg-amber-500 text-stone-950 shadow'
                 : 'bg-stone-800 text-stone-300 hover:bg-stone-700'
@@ -61,9 +86,22 @@ export const AnnouncementsModal: React.FC<AnnouncementsModalProps> = ({ isOpen, 
           <button
             onClick={() => {
               audio.playClick();
+              setSelectedCategory('apology');
+            }}
+            className={`px-3 py-1 rounded-full text-xs font-black transition-all whitespace-nowrap ${
+              selectedCategory === 'apology'
+                ? 'bg-rose-600 text-white shadow ring-2 ring-rose-400'
+                : 'bg-rose-950/60 text-rose-300 border border-rose-600/50 hover:bg-rose-900/60'
+            }`}
+          >
+            🎁 不具合のお詫び (750缶)
+          </button>
+          <button
+            onClick={() => {
+              audio.playClick();
               setSelectedCategory('event');
             }}
-            className={`px-3 py-1 rounded-full text-xs font-black transition-all ${
+            className={`px-3 py-1 rounded-full text-xs font-black transition-all whitespace-nowrap ${
               selectedCategory === 'event'
                 ? 'bg-red-600 text-white shadow'
                 : 'bg-stone-800 text-stone-300 hover:bg-stone-700'
@@ -76,7 +114,7 @@ export const AnnouncementsModal: React.FC<AnnouncementsModalProps> = ({ isOpen, 
               audio.playClick();
               setSelectedCategory('update');
             }}
-            className={`px-3 py-1 rounded-full text-xs font-black transition-all ${
+            className={`px-3 py-1 rounded-full text-xs font-black transition-all whitespace-nowrap ${
               selectedCategory === 'update'
                 ? 'bg-emerald-600 text-white shadow'
                 : 'bg-stone-800 text-stone-300 hover:bg-stone-700'
@@ -88,6 +126,75 @@ export const AnnouncementsModal: React.FC<AnnouncementsModalProps> = ({ isOpen, 
 
         {/* Content Body */}
         <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-6">
+          {/* ========================================================
+              APOLOGY NOTICE SECTION (750 Cat Food Distribution)
+             ======================================================== */}
+          {(selectedCategory === 'all' || selectedCategory === 'apology') && (
+            <div
+              id="notice-bug-apology"
+              className="relative rounded-2xl overflow-hidden border-2 border-rose-500 bg-gradient-to-br from-rose-950 via-stone-900 to-black p-4 sm:p-5 shadow-2xl"
+            >
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-2xl bg-rose-600/30 border border-rose-500 text-rose-400 flex items-center justify-center font-black shrink-0">
+                    <Gift className="w-6 h-6 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] bg-rose-600 text-white px-2 py-0.5 rounded font-black">
+                        重要・お詫び
+                      </span>
+                      <span className="text-xs text-rose-300 font-mono">2026.08.26</span>
+                    </div>
+                    <h3 className="text-base sm:text-lg font-black text-rose-200">
+                      多数のバグを引き起こしてしまい申し訳ございませんでした
+                    </h3>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-black/60 rounded-xl p-3.5 border border-rose-900/60 mb-4 text-xs sm:text-sm text-stone-200 leading-relaxed space-y-2">
+                <p className="font-bold text-rose-300">
+                  プレイヤーの皆様へ
+                </p>
+                <p>
+                  この度は、大狂乱ステージでボスが出現しない不具合、第3形態のテクスチャ表示不具合、記録欄オープン時のクラッシュ、マタタビ・キャッツアイ消費判定、およびステージ分類の誤りなど、多数の不具合によりご迷惑をおかけしてしまい大変申し訳ございませんでした。
+                </p>
+                <p>
+                  本不具合は最新アップデート（v3.8）にてすべて修正完了いたしました。
+                  お詫びといたしまして、全プレイヤーの皆様へ<strong className="text-yellow-300 text-base">【ネコカン 750個】</strong>をお贈りいたします。
+                </p>
+              </div>
+
+              {/* Claim Button */}
+              <div className="flex items-center justify-between flex-wrap gap-3 bg-stone-950/80 rounded-xl p-3 border border-rose-500/40">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🐱🥫</span>
+                  <div>
+                    <div className="text-xs text-stone-400 font-bold">お詫び配布アイテム</div>
+                    <div className="text-sm font-black text-yellow-300">ネコカン × 750個</div>
+                  </div>
+                </div>
+
+                {isApologyClaimed ? (
+                  <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-stone-800 border border-stone-700 text-stone-400 text-xs sm:text-sm font-black">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span>受取済み</span>
+                  </div>
+                ) : (
+                  <button
+                    id="btn-claim-bug-apology"
+                    onClick={handleClaimApology}
+                    className="px-5 sm:px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:brightness-110 text-stone-950 font-black text-xs sm:text-sm shadow-[0_0_15px_rgba(245,158,11,0.5),0_3px_0_#b45309] active:translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer animate-bounce"
+                  >
+                    <span>🎁</span>
+                    <span>お詫びを受け取る</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* ========================================================
               FEATURED ARTWORK: レジェンドストーリー終結 記念イラストSVG
              ======================================================== */}

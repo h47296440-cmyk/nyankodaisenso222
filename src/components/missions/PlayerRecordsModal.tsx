@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Trophy, Clock, Coins, Swords, Users, Skull, Sparkles, Award, ShieldCheck, Flame } from 'lucide-react';
 import { PlayerProfile } from '../../types';
+import { calculateUserRank } from '../../utils/storage';
 import { audio } from '../../utils/audio';
 
 interface PlayerRecordsModalProps {
@@ -16,7 +17,7 @@ export const PlayerRecordsModal: React.FC<PlayerRecordsModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  // Calculate stats formatting
+  // Calculate stats formatting safely with fallback values
   const totalSeconds = profile.stats?.playTimeSeconds || 0;
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -25,13 +26,18 @@ export const PlayerRecordsModal: React.FC<PlayerRecordsModalProps> = ({
 
   const totalStagesCleared = Object.values(profile.clearedStages || {}).filter(Boolean).length;
   const totalTreasures = Object.values(profile.treasures || {}).filter((t) => t === 'gold').length;
-  const totalCatsUnlocked = profile.unlockedCatIds.length;
+  const totalCatsUnlocked = Object.values(profile.cats || {}).filter((c: any) => c && c.unlocked).length;
+  const userRank = calculateUserRank(profile);
+
+  const battlesFought = profile.stats?.totalBattles || 0;
+  const battlesWon = profile.stats?.totalVictories || 0;
+  const winRate = battlesFought > 0 ? Math.round((battlesWon / battlesFought) * 100) : 0;
 
   const statCards = [
     {
       id: 'user_rank',
       label: 'ユーザーランク',
-      value: `${profile.userRank} UR`,
+      value: `${userRank} UR`,
       subtext: '育成や進化でランクアップ！',
       icon: <Trophy className="text-yellow-400" size={24} />,
       bg: 'from-amber-950/80 to-yellow-950/80 border-yellow-500/50',
@@ -63,12 +69,8 @@ export const PlayerRecordsModal: React.FC<PlayerRecordsModalProps> = ({
     {
       id: 'battles_count',
       label: '総出撃回数',
-      value: `${(profile.stats?.battlesFought || 0).toLocaleString()} 回`,
-      subtext: `勝利数: ${(profile.stats?.battlesWon || 0).toLocaleString()} 回 (勝率 ${
-        profile.stats?.battlesFought
-          ? Math.round(((profile.stats.battlesWon || 0) / profile.stats.battlesFought) * 100)
-          : 0
-      }%)`,
+      value: `${battlesFought.toLocaleString()} 回`,
+      subtext: `勝利数: ${battlesWon.toLocaleString()} 回 (勝率 ${winRate}%)`,
       icon: <Swords className="text-rose-400" size={24} />,
       bg: 'from-rose-950/80 to-red-950/80 border-rose-500/50',
     },
@@ -140,6 +142,7 @@ export const PlayerRecordsModal: React.FC<PlayerRecordsModalProps> = ({
           </div>
 
           <button
+            id="btn-close-player-records"
             onClick={() => {
               audio.playClick();
               onClose();
@@ -188,6 +191,7 @@ export const PlayerRecordsModal: React.FC<PlayerRecordsModalProps> = ({
             🐾 毎回の戦闘終了時に自動で戦歴が記録・集計されます
           </div>
           <button
+            id="btn-bottom-close-player-records"
             onClick={() => {
               audio.playClick();
               onClose();

@@ -602,6 +602,8 @@ export default function App() {
         {/* Announcements / News Modal */}
         <AnnouncementsModal
           isOpen={showAnnouncementsModal}
+          profile={profile}
+          onUpdateProfile={handleUpdateProfile}
           onClose={() => setShowAnnouncementsModal(false)}
         />
 

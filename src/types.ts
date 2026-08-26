@@ -389,7 +389,7 @@ export interface BattleActiveItems {
 
 export interface ChapterDefinition {
   id: ChapterId;
-  category: 'japan' | 'future' | 'cosmos' | 'legend' | 'crazed' | 'special' | 'advent' | 'real_legend' | 'matatabi' | 'catseye' | 'manic';
+  category: 'japan' | 'future' | 'cosmos' | 'legend' | 'crazed' | 'special' | 'advent' | 'real_legend' | 'matatabi' | 'catseye' | 'manic' | 'makai';
   chapterNumber: number;
   name: string;
   jpName: string;
@@ -596,6 +596,7 @@ export interface PlayerProfile {
   catseyes?: Record<string, number>; // ex, rare, super_rare, uber_rare, legend_rare
   catfruits?: Record<string, number>; // green, purple, red, blue, yellow, rainbow, ancient, aku, seeds
   unlockedTrueForms?: Record<string, boolean>; // catId -> boolean (マタタビ進化・大狂乱進化)
+  claimedApologies?: Record<string, boolean>; // お詫び受取済み記録
   inputMode?: 'touch' | 'gamepad';
 }
 

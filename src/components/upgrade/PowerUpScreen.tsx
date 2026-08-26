@@ -61,15 +61,26 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
     }
 
     const rarityKey = selectedCatDef.rarity;
-    const catseyeCount = profile.catseyes?.[rarityKey] ?? (isInfiniteXp ? 99 : 5); // default supply or from stages
+    const catseyeCount = (profile.catseyes?.[rarityKey] || 0) + (profile.catseyes?.['all'] || 0);
+
+    if (!isInfiniteXp && catseyeCount <= 0) {
+      alert(`【キャッツアイ不足】\n${selectedCatDef.rarity.toUpperCase()} または共通のキャッツアイがありません！\nキャッツアイステージをクリアして手に入れてにゃ！`);
+      return;
+    }
 
     audio.playVictory();
     onUpdateProfile((prev) => {
       const cur = prev.cats[selectedCatId] || { catId: selectedCatId, level: 30, unlocked: true, activeForm: 0 };
       const nextMax = Math.min(40, (cur.maxLevelUnlocked || 30) + 1);
-      const updatedCatseyes = prev.catseyes
-        ? { ...prev.catseyes, [rarityKey]: Math.max(0, (prev.catseyes[rarityKey] || 0) - 1) }
-        : undefined;
+      
+      let updatedCatseyes = { ...(prev.catseyes || {}) };
+      if (!isInfiniteXp) {
+        if ((updatedCatseyes[rarityKey] || 0) > 0) {
+          updatedCatseyes[rarityKey] = Math.max(0, updatedCatseyes[rarityKey] - 1);
+        } else if ((updatedCatseyes['all'] || 0) > 0) {
+          updatedCatseyes['all'] = Math.max(0, updatedCatseyes['all'] - 1);
+        }
+      }
 
       return {
         ...prev,
@@ -95,11 +106,52 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
       alert('第3形態への進化には Lv.30 が必要だにゃ！');
       return;
     }
+
+    // Check Catfruit requirement or Manic stage requirement
+    const isManicUnit = selectedCatId.startsWith('cat_crazed_');
+    const requiredManicStageId = selectedCatDef.requiredStageId || '';
+    const hasClearedManicStage = !!profile.clearedStages?.[requiredManicStageId];
+
+    const rainbowFruit: number = profile.catfruits?.['rainbow'] ?? 0;
+    const totalFruit: number = Object.values(profile.catfruits || {}).reduce<number>((a, b) => a + (Number(b) || 0), 0);
+    const hasEnoughFruit: boolean = rainbowFruit >= 1 || totalFruit >= 5;
+
+    if (!isInfiniteXp && !hasClearedManicStage && !hasEnoughFruit) {
+      alert(
+        `【進化素材不足】\n第3形態への進化には以下が必要です：\n` +
+        `・大狂乱ステージクリア または\n` +
+        `・マタタビ（虹のマタタビ×1 または マタタビ×5）\n\n` +
+        `マタタビステージまたは大狂乱ステージで入手してにゃ！`
+      );
+      return;
+    }
+
     audio.playVictory();
     onUpdateProfile((prev) => {
       const cur = prev.cats[selectedCatId] || { catId: selectedCatId, level: 30, unlocked: true, activeForm: 0 };
+      
+      // Deduct catfruit if user didn't clear the manic stage (or consume 1 rainbow fruit)
+      let updatedCatfruits = { ...(prev.catfruits || {}) };
+      if (!isInfiniteXp && !hasClearedManicStage) {
+        if ((updatedCatfruits['rainbow'] || 0) >= 1) {
+          updatedCatfruits['rainbow'] -= 1;
+        } else {
+          // Consume 5 of any fruits
+          let toConsume = 5;
+          for (const key of Object.keys(updatedCatfruits)) {
+            if (updatedCatfruits[key] > 0) {
+              const take = Math.min(toConsume, updatedCatfruits[key]);
+              updatedCatfruits[key] -= take;
+              toConsume -= take;
+              if (toConsume <= 0) break;
+            }
+          }
+        }
+      }
+
       return {
         ...prev,
+        catfruits: updatedCatfruits,
         unlockedTrueForms: {
           ...prev.unlockedTrueForms,
           [selectedCatId]: true,

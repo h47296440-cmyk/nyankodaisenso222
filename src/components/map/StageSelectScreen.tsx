@@ -70,7 +70,7 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
   const [hasWatchedMovie, setHasWatchedMovie] = useState<boolean>(false);
 
   // Category filter for the chapter select menu
-  const [activeCategoryTab, setActiveCategoryTab] = useState<'all' | 'japan' | 'future' | 'cosmos' | 'legend' | 'special' | 'crazed' | 'advent'>('all');
+  const [activeCategoryTab, setActiveCategoryTab] = useState<'all' | 'japan' | 'future' | 'cosmos' | 'legend' | 'makai' | 'special' | 'crazed' | 'advent'>('all');
 
   const isInfiniteEnergy = !!profile.devMode?.infiniteEnergy;
   const isInfiniteXp = !!profile.devMode?.infiniteXp;
@@ -775,7 +775,8 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                 { id: 'future' as const, label: '未来編' },
                 { id: 'cosmos' as const, label: '宇宙編' },
                 { id: 'legend' as const, label: 'レジェンド' },
-                { id: 'special' as const, label: '魔界編' },
+                { id: 'makai' as const, label: '魔界編' },
+                { id: 'special' as const, label: 'マタタビ・育成' },
                 { id: 'crazed' as const, label: '狂乱祭' },
                 { id: 'advent' as const, label: '降臨BOSS' },
               ].map((tab) => (
@@ -858,6 +859,12 @@ export const StageSelectScreen: React.FC<StageSelectScreenProps> = ({
                               ? '宇宙編'
                               : ch.category === 'legend'
                               ? 'レジェンドストーリー'
+                              : ch.category === 'makai'
+                              ? '魔界編'
+                              : ch.category === 'special'
+                              ? '育成・イベント'
+                              : ch.category === 'crazed'
+                              ? '狂乱の祭典'
                               : '降臨イベント'}
                           </span>
                           {ch.category === 'crazed' && (
