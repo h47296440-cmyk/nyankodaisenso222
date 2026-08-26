@@ -3,7 +3,7 @@ import React from 'react';
 interface UnitSpriteProps {
   spriteType: string;
   isCat: boolean;
-  state: 'walk' | 'attack' | 'knockback' | 'die' | 'burrow' | 'revive';
+  state: 'walk' | 'attack' | 'knockback' | 'die' | 'burrow' | 'revive' | 'charge';
   animTimer: number;
   scale?: number;
   isAttackingWindup?: boolean;

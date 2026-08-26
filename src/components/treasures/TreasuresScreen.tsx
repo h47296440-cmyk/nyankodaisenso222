@@ -10,7 +10,7 @@ interface TreasuresScreenProps {
 }
 
 export const TreasuresScreen: React.FC<TreasuresScreenProps> = ({ profile, onBack }) => {
-  const [selectedChapterId, setSelectedChapterId] = useState<'japan' | 'future' | 'cosmos'>('japan');
+  const [selectedChapterId, setSelectedChapterId] = useState<string>('japan');
 
   const currentChapter = CHAPTERS.find((c) => c.id === selectedChapterId) || CHAPTERS[0];
 

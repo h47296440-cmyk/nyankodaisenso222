@@ -470,7 +470,7 @@ export const PowerUpScreen: React.FC<PowerUpScreenProps> = ({
               const prog = profile.cats[cat.id] || { catId: cat.id, level: 1, unlocked: false, activeForm: 0 };
               const isSelected = selectedCatId === cat.id;
               const isInDeck = profile.deck.includes(cat.id);
-              const form = cat.forms[prog.activeForm || 0];
+              const form = cat.forms[prog.activeForm || 0] || cat.forms[0];
               const cost = getCatLevelUpCost(cat.rarity, prog.level);
               const isMax = prog.level >= maxLevel;
 

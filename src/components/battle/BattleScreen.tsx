@@ -182,12 +182,12 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   // Start Battle Music on Mount
   useEffect(() => {
     audio.unlockAudio();
-    audio.startBattleBgm(stage.chapterId || stage.chapter, false, stage.isFinalBossStage, stage.id, stage.bgType);
+    audio.startBattleBgm(stage.chapterId, false, stage.isFinalBossStage, stage.id, stage.bgType);
 
     return () => {
       audio.stopBattleBgm();
     };
-  }, [stage.chapter, stage.chapterId, stage.isFinalBossStage, stage.id, stage.bgType]);
+  }, [stage.chapterId, stage.isFinalBossStage, stage.id, stage.bgType]);
 
   // Main 60FPS Game Loop
   useEffect(() => {
@@ -390,7 +390,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     const slot = deckSlotDefs.find((s) => s.def.id === catId);
     if (!slot || moneyRef.current < slot.cost || (deckCooldownsRef.current[catId] || 0) > 0) return;
 
-    const form = slot.def.forms[slot.activeFormIndex];
+    const form = slot.def.forms?.[slot.activeFormIndex] || slot.def.forms?.[0] || CAT_DEFINITIONS[0].forms[0];
     const catLevel = profile.cats[catId]?.level || 1;
     const levelMult = 1 + (catLevel - 1) * 0.1;
 
@@ -776,8 +776,8 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       }
 
       // Handle Filibuster / Charge Attack Boss Mechanics
-      if (enemy.abilities?.chargeAttack && enemy.state !== 'burrow' && enemy.state !== 'revive') {
-        if (enemy.state === 'knockback') {
+      if (enemy.abilities?.chargeAttack && (enemy.state as string) !== 'burrow' && (enemy.state as string) !== 'revive') {
+        if ((enemy.state as string) === 'knockback') {
           // Being knocked back interrupts and cancels the current charge!
           enemy.chargeTimer = enemy.abilities.chargeAttack.chargeTime;
           enemy.isCharging = false;
@@ -1523,8 +1523,8 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const handleTestSound = useCallback(() => {
     audio.unlockAudio();
     audio.playTestTone();
-    audio.startBattleBgm(stage.chapterId || stage.chapter, false, stage.isFinalBossStage, stage.id, stage.bgType);
-  }, [stage.chapter, stage.chapterId, stage.isFinalBossStage, stage.id, stage.bgType]);
+    audio.startBattleBgm(stage.chapterId, false, stage.isFinalBossStage, stage.id, stage.bgType);
+  }, [stage.chapterId, stage.isFinalBossStage, stage.id, stage.bgType]);
 
   // Controller / Switch bindings
   const handleDeploySlotByIndex = useCallback(
@@ -1640,7 +1640,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
               catFoodEarned: 0,
               treasureDropped: null,
             });
-            audio.startBattleBgm(stage.chapter, false, stage.isFinalBossStage);
+            audio.startBattleBgm(stage.chapterId, false, stage.isFinalBossStage, stage.id, stage.bgType);
           }}
           hasNextStage={hasNextStage}
         />

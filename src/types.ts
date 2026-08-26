@@ -420,6 +420,7 @@ export interface PlayerUpgrades {
 export interface PlayerCatProgress {
   catId: string;
   level: number; // 1 to 40
+  plusLevel?: number; // プラス値 (+1 ~ +10)
   unlocked: boolean;
   activeForm: number; // 0: 1st, 1: 2nd, 2: 3rd (True Form)
   maxLevelUnlocked?: number; // 30 by default, up to 40 via Catseyes!
@@ -520,6 +521,8 @@ export interface AchievementDefinition {
 export interface PlayerStats {
   totalBattles: number;
   totalVictories: number;
+  battlesFought?: number;
+  battlesWon?: number;
   totalGachaPulls: number;
   totalCatsUpgraded: number;
   totalBaseUpgrades: number;
@@ -561,6 +564,8 @@ export interface PvpFriendRecord {
 
 export interface PlayerProfile {
   playerName?: string; // プレイヤー名（司令官ネーム）
+  userRank?: number;
+  facilities?: Record<string, number>;
   xp: number;
   catFood: number;
   energy: number;

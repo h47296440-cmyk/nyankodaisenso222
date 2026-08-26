@@ -50,16 +50,16 @@ export const DeckFormationModal: React.FC<DeckFormationModalProps> = ({
     if (filterRarity === 'traits') {
       const form1 = cat.forms[0];
       const form2 = cat.forms[1];
-      return !!(form1.traitBonus || form1.abilities || form1.waveLevel || form2.traitBonus || form2.abilities || form2.waveLevel);
+      return !!(form1?.traitBonus || form1?.abilities || form1?.waveLevel || form2?.traitBonus || form2?.abilities || form2?.waveLevel);
     }
     return cat.rarity === filterRarity;
   }).sort((a, b) => {
     const progA = profile.cats[a.id];
     const progB = profile.cats[b.id];
-    const formA = a.forms[progA?.activeForm || 0];
-    const formB = b.forms[progB?.activeForm || 0];
+    const formA = a.forms[progA?.activeForm || 0] || a.forms[0];
+    const formB = b.forms[progB?.activeForm || 0] || b.forms[0];
 
-    if (sortBy === 'cost') return formA.cost - formB.cost;
+    if (sortBy === 'cost') return (formA?.cost || 0) - (formB?.cost || 0);
     if (sortBy === 'level') return (progB?.level || 1) - (progA?.level || 1);
     return 0;
   });
@@ -159,14 +159,14 @@ export const DeckFormationModal: React.FC<DeckFormationModalProps> = ({
   const deckCosts = profile.deck.map((catId) => {
     const def = CAT_DEFINITIONS.find((c) => c.id === catId);
     const prog = profile.cats[catId];
-    return def ? def.forms[prog?.activeForm || 0].cost : 0;
+    return def ? (def.forms[prog?.activeForm || 0] || def.forms[0]).cost : 0;
   });
   const avgCost = Math.round(deckCosts.reduce((a, b) => a + b, 0) / Math.max(1, profile.deck.length));
 
   // Selected Cat inspection
   const inspectingCat = CAT_DEFINITIONS.find((c) => c.id === selectedCatDetailId);
   const inspectingProg = inspectingCat ? profile.cats[inspectingCat.id] : null;
-  const inspectingForm = inspectingCat ? inspectingCat.forms[inspectingProg?.activeForm || 0] : null;
+  const inspectingForm = inspectingCat ? (inspectingCat.forms[inspectingProg?.activeForm || 0] || inspectingCat.forms[0]) : null;
 
   return (
     <div
@@ -245,7 +245,7 @@ export const DeckFormationModal: React.FC<DeckFormationModalProps> = ({
               const isSelected = selectedSlotIndex === idx;
 
               if (!def) return null;
-              const form = def.forms[prog?.activeForm || 0];
+              const form = def.forms[prog?.activeForm || 0] || def.forms[0];
 
               return (
                 <button
@@ -411,7 +411,7 @@ export const DeckFormationModal: React.FC<DeckFormationModalProps> = ({
               const prog = profile.cats[cat.id];
               const isInDeck = profile.deck.includes(cat.id);
               const deckIndex = profile.deck.indexOf(cat.id);
-              const form = cat.forms[prog?.activeForm || 0];
+              const form = cat.forms[prog?.activeForm || 0] || cat.forms[0];
               const isSelected = selectedCatDetailId === cat.id;
 
               return (

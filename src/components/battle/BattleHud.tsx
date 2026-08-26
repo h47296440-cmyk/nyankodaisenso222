@@ -323,7 +323,9 @@ export const BattleHud: React.FC<BattleHudProps> = ({
           {/* Center: Cat Deployment Deck (10 slots in 2 rows of 5) */}
           <div className="flex-1 grid grid-cols-5 grid-rows-2 gap-1 sm:gap-2 min-w-0">
             {deckCats.map((slot, index) => {
-              const form = slot.def.forms[slot.activeFormIndex];
+              if (!slot || !slot.def) return null;
+              const form = slot.def.forms?.[slot.activeFormIndex] || slot.def.forms?.[0];
+              if (!form) return null;
               const canAfford = money >= slot.cost;
               const isOnCooldown = slot.cooldownRemaining > 0;
               const canSpawn = canAfford && !isOnCooldown;

@@ -48,7 +48,7 @@ export const StorageModal: React.FC<StorageModalProps> = ({
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
               {unlockedCats.map((cat) => {
                 const prog = profile.cats[cat.id];
-                const form = cat.forms[prog?.activeForm || 0];
+                const form = cat.forms[prog?.activeForm || 0] || cat.forms[0];
 
                 return (
                   <div

@@ -16,7 +16,7 @@ interface BattleCanvasProps {
   isCannonFiring: boolean;
   cannonProgress: number;
   cameraX: number;
-  setCameraX: (fn: (prev: number) => number | number) => void;
+  setCameraX: React.Dispatch<React.SetStateAction<number>> | ((val: number | ((prev: number) => number)) => void);
   bossAlert: string | null;
 }
 

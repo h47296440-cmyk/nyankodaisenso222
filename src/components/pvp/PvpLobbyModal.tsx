@@ -217,7 +217,14 @@ export const PvpLobbyModal: React.FC<PvpLobbyModalProps> = ({
       peerId: myPeerId,
       deck: deckUnits,
       treasures: profile.treasures,
-      facilities: profile.facilities,
+      facilities: {
+        workerEfficiency: profile.upgrades?.workerCatRate || 1,
+        workerWallet: profile.upgrades?.workerCatWallet || 1,
+        castleHealth: profile.upgrades?.castleHealth || 1,
+        cannonPower: profile.upgrades?.cannonPower || 1,
+        cannonChargeRate: profile.upgrades?.cannonCharge || 1,
+        xpBonus: profile.upgrades?.accounting || 1,
+      },
       profile: profile,
     };
   };

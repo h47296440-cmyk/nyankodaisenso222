@@ -28,6 +28,7 @@ import { AncientPearlMovieModal } from './components/story/AncientPearlMovieModa
 import { AnnouncementsModal } from './components/announcements/AnnouncementsModal';
 import { PvpLobbyModal, PvpConnectionPayload } from './components/pvp/PvpLobbyModal';
 import { PvpBattleScreen } from './components/pvp/PvpBattleScreen';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { audio } from './utils/audio';
 
 type AppView = 'title' | 'base' | 'map' | 'battle' | 'upgrade' | 'gacha' | 'treasures' | 'encyclopedia';
@@ -173,13 +174,17 @@ export default function App() {
       const nextCats = { ...prev.cats };
 
       if (result.victory) {
-        nextClearedStages[activeStage.id] = true;
+        nextClearedStages[activeStage.id] = {
+          stars: (prev.clearedStages[activeStage.id]?.stars || 0) + 1,
+          highscore: Math.max(prev.clearedStages[activeStage.id]?.highscore || 0, result.scoreAttackScore || 0),
+        };
 
         // Unlock stage-specific reward characters (e.g. Crazed Series)
         if (activeStage.rewardCatUnlockId) {
           const unlockId = activeStage.rewardCatUnlockId;
           if (!nextCats[unlockId]) {
             nextCats[unlockId] = {
+              catId: unlockId,
               unlocked: true,
               level: 1,
               plusLevel: 0,
@@ -192,6 +197,7 @@ export default function App() {
         if (activeStage.id === 'future_zombie_3' || activeStage.rewardCatUnlockId === 'valkyrie_true_form') {
           if (!nextCats['cat_valkyrie']) {
             nextCats['cat_valkyrie'] = {
+              catId: 'cat_valkyrie',
               unlocked: true,
               level: 20,
               plusLevel: 0,
@@ -417,16 +423,18 @@ export default function App() {
               />
             )}
 
-            {currentView === 'battle' && activeStage && (
-              <BattleScreen
-                stage={activeStage}
-                profile={profile}
-                activeItems={battleActiveItems}
-                onBattleEnd={handleBattleEnd}
-                onExit={() => setCurrentView('map')}
-                onNextStage={nextStage ? handleNextStage : undefined}
-                hasNextStage={!!nextStage}
-              />
+            {currentView === 'battle' && (
+              <ErrorBoundary fallbackView={() => setCurrentView('map')} componentName="BattleScreen">
+                <BattleScreen
+                  stage={activeStage || CHAPTERS[0].stages[0]}
+                  profile={profile}
+                  activeItems={battleActiveItems}
+                  onBattleEnd={handleBattleEnd}
+                  onExit={() => setCurrentView('map')}
+                  onNextStage={nextStage ? handleNextStage : undefined}
+                  hasNextStage={!!nextStage}
+                />
+              </ErrorBoundary>
             )}
 
             {currentView === 'upgrade' && (
